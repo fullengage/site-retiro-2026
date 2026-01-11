@@ -6,14 +6,13 @@ import { supabase } from '../lib/supabase'
 interface GalleryImage {
     id: string
     url: string
-    label: string | null
-    position_top: string | null
+    label: string
+    position_top: string
     position_left: string | null
     position_right: string | null
     rotate: number
     z_index: number
     aspect_ratio: string
-    is_polaroid: boolean
     width_class: string
 }
 
@@ -27,17 +26,78 @@ const GallerySection = () => {
     }, [])
 
     const fetchImages = async () => {
-        const { data, error } = await supabase
-            .from('gallery_images')
-            .select('*')
-            .order('created_at', { ascending: true })
+        try {
+            const { data: files, error } = await supabase
+                .storage
+                .from('site-assets')
+                .list('gallery', {
+                    limit: 100,
+                    offset: 0,
+                    sortBy: { column: 'name', order: 'asc' }
+                })
 
-        if (error) {
-            console.error('Error fetching gallery:', error)
-        } else {
-            setImages(data || [])
+            if (error) {
+                console.error('Error fetching gallery:', error)
+                setLoading(false)
+                return
+            }
+
+            if (!files || files.length === 0) {
+                console.log('No images found in gallery folder')
+                setLoading(false)
+                return
+            }
+
+            const imageFiles = files.filter(file => 
+                file.name.match(/\.(jpg|jpeg|png|gif|webp)$/i)
+            )
+
+            const positions = [
+                { top: '6%', left: '45%', right: null, rotate: 3, z: 30, aspect: 'aspect-square', width: 'w-48', label: 'Adoração 2023' },
+                { top: '5%', left: '5%', right: null, rotate: -12, z: 10, aspect: 'aspect-square', width: 'w-48', label: 'Adoração 2025' },
+                { top: '10%', left: '25%', right: null, rotate: 6, z: 20, aspect: 'aspect-[4/3]', width: 'w-56', label: 'Festa Neon 2025' },
+                { top: '2%', left: null, right: '15%', rotate: 12, z: 10, aspect: 'aspect-square', width: 'w-40', label: 'Louvor' },
+                { top: '12%', left: null, right: '2%', rotate: -6, z: 20, aspect: 'aspect-square', width: 'w-48', label: 'Comunhão' },
+                { top: '30%', left: '10%', right: null, rotate: -3, z: 30, aspect: 'aspect-video', width: 'w-64', label: 'Adoração' },
+                { top: '28%', left: '30%', right: null, rotate: 12, z: 10, aspect: 'aspect-square', width: 'w-44', label: 'Alegria' },
+                { top: '25%', left: null, right: '30%', rotate: 6, z: 20, aspect: 'aspect-square', width: 'w-48', label: 'Fé' },
+                { top: '35%', left: null, right: '5%', rotate: -9, z: 15, aspect: 'aspect-square', width: 'w-52', label: 'Esperança' },
+                { top: '50%', left: '5%', right: null, rotate: 8, z: 25, aspect: 'aspect-[4/3]', width: 'w-56', label: 'Partilha' },
+                { top: '48%', left: '35%', right: null, rotate: -5, z: 20, aspect: 'aspect-square', width: 'w-48', label: 'Oração' },
+                { top: '55%', left: null, right: '15%', rotate: 7, z: 18, aspect: 'aspect-square', width: 'w-44', label: 'Celebração' },
+                { top: '65%', left: '15%', right: null, rotate: -8, z: 22, aspect: 'aspect-video', width: 'w-60', label: 'Encontro' },
+                { top: '70%', left: '45%', right: null, rotate: 4, z: 16, aspect: 'aspect-square', width: 'w-48', label: 'Amizade' },
+                { top: '68%', left: null, right: '8%', rotate: -6, z: 19, aspect: 'aspect-square', width: 'w-52', label: 'Gratidão' },
+            ]
+
+            const galleryImages: GalleryImage[] = imageFiles.map((file, index) => {
+                const { data: publicUrlData } = supabase
+                    .storage
+                    .from('site-assets')
+                    .getPublicUrl(`gallery/${file.name}`)
+
+                const pos = positions[index % positions.length]
+
+                return {
+                    id: file.name,
+                    url: publicUrlData.publicUrl,
+                    label: pos.label,
+                    position_top: pos.top,
+                    position_left: pos.left,
+                    position_right: pos.right,
+                    rotate: pos.rotate,
+                    z_index: pos.z,
+                    aspect_ratio: pos.aspect,
+                    width_class: pos.width
+                }
+            })
+
+            setImages(galleryImages)
+        } catch (err) {
+            console.error('Unexpected error:', err)
+        } finally {
+            setLoading(false)
         }
-        setLoading(false)
     }
 
     return (
