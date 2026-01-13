@@ -53,21 +53,31 @@ const GallerySection = () => {
             )
 
             const positions = [
-                { top: '6%', left: '45%', right: null, rotate: 3, z: 30, aspect: 'aspect-square', width: 'w-48', label: 'Adoração 2023' },
-                { top: '5%', left: '5%', right: null, rotate: -12, z: 10, aspect: 'aspect-square', width: 'w-48', label: 'Adoração 2025' },
-                { top: '10%', left: '25%', right: null, rotate: 6, z: 20, aspect: 'aspect-[4/3]', width: 'w-56', label: 'Festa Neon 2025' },
-                { top: '2%', left: null, right: '15%', rotate: 12, z: 10, aspect: 'aspect-square', width: 'w-40', label: 'Louvor' },
-                { top: '12%', left: null, right: '2%', rotate: -6, z: 20, aspect: 'aspect-square', width: 'w-48', label: 'Comunhão' },
-                { top: '30%', left: '10%', right: null, rotate: -3, z: 30, aspect: 'aspect-video', width: 'w-64', label: 'Adoração' },
-                { top: '28%', left: '30%', right: null, rotate: 12, z: 10, aspect: 'aspect-square', width: 'w-44', label: 'Alegria' },
-                { top: '25%', left: null, right: '30%', rotate: 6, z: 20, aspect: 'aspect-square', width: 'w-48', label: 'Fé' },
-                { top: '35%', left: null, right: '5%', rotate: -9, z: 15, aspect: 'aspect-square', width: 'w-52', label: 'Esperança' },
-                { top: '50%', left: '5%', right: null, rotate: 8, z: 25, aspect: 'aspect-[4/3]', width: 'w-56', label: 'Partilha' },
-                { top: '48%', left: '35%', right: null, rotate: -5, z: 20, aspect: 'aspect-square', width: 'w-48', label: 'Oração' },
-                { top: '55%', left: null, right: '15%', rotate: 7, z: 18, aspect: 'aspect-square', width: 'w-44', label: 'Celebração' },
-                { top: '65%', left: '15%', right: null, rotate: -8, z: 22, aspect: 'aspect-video', width: 'w-60', label: 'Encontro' },
-                { top: '70%', left: '45%', right: null, rotate: 4, z: 16, aspect: 'aspect-square', width: 'w-48', label: 'Amizade' },
-                { top: '68%', left: null, right: '8%', rotate: -6, z: 19, aspect: 'aspect-square', width: 'w-52', label: 'Gratidão' },
+                { top: '3%', left: '7%', right: null, rotate: -12, z: 10, aspect: 'aspect-square', width: 'w-48', label: 'Adoração' },
+                { top: '2%', left: '25%', right: null, rotate: 6, z: 20, aspect: 'aspect-[4/3]', width: 'w-56', label: 'Momento Maria 2023' },
+                { top: '2%', left: '46%', right: null, rotate: 3, z: 30, aspect: 'aspect-square', width: 'w-48', label: 'Familia UniVersos' },
+                { top: '5%', left: '65%', right: null, rotate: 12, z: 15, aspect: 'aspect-square', width: 'w-40', label: 'Tribus!' },
+                { top: '8%', left: null, right: '8%', rotate: -6, z: 20, aspect: 'aspect-square', width: 'w-48', label: 'Presença' },
+                { top: '18%', left: '8%', right: null, rotate: -3, z: 30, aspect: 'aspect-video', width: 'w-64', label: 'Festividade' },
+                { top: '23%', left: '30%', right: null, rotate: 12, z: 10, aspect: 'aspect-square', width: 'w-44', label: 'Momentos' },
+                { top: '24%', left: '55%', right: null, rotate: 6, z: 20, aspect: 'aspect-square', width: 'w-48', label: 'Oração' },
+                { top: '30%', left: null, right: '12%', rotate: -2, z: 40, aspect: 'aspect-[4/3]', width: 'w-52', label: 'Baile de Mascaras 2025' },
+                { top: '30%', left: '10%', right: null, rotate: -6, z: 30, aspect: 'aspect-square', width: 'w-56', label: 'Alegria!' },
+                { top: '28%', left: '38%', right: null, rotate: 3, z: 20, aspect: 'aspect-[3/4]', width: 'w-52', label: 'Partilha' },
+                { top: '54%', left: '55%', right: null, rotate: -6, z: 30, aspect: 'aspect-square', width: 'w-44', label: 'Família' },
+                { top: '52%', left: null, right: '7%', rotate: -2, z: 40, aspect: 'aspect-video', width: 'w-72', label: 'Caravana Urupes 2025' },
+                { top: '60%', left: '10%', right: null, rotate: 2, z: 30, aspect: 'aspect-video', width: 'w-56', label: 'Unidos' },
+                { top: '57%', left: '35%', right: null, rotate: 12, z: 20, aspect: 'aspect-square', width: 'w-44', label: 'Homenagem 2025' },
+                { top: '77%', left: '52%', right: null, rotate: -8, z: 22, aspect: 'aspect-[4/3]', width: 'w-72', label: 'Vida Nova' },
+                { top: '75%', left: null, right: '8%', rotate: 5, z: 25, aspect: 'aspect-square', width: 'w-48', label: 'Fogueira 2023' },
+                { top: '77%', left: '8%', right: null, rotate: -10, z: 15, aspect: 'aspect-[4/3]', width: 'w-56', label: 'Gratidão' },
+                { top: '80%', left: '30%', right: null, rotate: 8, z: 35, aspect: 'aspect-square', width: 'w-48', label: 'Paz' },
+                { top: '56%', left: '50%', right: null, rotate: -4, z: 28, aspect: 'aspect-video', width: 'w-64', label: 'Carnaval 2023!' },
+                { top: '50%', left: null, right: '10%', rotate: 7, z: 18, aspect: 'aspect-square', width: 'w-44', label: 'Fé' },
+                { top: '68%', left: '12%', right: null, rotate: -7, z: 32, aspect: 'aspect-square', width: 'w-52', label: 'Amor' },
+                { top: '66%', left: '35%', right: null, rotate: 4, z: 24, aspect: 'aspect-[3/4]', width: 'w-48', label: 'Renovação' },
+                { top: '70%', left: '58%', right: null, rotate: -9, z: 26, aspect: 'aspect-video', width: 'w-60', label: 'Celebração' },
+                { top: '64%', left: null, right: '8%', rotate: 11, z: 20, aspect: 'aspect-square', width: 'w-48', label: 'Transformação' },
             ]
 
             const galleryImages: GalleryImage[] = imageFiles.map((file, index) => {
@@ -128,20 +138,26 @@ const GallerySection = () => {
                                     drag
                                     dragConstraints={{ left: -100, right: 100, top: -100, bottom: 100 }}
                                     whileHover={{ scale: 1.1, zIndex: 100 }}
+                                    initial={{
+                                        rotate: img.rotate
+                                    }}
                                     style={{
-                                        top: img.position_top || 'auto',
+                                        top: img.position_top,
                                         left: img.position_left || 'auto',
                                         right: img.position_right || 'auto',
-                                        zIndex: img.z_index,
-                                        transform: `rotate(${img.rotate}deg)`
+                                        zIndex: img.z_index
                                     }}
-                                    className={`polaroid absolute ${img.width_class} bg-white transform cursor-pointer flex flex-col shadow-2xl`}
+                                    className={`polaroid absolute ${img.width_class} bg-white cursor-pointer flex flex-col shadow-2xl p-2 ${img.label ? 'pb-10' : 'pb-2'}`}
                                     onClick={() => setSelectedImg(img.url)}
                                 >
                                     <div className={`${img.aspect_ratio} bg-gray-200 overflow-hidden`}>
-                                        <img src={img.url} className="w-full h-full object-cover" alt={img.label || 'Gallery image'} />
+                                        <img src={img.url} className="w-full h-full object-cover" alt={img.label || 'Galeria'} />
                                     </div>
-                                    {img.label && <div className="font-marker text-xl text-center mt-2 text-black">{img.label}</div>}
+                                    {img.label && (
+                                        <div className={`font-marker ${img.label === 'HOLI 2026!' ? 'text-2xl text-red-600 mt-3' : 'text-lg text-black mt-2'} text-center`}>
+                                            {img.label}
+                                        </div>
+                                    )}
                                 </motion.div>
                             ))}
                         </>

@@ -4,10 +4,10 @@ import { supabase } from '../lib/supabase'
 import {
     User, Mail, Calendar, Phone, MapPin,
     Home, CheckCircle, Package, Shirt,
-    ArrowRight, Loader2, Sparkles, CreditCard
+    ArrowRight, Loader2, Sparkles, CreditCard, Upload, FileCheck
 } from 'lucide-react'
 
-const TSHIRT_SIZES = ['P', 'M', 'G', 'GG', 'XG', 'BABYLOOK P', 'BABYLOOK M', 'BABYLOOK G']
+const TSHIRT_SIZES = ['P', 'M', 'G', 'GG', 'XG']
 const PARISHES = [
     'Paróquia São José da Santíssima Trindade',
     'Paróquia Santa Clara de Assis',
@@ -19,6 +19,10 @@ const RegistrationPage = () => {
     const [loading, setLoading] = useState(false)
     const [submitted, setSubmitted] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const [registrationId, setRegistrationId] = useState<string | null>(null)
+    const [receiptFile, setReceiptFile] = useState<File | null>(null)
+    const [uploadingReceipt, setUploadingReceipt] = useState(false)
+    const [receiptUploaded, setReceiptUploaded] = useState(false)
 
     const [formData, setFormData] = useState({
         email: '',
@@ -33,6 +37,8 @@ const RegistrationPage = () => {
         staying_on_site: false,
         kit_option: 'Kit 01 - Inscrição (R$ 30,00)',
         tshirt_size: '',
+        tshirt_size_2: '',
+        payment_receipt_url: ''
     })
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -45,29 +51,82 @@ const RegistrationPage = () => {
         }
     }
 
+    const handleReceiptUpload = async () => {
+        if (!receiptFile || !registrationId) return
+        
+        setUploadingReceipt(true)
+        setError(null)
+
+        try {
+            const fileExt = receiptFile.name.split('.').pop()
+            const fileName = `${Date.now()}_${formData.email.replace(/[^a-zA-Z0-9]/g, '_')}.${fileExt}`
+            const filePath = `${fileName}`
+
+            const { error: uploadError } = await supabase.storage
+                .from('pagamentos')
+                .upload(filePath, receiptFile, {
+                    cacheControl: '3600',
+                    upsert: false
+                })
+
+            if (uploadError) {
+                throw new Error('Erro ao fazer upload. Tente novamente ou envie pelo WhatsApp.')
+            }
+
+            const { data: { publicUrl } } = supabase.storage
+                .from('pagamentos')
+                .getPublicUrl(filePath)
+
+            const { error: updateError } = await supabase
+                .from('event_registrations')
+                .update({ payment_receipt_url: publicUrl })
+                .eq('id', registrationId)
+
+            if (updateError) {
+                throw new Error('Erro ao salvar comprovante')
+            }
+
+            setReceiptUploaded(true)
+        } catch (err: any) {
+            console.error('Upload error:', err)
+            setError(err.message || 'Erro ao enviar comprovante')
+        } finally {
+            setUploadingReceipt(false)
+        }
+    }
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setLoading(true)
         setError(null)
 
         try {
-            const payment_amount = formData.kit_option.includes('70') ? 70 : 30
+            let payment_amount = 30
+            if (formData.kit_option.includes('160')) payment_amount = 160
+            else if (formData.kit_option.includes('80')) payment_amount = 80
+            else if (formData.kit_option.includes('30')) payment_amount = 30
 
-            const { error: insertError } = await supabase
+            const { data: insertData, error: insertError } = await supabase
                 .from('event_registrations')
                 .insert([{
                     ...formData,
                     payment_amount,
-                    payment_status: 'Pendente'
+                    payment_status: 'Pendente',
+                    payment_receipt_url: null
                 }])
+                .select()
 
             if (insertError) throw insertError
+            
+            if (insertData && insertData[0]) {
+                setRegistrationId(insertData[0].id)
+            }
 
             setSubmitted(true)
             window.scrollTo(0, 0)
         } catch (err: any) {
             console.error('Error submitting registration:', err)
-            setError('Ocorreu um erro ao processar sua inscrição. Por favor, tente novamente.')
+            setError(err.message || 'Ocorreu um erro ao processar sua inscrição. Por favor, tente novamente.')
         } finally {
             setLoading(false)
         }
@@ -82,7 +141,7 @@ const RegistrationPage = () => {
                     </div>
                     <h2 className="text-4xl font-black mb-6 uppercase tracking-tight">Inscrição Realizada!</h2>
                     <p className="text-gray-400 text-lg mb-10">
-                        Sua pré-inscrição foi recebida com sucesso. Para confirmar sua participação, realize o pagamento via PIX.
+                        Sua inscrição foi recebida com sucesso! <strong className="text-white">Agora realize o pagamento via PIX</strong> e envie o comprovante pelo WhatsApp.
                     </p>
 
                     <div className="bg-black/40 border border-white/5 rounded-2xl p-6 mb-10 text-left">
@@ -101,15 +160,124 @@ const RegistrationPage = () => {
                             <div>
                                 <span className="text-gray-500 text-xs block uppercase">Valor</span>
                                 <span className="text-2xl font-black text-holi-secondary">
-                                    {formData.kit_option.includes('70') ? 'R$ 70,00' : 'R$ 30,00'}
+                                    {formData.kit_option.includes('160') ? 'R$ 160,00' : 
+                                     formData.kit_option.includes('80') ? 'R$ 80,00' : 'R$ 30,00'}
                                 </span>
                             </div>
                         </div>
                     </div>
 
-                    <p className="text-sm text-gray-500 mb-8 italic">
-                        * Após realizar o pagamento, envie o comprovante para o Wagner: (11) 95550-1090
-                    </p>
+                    <div className="bg-holi-primary/10 border border-holi-primary/20 rounded-2xl p-6 mb-8">
+                        <h4 className="text-holi-primary font-black uppercase text-sm mb-3 flex items-center gap-2">
+                            <CheckCircle size={16} /> Próximos Passos
+                        </h4>
+                        <ol className="text-left text-sm text-gray-300 space-y-2">
+                            <li className="flex gap-3">
+                                <span className="text-holi-primary font-black">1.</span>
+                                <span>Realize o pagamento via PIX usando os dados acima</span>
+                            </li>
+                            <li className="flex gap-3">
+                                <span className="text-holi-primary font-black">2.</span>
+                                <span>Tire um print ou foto do comprovante de pagamento</span>
+                            </li>
+                            <li className="flex gap-3">
+                                <span className="text-holi-primary font-black">3.</span>
+                                <span><strong className="text-white">Envie o comprovante abaixo</strong> ou pelo WhatsApp: <a href="https://wa.me/5511955501090" target="_blank" className="text-holi-secondary underline font-bold">(11) 95550-1090</a></span>
+                            </li>
+                        </ol>
+                    </div>
+
+                    {/* Upload de Comprovante */}
+                    {!receiptUploaded ? (
+                        <div className="bg-black/40 border border-white/5 rounded-2xl p-6 mb-8">
+                            <h4 className="text-white font-black uppercase text-sm mb-4 flex items-center gap-2">
+                                <Upload size={16} /> Enviar Comprovante
+                            </h4>
+                            
+                            <input
+                                type="file"
+                                accept="image/*,.pdf"
+                                onChange={(e) => {
+                                    if (e.target.files && e.target.files[0]) {
+                                        const file = e.target.files[0]
+                                        if (file.size > 5 * 1024 * 1024) {
+                                            setError('O arquivo deve ter no máximo 5MB')
+                                            return
+                                        }
+                                        setReceiptFile(file)
+                                        setError(null)
+                                    }
+                                }}
+                                className="hidden"
+                                id="receipt-upload-confirm"
+                            />
+                            
+                            {!receiptFile ? (
+                                <label
+                                    htmlFor="receipt-upload-confirm"
+                                    className="flex items-center justify-center gap-3 w-full bg-black/50 border-2 border-dashed border-white/20 rounded-2xl py-8 cursor-pointer hover:border-holi-primary/50 hover:bg-white/5 transition-all"
+                                >
+                                    <Upload className="text-gray-500" size={24} />
+                                    <div className="text-center">
+                                        <p className="text-white font-bold">Clique para selecionar o comprovante</p>
+                                        <p className="text-xs text-gray-500">PNG, JPG ou PDF - Máximo 5MB</p>
+                                    </div>
+                                </label>
+                            ) : (
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-3 bg-green-500/10 border border-green-500/20 rounded-xl p-4">
+                                        <FileCheck className="text-green-500" size={24} />
+                                        <div className="flex-1">
+                                            <p className="text-white font-bold">{receiptFile.name}</p>
+                                            <p className="text-xs text-gray-500">
+                                                {(receiptFile.size / 1024).toFixed(2)} KB
+                                            </p>
+                                        </div>
+                                        <button
+                                            onClick={() => setReceiptFile(null)}
+                                            className="text-gray-500 hover:text-white text-xs underline"
+                                        >
+                                            Trocar
+                                        </button>
+                                    </div>
+                                    
+                                    <button
+                                        onClick={handleReceiptUpload}
+                                        disabled={uploadingReceipt}
+                                        className="w-full bg-holi-primary text-white font-black py-4 rounded-xl hover:bg-holi-primary/80 disabled:opacity-50 disabled:cursor-not-allowed transition-all uppercase tracking-widest flex items-center justify-center gap-2"
+                                    >
+                                        {uploadingReceipt ? (
+                                            <>
+                                                <Loader2 className="animate-spin" size={18} />
+                                                <span>Enviando...</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Upload size={18} />
+                                                <span>Enviar Comprovante</span>
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
+                            )}
+                            
+                            {error && (
+                                <div className="mt-4 bg-red-500/10 border border-red-500/20 text-red-500 p-3 rounded-xl text-xs font-bold text-center">
+                                    {error}
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <div className="bg-green-500/10 border border-green-500/20 rounded-2xl p-6 mb-8 text-center">
+                            <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <CheckCircle size={32} className="text-white" />
+                            </div>
+                            <h4 className="text-green-500 font-black uppercase text-lg mb-2">Comprovante Enviado!</h4>
+                            <p className="text-gray-400 text-sm">
+                                Seu comprovante foi recebido com sucesso. Aguarde a confirmação do pagamento.
+                            </p>
+                        </div>
+                    )}
 
                     <button
                         onClick={() => window.location.href = '/'}
@@ -333,10 +501,23 @@ const RegistrationPage = () => {
 
                         <div className="md:col-span-2 space-y-2">
                             <label className="text-xs font-bold uppercase text-gray-400 ml-1">Escolha seu Kit</label>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                 {[
-                                    { label: 'Kit 01 - Inscrição (R$ 30,00)', icon: <CheckCircle /> },
-                                    { label: 'Kit 02 - Inscrição + Camiseta (R$ 70,00)', icon: <Shirt /> }
+                                    { 
+                                        label: 'Kit 01 - Inscrição (R$ 30,00)', 
+                                        icon: <CheckCircle />,
+                                        description: 'Sem camiseta'
+                                    },
+                                    { 
+                                        label: 'Kit 02 - Inscrição + Camiseta (R$ 80,00)', 
+                                        icon: <Shirt />,
+                                        description: 'Com 1 camiseta'
+                                    },
+                                    { 
+                                        label: 'Kit 03 - Inscrição + 2 Camisetas + Kit Intocáveis (R$ 160,00)', 
+                                        icon: <Package />,
+                                        description: 'Com 2 camisetas + Kit Intocáveis'
+                                    }
                                 ].map(option => (
                                     <label key={option.label} className="flex-1">
                                         <input
@@ -352,25 +533,27 @@ const RegistrationPage = () => {
                                             <div className="mb-3 text-holi-accent flex justify-center">
                                                 {option.icon}
                                             </div>
-                                            <div className="text-sm font-black uppercase tracking-wide">{option.label}</div>
+                                            <div className="text-sm font-black uppercase tracking-wide mb-2">{option.label}</div>
+                                            <div className="text-xs text-gray-500">{option.description}</div>
                                         </div>
                                     </label>
                                 ))}
                             </div>
                         </div>
 
-                        {formData.kit_option.includes('70') && (
+                        {(formData.kit_option.includes('80') || formData.kit_option.includes('160')) && (
                             <motion.div
                                 initial={{ opacity: 0, height: 0 }}
                                 animate={{ opacity: 1, height: 'auto' }}
                                 className="md:col-span-2 space-y-2 overflow-hidden"
                             >
-                                <label className="text-xs font-bold uppercase text-gray-400 ml-1">Tamanho da Camiseta</label>
+                                <label className="text-xs font-bold uppercase text-gray-400 ml-1">
+                                    Tamanho da Camiseta {formData.kit_option.includes('160') ? '(1ª Camiseta)' : ''}
+                                </label>
                                 <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
                                     {TSHIRT_SIZES.map(size => (
                                         <label key={size}>
                                             <input
-                                                required
                                                 type="radio"
                                                 name="tshirt_size"
                                                 value={size}
@@ -379,6 +562,35 @@ const RegistrationPage = () => {
                                                 className="hidden peer"
                                             />
                                             <div className="bg-black/50 border border-white/10 rounded-lg py-3 text-center cursor-pointer hover:border-holi-primary/50 peer-checked:border-holi-primary peer-checked:bg-holi-primary text-[10px] font-black transition-all">
+                                                {size}
+                                            </div>
+                                        </label>
+                                    ))}
+                                </div>
+                            </motion.div>
+                        )}
+
+                        {formData.kit_option.includes('160') && (
+                            <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                className="md:col-span-2 space-y-2 overflow-hidden"
+                            >
+                                <label className="text-xs font-bold uppercase text-gray-400 ml-1">
+                                    Tamanho da 2ª Camiseta
+                                </label>
+                                <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
+                                    {TSHIRT_SIZES.map(size => (
+                                        <label key={size}>
+                                            <input
+                                                type="radio"
+                                                name="tshirt_size_2"
+                                                value={size}
+                                                checked={formData.tshirt_size_2 === size}
+                                                onChange={handleChange}
+                                                className="hidden peer"
+                                            />
+                                            <div className="bg-black/50 border border-white/10 rounded-lg py-3 text-center cursor-pointer hover:border-holi-secondary/50 peer-checked:border-holi-secondary peer-checked:bg-holi-secondary text-[10px] font-black transition-all">
                                                 {size}
                                             </div>
                                         </label>

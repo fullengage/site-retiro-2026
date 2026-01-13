@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
     Search, Download, Users, CheckCircle,
     XCircle, Clock, Shirt, UserCheck,
-    Filter, Edit3, X, Save, LogIn, Sun
+    Filter, Edit3, X, Save, LogIn, Sun, FileText, ExternalLink
 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 
@@ -17,10 +17,12 @@ interface Registration {
     payment_status: 'Pendente' | 'Pago' | 'Cancelado'
     assigned_angel: string | null
     tshirt_size: string | null
+    tshirt_size_2: string | null
     kit_option: string
     city: string
     payment_amount: number
     birth_date: string
+    payment_receipt_url: string | null
 }
 
 const RegistrationAdmin = () => {
@@ -260,15 +262,16 @@ const RegistrationAdmin = () => {
                                     <th className="p-6 text-[10px] font-bold uppercase tracking-widest text-gray-500">Paróquia / Cidade</th>
                                     <th className="p-6 text-[10px] font-bold uppercase tracking-widest text-gray-500">Camiseta / Kit</th>
                                     <th className="p-6 text-[10px] font-bold uppercase tracking-widest text-gray-500">Status Pagamento</th>
+                                    <th className="p-6 text-[10px] font-bold uppercase tracking-widest text-gray-500">Comprovante</th>
                                     <th className="p-6 text-[10px] font-bold uppercase tracking-widest text-gray-500">Anjo Responsável</th>
                                     <th className="p-6 text-[10px] font-bold uppercase tracking-widest text-gray-500">Ações</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-white/5">
                                 {loading ? (
-                                    <tr><td colSpan={6} className="p-12 text-center text-gray-500 font-mono">Carregando dados...</td></tr>
+                                    <tr><td colSpan={7} className="p-12 text-center text-gray-500 font-mono">Carregando dados...</td></tr>
                                 ) : filtered.length === 0 ? (
-                                    <tr><td colSpan={6} className="p-12 text-center text-gray-500 font-mono">Nenhuma inscrição encontrada.</td></tr>
+                                    <tr><td colSpan={7} className="p-12 text-center text-gray-500 font-mono">Nenhuma inscrição encontrada.</td></tr>
                                 ) : (
                                     filtered.map(reg => (
                                         <tr key={reg.id} className="hover:bg-white/5 transition-colors group">
@@ -298,6 +301,22 @@ const RegistrationAdmin = () => {
                                                         reg.payment_status === 'Pendente' ? <Clock size={10} /> : <XCircle size={10} />}
                                                     {reg.payment_status}
                                                 </div>
+                                            </td>
+                                            <td className="p-6">
+                                                {reg.payment_receipt_url ? (
+                                                    <a
+                                                        href={reg.payment_receipt_url}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="inline-flex items-center gap-2 px-3 py-2 bg-holi-primary/10 text-holi-primary border border-holi-primary/20 rounded-xl hover:bg-holi-primary hover:text-white transition-all text-xs font-bold"
+                                                    >
+                                                        <FileText size={14} />
+                                                        Ver Comprovante
+                                                        <ExternalLink size={12} />
+                                                    </a>
+                                                ) : (
+                                                    <div className="text-xs text-gray-600 italic">Sem comprovante</div>
+                                                )}
                                             </td>
                                             <td className="p-6">
                                                 <div className="flex items-center gap-2 text-sm">

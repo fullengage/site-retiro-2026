@@ -20,6 +20,7 @@ const Navbar = () => {
                         <a href="/#informacoes" className="text-gray-300 hover:text-holi-secondary transition-colors font-semibold uppercase tracking-wider text-sm">Informações</a>
                         <Link to="/cronograma" className="text-gray-300 hover:text-holi-accent transition-colors font-semibold uppercase tracking-wider text-sm">Cronograma</Link>
                         <a href="/#galeria" className="text-gray-300 hover:text-white transition-colors font-semibold uppercase tracking-wider text-sm">Galeria</a>
+                        <Link to="/doacoes" className="text-gray-300 hover:text-holi-primary transition-colors font-semibold uppercase tracking-wider text-sm">Doações</Link>
                         <Link to="/inscricao" className="bg-gradient-to-r from-holi-primary to-purple-600 hover:from-purple-600 hover:to-holi-primary text-white px-6 py-2.5 rounded-full font-bold transition-all hover:scale-105 shadow-[0_0_15px_rgba(217,70,239,0.5)] uppercase tracking-wide text-sm">
                             INSCREVA-SE
                         </Link>

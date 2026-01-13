@@ -85,20 +85,20 @@ const Newspaper = () => {
                         >
                             {/* Standard Newspaper Card */}
                             {item.type === 'standard' && (
-                                <div className="text-gray-900">
-                                    <div className="border-b-2 border-black/40 mb-6 pb-2 flex justify-between items-end">
-                                        <span className="font-news font-bold italic text-xl text-black/80">{item.subtitle}</span>
-                                        {item.tag && <span className="font-mono text-xs font-black text-black/60 tracking-tighter">{item.tag}</span>}
+                                <div className={item.bg.includes('black') || item.bg.includes('gray-900') || item.bg.includes('holi-dark') ? 'text-white' : 'text-gray-900'}>
+                                    <div className={`border-b-2 ${item.bg.includes('black') || item.bg.includes('gray-900') || item.bg.includes('holi-dark') ? 'border-white/40' : 'border-black/40'} mb-6 pb-2 flex justify-between items-end`}>
+                                        <span className={`font-news font-bold italic text-xl ${item.bg.includes('black') || item.bg.includes('gray-900') || item.bg.includes('holi-dark') ? 'text-white/80' : 'text-black/80'}`}>{item.subtitle}</span>
+                                        {item.tag && <span className={`font-mono text-xs font-black ${item.bg.includes('black') || item.bg.includes('gray-900') || item.bg.includes('holi-dark') ? 'text-white/60' : 'text-black/60'} tracking-tighter`}>{item.tag}</span>}
                                     </div>
-                                    <h3 className="font-news font-black text-4xl leading-[0.85] mb-6 uppercase tracking-tighter text-black">{item.title}</h3>
-                                    <div className="font-news text-[15px] text-justify leading-snug mb-6 text-gray-800">
-                                        <span className="float-left text-6xl font-black mr-3 mt-[-8px] font-display text-black">
+                                    <h3 className={`font-news font-black text-4xl leading-[0.85] mb-6 uppercase tracking-tighter ${item.bg.includes('black') || item.bg.includes('gray-900') || item.bg.includes('holi-dark') ? 'text-white' : 'text-black'}`}>{item.title}</h3>
+                                    <div className={`font-news text-[15px] text-justify leading-snug mb-6 ${item.bg.includes('black') || item.bg.includes('gray-900') || item.bg.includes('holi-dark') ? 'text-gray-200' : 'text-gray-800'}`}>
+                                        <span className={`float-left text-6xl font-black mr-3 mt-[-8px] font-display ${item.bg.includes('black') || item.bg.includes('gray-900') || item.bg.includes('holi-dark') ? 'text-white' : 'text-black'}`}>
                                             {item.content?.charAt(0)}
                                         </span>
                                         {item.content?.substring(1)}
                                     </div>
-                                    <div className="w-full h-1.5 bg-black/20 mb-1"></div>
-                                    <div className="w-full h-0.5 bg-black/20"></div>
+                                    <div className={`w-full h-1.5 ${item.bg.includes('black') || item.bg.includes('gray-900') || item.bg.includes('holi-dark') ? 'bg-white/20' : 'bg-black/20'} mb-11`}></div>
+                                    <div className={`w-full h-0.5 ${item.bg.includes('black') || item.bg.includes('gray-900') || item.bg.includes('holi-dark') ? 'bg-white/20' : 'bg-black/20'}`}></div>
                                     {item.marker && (
                                         <div className="absolute bottom-4 right-4 text-holi-secondary font-marker text-2xl rotate-[-5deg] drop-shadow-sm">{item.marker}</div>
                                     )}

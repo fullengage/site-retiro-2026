@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, useLocation, Link } from 'react-router-dom'
 import { useEffect } from 'react'
 import Navbar from './components/Navbar'
 import Background from './components/Background'
@@ -42,6 +42,14 @@ function AppContent() {
                 <footer className="py-12 bg-holi-surface border-t border-white/10 relative z-10">
                     <div className="max-w-7xl mx-auto px-4 text-center">
                         <div className="font-marker text-2xl mb-8">RETIRO DE CARNAVAL 2026</div>
+
+                        <div className="flex flex-wrap justify-center gap-8 mb-8 font-mono text-sm uppercase tracking-widest text-gray-400">
+                            <Link to="/doacoes" className="hover:text-holi-primary transition-colors">Doações</Link>
+                            <a href="/#noticias" className="hover:text-holi-secondary transition-colors">Notícias</a>
+                            <Link to="/cronograma" className="hover:text-holi-accent transition-colors">Cronograma</Link>
+                            <a href="/#sobre" className="hover:text-white transition-colors">Sobre Nós</a>
+                        </div>
+
                         <div className="flex justify-center space-x-6 mb-8 text-gray-400">
                             <a href="#" className="hover:text-holi-primary transition-colors">
                                 <i className="fab fa-instagram text-2xl"></i>
