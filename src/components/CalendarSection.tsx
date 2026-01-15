@@ -24,11 +24,11 @@ const CalendarSection = () => {
                             </div>
                             <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-holi-primary via-holi-accent to-holi-secondary"></div>
                         </motion.div>
-                        <a href="#" className="mt-8 inline-flex items-center gap-2 text-holi-secondary hover:text-white font-bold uppercase tracking-widest transition-colors relative group">
+                        <Link to="/em-breve" className="mt-8 inline-flex items-center gap-2 text-holi-secondary hover:text-white font-bold uppercase tracking-widest transition-colors relative group">
                             <CalendarIcon size={16} />
                             <span>Cronograma do evento</span>
                             <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-holi-secondary transition-all group-hover:w-full"></span>
-                        </a>
+                        </Link>
                     </div>
 
                     <div className="bg-white/5 backdrop-blur-md p-8 md:p-12 rounded-[2rem] shadow-xl border border-white/10 relative">
@@ -37,16 +37,18 @@ const CalendarSection = () => {
                         </h2>
                         <ul className="space-y-6 mb-10">
                             {[
-                                { batch: "PRIMEIRO LOTE", dates: "10 JAN - 25 JAN" },
-                                { batch: "SEGUNDO LOTE", dates: "25 JAN - 07 FEV" },
-                                { batch: "TERCEIRO LOTE", dates: "07 FEV - 10 FEV" }
+                                { batch: "PRIMEIRO LOTE", dates: "10 JAN - 25 JAN", status: "Liberado" },
+                                { batch: "SEGUNDO LOTE", dates: "25 JAN - 07 FEV", status: "EM BREVE" },
+                                { batch: "TERCEIRO LOTE", dates: "07 FEV - 10 FEV", status: "EM BREVE" }
                             ].map((item, idx) => (
                                 <li key={idx} className={`flex items-center justify-between ${idx !== 2 ? 'border-b border-white/10 pb-4' : 'pb-4'}`}>
                                     <div>
-                                        <span className="text-xl font-bold text-gray-500 block">{item.batch}</span>
-                                        <span className="text-xs text-gray-600 font-mono">{item.dates}</span>
+                                        <span className={`text-xl font-bold block ${item.status === 'Liberado' ? 'text-white' : 'text-gray-500'}`}>{item.batch}</span>
+                                        <span className={`text-xs font-mono ${item.status === 'Liberado' ? 'text-holi-accent' : 'text-gray-600'}`}>{item.dates}</span>
                                     </div>
-                                    <span className="text-gray-500 font-bold text-sm bg-white/5 px-3 py-1 rounded-lg">EM BREVE</span>
+                                    <span className={`font-bold text-sm px-3 py-1 rounded-lg ${item.status === 'Liberado' ? 'bg-holi-accent text-gray-900' : 'bg-white/5 text-gray-500'}`}>
+                                        {item.status}
+                                    </span>
                                 </li>
                             ))}
                         </ul>

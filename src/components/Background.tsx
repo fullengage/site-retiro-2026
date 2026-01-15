@@ -10,15 +10,8 @@ const Background = () => (
             style={{ clipPath: 'polygon(39% 0%, 100% 38%, 82% 100%, 8% 82%, 0% 38%)' }}></div>
         <div className="ink-drop w-24 h-24 bg-holi-secondary top-[45%] right-[20%] opacity-20 mix-blend-screen"
             style={{ clipPath: 'circle(50% at 50% 50%)', transform: 'scale(1.5, 1)' }}></div>
-        <div className="ink-drop w-40 h-40 bg-holi-accent top-[75%] left-[5%] opacity-10 mix-blend-screen"
-            style={{ clipPath: 'ellipse(50% 40% at 50% 50%)', transform: 'rotate(45deg)' }}></div>
-        <div className="ink-drop w-16 h-16 bg-holi-green top-[30%] left-[40%] opacity-20 mix-blend-overlay rounded-full blur-md"></div>
-        <div className="ink-drop w-64 h-64 bg-purple-600 bottom-[10%] right-[30%] opacity-10 mix-blend-overlay filter blur-3xl"></div>
-
-        {/* Blurred Color Blobs */}
-        <div className="absolute top-[20%] left-[30%] w-64 h-64 bg-holi-primary rounded-full mix-blend-overlay filter blur-[90px] opacity-20"></div>
-        <div className="absolute bottom-[40%] right-[20%] w-72 h-72 bg-holi-secondary rounded-full mix-blend-overlay filter blur-[80px] opacity-15"></div>
-        <div className="absolute top-[80%] left-[10%] w-96 h-96 bg-holi-accent rounded-full mix-blend-overlay filter blur-[100px] opacity-10"></div>
+        {/* Ink drops and blobs with contextless colors removed per user request */}
+        <div className="ink-drop w-16 h-16 bg-purple-600 bottom-[10%] right-[30%] opacity-10 mix-blend-overlay filter blur-3xl"></div>
 
         {/* Noise Texture Overlay */}
         <div className="absolute inset-0 bg-noise opacity-10 pointer-events-none"></div>

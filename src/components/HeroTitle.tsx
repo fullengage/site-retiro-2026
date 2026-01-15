@@ -57,12 +57,8 @@ const HeroTitle = () => (
                         </div>
                         <div className="absolute top-0 inset-x-0 h-8 bg-holi-dark z-20 rounded-b-2xl w-48 mx-auto border-b border-x border-white/20"></div>
                         <div className="w-full h-full rounded-[2.5rem] overflow-hidden relative">
-                            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCIQl5k1_4LOwSxdj8_d5wqJD9MG5zXYQ_e_sArmByNMbiLM1kJv_CN_1PzwacGsB2Ot9h3vK2FrFZkqxgLrftVcAnJYX00T2Bwa1smCpQqIQkQxrWq3wJFmbyNGn84NKUtrgHWBFY_BIseI6V7On4wBKqnKQHoKCTC9u4ie7-xQS21xerCqrQJgkpL7KMaRdaZBjm-8Cv8WiWEjZ_zStuCccb3C1kR12x8WeZhklIgJZ50jUwu1SPyweSOBYNpa1P4OBvqUaec_F6i" className="w-full h-full object-cover opacity-90 group-hover:scale-110 transition-transform duration-700" alt="Holi Fest" />
+                            <img src="/celular.jpg" className="w-full h-full object-cover opacity-90 group-hover:scale-110 transition-transform duration-700" alt="Celular" />
                             <div className="absolute inset-0 bg-gradient-to-t from-holi-primary/80 via-transparent to-transparent mix-blend-overlay"></div>
-                            <div className="absolute bottom-0 inset-x-0 p-8 bg-gradient-to-t from-black via-black/80 to-transparent text-white z-10">
-                                <h3 className="font-black text-3xl uppercase text-holi-accent mb-1 drop-shadow-md">Holi Fest</h3>
-                                <p className="text-sm text-gray-200 font-semibold">O sobrenatural em cores!</p>
-                            </div>
                         </div>
                     </motion.div>
                 </div>

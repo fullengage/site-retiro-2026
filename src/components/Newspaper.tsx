@@ -85,20 +85,20 @@ const Newspaper = () => {
                         >
                             {/* Standard Newspaper Card */}
                             {item.type === 'standard' && (
-                                <div className={item.bg.includes('black') || item.bg.includes('gray-900') || item.bg.includes('holi-dark') ? 'text-white' : 'text-gray-900'}>
-                                    <div className={`border-b-2 ${item.bg.includes('black') || item.bg.includes('gray-900') || item.bg.includes('holi-dark') ? 'border-white/40' : 'border-black/40'} mb-6 pb-2 flex justify-between items-end`}>
-                                        <span className={`font-news font-bold italic text-xl ${item.bg.includes('black') || item.bg.includes('gray-900') || item.bg.includes('holi-dark') ? 'text-white/80' : 'text-black/80'}`}>{item.subtitle}</span>
-                                        {item.tag && <span className={`font-mono text-xs font-black ${item.bg.includes('black') || item.bg.includes('gray-900') || item.bg.includes('holi-dark') ? 'text-white/60' : 'text-black/60'} tracking-tighter`}>{item.tag}</span>}
+                                <div className={item.bg.includes('black') || item.bg.includes('gray-900') || item.bg.includes('holi') || item.bg.includes('red') ? 'text-white' : 'text-gray-900'}>
+                                    <div className={`border-b-2 ${item.bg.includes('black') || item.bg.includes('gray-900') || item.bg.includes('holi') || item.bg.includes('red') ? 'border-white/40' : 'border-black/40'} mb-6 pb-2 flex justify-between items-end`}>
+                                        <span className={`font-news font-bold italic text-xl ${item.bg.includes('black') || item.bg.includes('gray-900') || item.bg.includes('holi') || item.bg.includes('red') ? 'text-white/80' : 'text-black/80'}`}>{item.subtitle}</span>
+                                        {item.tag && <span className={`font-mono text-xs font-black ${item.bg.includes('black') || item.bg.includes('gray-900') || item.bg.includes('holi') || item.bg.includes('red') ? 'text-white/60' : 'text-black/60'} tracking-tighter`}>{item.tag}</span>}
                                     </div>
-                                    <h3 className={`font-news font-black text-4xl leading-[0.85] mb-6 uppercase tracking-tighter ${item.bg.includes('black') || item.bg.includes('gray-900') || item.bg.includes('holi-dark') ? 'text-white' : 'text-black'}`}>{item.title}</h3>
-                                    <div className={`font-news text-[15px] text-justify leading-snug mb-6 ${item.bg.includes('black') || item.bg.includes('gray-900') || item.bg.includes('holi-dark') ? 'text-gray-200' : 'text-gray-800'}`}>
-                                        <span className={`float-left text-6xl font-black mr-3 mt-[-8px] font-display ${item.bg.includes('black') || item.bg.includes('gray-900') || item.bg.includes('holi-dark') ? 'text-white' : 'text-black'}`}>
+                                    <h3 className={`font-news font-black text-4xl leading-[0.85] mb-6 uppercase tracking-tighter ${item.bg.includes('black') || item.bg.includes('gray-900') || item.bg.includes('holi') || item.bg.includes('red') ? 'text-white' : 'text-black'}`}>{item.title}</h3>
+                                    <div className={`font-news text-[15px] text-justify leading-snug mb-6 ${item.bg.includes('black') || item.bg.includes('gray-900') || item.bg.includes('holi') || item.bg.includes('red') ? 'text-gray-200' : 'text-gray-800'}`}>
+                                        <span className={`float-left text-6xl font-black mr-3 mt-[-8px] font-display ${item.bg.includes('black') || item.bg.includes('gray-900') || item.bg.includes('holi') || item.bg.includes('red') ? 'text-white' : 'text-black'}`}>
                                             {item.content?.charAt(0)}
                                         </span>
                                         {item.content?.substring(1)}
                                     </div>
-                                    <div className={`w-full h-1.5 ${item.bg.includes('black') || item.bg.includes('gray-900') || item.bg.includes('holi-dark') ? 'bg-white/20' : 'bg-black/20'} mb-11`}></div>
-                                    <div className={`w-full h-0.5 ${item.bg.includes('black') || item.bg.includes('gray-900') || item.bg.includes('holi-dark') ? 'bg-white/20' : 'bg-black/20'}`}></div>
+                                    <div className={`w-full h-1.5 ${item.bg.includes('black') || item.bg.includes('gray-900') || item.bg.includes('holi') || item.bg.includes('red') ? 'bg-white/20' : 'bg-black/20'} mb-11`}></div>
+                                    <div className={`w-full h-0.5 ${item.bg.includes('black') || item.bg.includes('gray-900') || item.bg.includes('holi') || item.bg.includes('red') ? 'bg-white/20' : 'bg-black/20'}`}></div>
                                     {item.marker && (
                                         <div className="absolute bottom-4 right-4 text-holi-secondary font-marker text-2xl rotate-[-5deg] drop-shadow-sm">{item.marker}</div>
                                     )}
@@ -227,19 +227,19 @@ const Newspaper = () => {
                             animate={{ scale: 1, y: 0, opacity: 1 }}
                             exit={{ scale: 0.8, y: 50, opacity: 0 }}
                             onClick={(e) => e.stopPropagation()}
-                            className={`relative w-full max-w-3xl ${selectedItem.bg} ${selectedItem.bg.includes('bg-red') || selectedItem.bg.includes('bg-gray-900') || selectedItem.bg.includes('bg-holi') ? 'text-white' : 'text-gray-900'} p-10 md:p-16 shadow-[0_30px_100px_rgba(0,0,0,0.8)] ${selectedItem.torn ? 'torn-paper-edge' : 'rounded-lg'} max-h-[90vh] overflow-y-auto cursor-default`}
+                            className={`relative w-full max-w-3xl ${selectedItem.bg} ${selectedItem.bg.includes('black') || selectedItem.bg.includes('gray-900') || selectedItem.bg.includes('holi') || selectedItem.bg.includes('red') ? 'text-white' : 'text-gray-900'} p-10 md:p-16 shadow-[0_30px_100px_rgba(0,0,0,0.8)] ${selectedItem.torn ? 'torn-paper-edge' : 'rounded-lg'} max-h-[90vh] overflow-y-auto cursor-default`}
                         >
                             <button
                                 onClick={() => setSelectedNews(null)}
                                 className="absolute top-8 right-8 bg-black/5 hover:bg-black/10 p-3 rounded-full transition-all hover:rotate-90"
                             >
-                                <X size={40} className={selectedItem.bg.includes('bg-white') || selectedItem.bg.includes('bg-[#]') ? 'text-black' : 'text-white'} />
+                                <X size={40} className={selectedItem.bg.includes('white') || selectedItem.bg.includes('paper') || selectedItem.bg.includes('fdfbf7') ? 'text-black' : 'text-white'} />
                             </button>
 
                             <div className="space-y-10">
                                 {selectedItem.subtitle && (
-                                    <div className={`border-b-4 ${selectedItem.bg.includes('bg-white') || selectedItem.bg.includes('bg-[#]') ? 'border-black' : 'border-white/20'} mb-10 pb-4`}>
-                                        <span className="font-news font-bold italic text-2xl opacity-80">{selectedItem.subtitle} - Edição 2026</span>
+                                    <div className={`border-b-4 ${selectedItem.bg.includes('black') || selectedItem.bg.includes('gray-900') || selectedItem.bg.includes('holi') || selectedItem.bg.includes('red') ? 'border-white/20' : 'border-black/20'} mb-10 pb-4`}>
+                                        <span className="font-news font-bold italic text-2xl">{selectedItem.subtitle} - Edição 2026</span>
                                     </div>
                                 )}
 
@@ -288,12 +288,12 @@ const Newspaper = () => {
                                 )}
 
                                 {(selectedItem.full_content || selectedItem.content) && selectedItem.type !== 'quote' && (
-                                    <p className="font-news text-2xl text-justify leading-relaxed first-letter:text-7xl first-letter:font-black first-letter:mr-3 first-letter:float-left first-letter:leading-none">
+                                    <p className="font-news text-2xl text-justify leading-relaxed first-letter:text-7xl first-letter:font-black first-letter:mr-3 first-letter:float-left first-letter:leading-none whitespace-pre-line">
                                         {selectedItem.full_content || selectedItem.content}
                                     </p>
                                 )}
 
-                                <div className={`pt-12 border-t-2 ${selectedItem.bg.includes('bg-white') || selectedItem.bg.includes('bg-[#]') ? 'border-black/10' : 'border-white/10'} flex justify-between items-center opacity-40 font-bold`}>
+                                <div className={`pt-12 border-t-2 ${selectedItem.bg.includes('black') || selectedItem.bg.includes('gray-900') || selectedItem.bg.includes('holi') || selectedItem.bg.includes('red') ? 'border-white/10' : 'border-black/10'} flex justify-between items-center opacity-40 font-bold`}>
                                     <span className="font-marker text-3xl">Comunidade Voz de Deus</span>
                                     <span className="font-mono text-lg uppercase tracking-widest">NH - Fevereiro 2026</span>
                                 </div>

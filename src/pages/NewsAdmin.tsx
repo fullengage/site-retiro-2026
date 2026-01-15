@@ -586,6 +586,23 @@ const NewsAdmin = () => {
                                             </label>
                                         </div>
                                     )}
+
+                                    <label className="block">
+                                        <span className="text-xs font-bold uppercase text-gray-500 mb-2 block">Cor de Fundo</span>
+                                        <select
+                                            value={editingItem.bg}
+                                            onChange={(e) => setEditingItem({ ...editingItem, bg: e.target.value })}
+                                            className="w-full bg-gray-50 border-2 border-gray-100 rounded-xl px-4 py-3 focus:border-holi-primary outline-none transition-all"
+                                        >
+                                            <option value="bg-[#fdfbf7]">Papel Antigo (Padrão)</option>
+                                            <option value="bg-white">Branco Puro</option>
+                                            <option value="bg-gray-100">Cinza Claro</option>
+                                            <option value="bg-gray-900">Preto (Dark)</option>
+                                            <option value="bg-holi-primary">Holi Primary (Laranja)</option>
+                                            <option value="bg-holi-secondary">Holi Secondary (Amarelo)</option>
+                                            <option value="bg-red-600">Vermelho (Urgente)</option>
+                                        </select>
+                                    </label>
                                 </div>
 
                                 <div className="space-y-4">
@@ -622,7 +639,7 @@ const NewsAdmin = () => {
                                         />
                                     </label>
 
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-3 gap-4">
                                         <label className="block text-center p-4 border-2 border-gray-100 rounded-2xl bg-gray-50 cursor-pointer hover:border-holi-primary transition-all">
                                             <input
                                                 type="checkbox"
@@ -630,7 +647,7 @@ const NewsAdmin = () => {
                                                 onChange={(e) => setEditingItem({ ...editingItem, torn: e.target.checked })}
                                                 className="hidden"
                                             />
-                                            <span className={`text-xs font-bold uppercase transition-colors ${editingItem.torn ? 'text-holi-primary' : 'text-gray-400'}`}>Borda Rasgada</span>
+                                            <span className={`text-[10px] font-bold uppercase transition-colors ${editingItem.torn ? 'text-holi-primary' : 'text-gray-400'}`}>Rasgado</span>
                                         </label>
                                         <label className="block text-center p-4 border-2 border-gray-100 rounded-2xl bg-gray-50 cursor-pointer hover:border-holi-primary transition-all">
                                             <input
@@ -639,9 +656,167 @@ const NewsAdmin = () => {
                                                 onChange={(e) => setEditingItem({ ...editingItem, hot: e.target.checked })}
                                                 className="hidden"
                                             />
-                                            <span className={`text-xs font-bold uppercase transition-colors ${editingItem.hot ? 'text-orange-500' : 'text-gray-400'}`}>HOT / Destaque</span>
+                                            <span className={`text-[10px] font-bold uppercase transition-colors ${editingItem.hot ? 'text-orange-500' : 'text-gray-400'}`}>HOT</span>
+                                        </label>
+                                        <label className="block text-center p-4 border-2 border-gray-100 rounded-2xl bg-gray-50 cursor-pointer hover:border-holi-primary transition-all">
+                                            <input
+                                                type="checkbox"
+                                                checked={editingItem.tape}
+                                                onChange={(e) => setEditingItem({ ...editingItem, tape: e.target.checked })}
+                                                className="hidden"
+                                            />
+                                            <span className={`text-[10px] font-bold uppercase transition-colors ${editingItem.tape ? 'text-blue-500' : 'text-gray-400'}`}>Fita</span>
                                         </label>
                                     </div>
+
+                                    {editingItem.type === 'photo' && (
+                                        <label className="block">
+                                            <span className="text-xs font-bold uppercase text-gray-500 mb-2 block">Legenda da Foto</span>
+                                            <input
+                                                type="text"
+                                                value={editingItem.caption || ''}
+                                                onChange={(e) => setEditingItem({ ...editingItem, caption: e.target.value })}
+                                                className="w-full bg-gray-50 border-2 border-gray-100 rounded-xl px-4 py-3 focus:border-holi-primary outline-none transition-all"
+                                                placeholder="Ex: Momentos marcantes..."
+                                            />
+                                        </label>
+                                    )}
+
+                                    {(editingItem.type === 'list' || editingItem.type === 'standard') && (
+                                        <div className="space-y-4">
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-xs font-bold uppercase text-gray-500">Itens Resumidos (Home)</span>
+                                                <button
+                                                    onClick={() => setEditingItem({ ...editingItem, items: [...(editingItem.items || []), ''] })}
+                                                    className="p-1 bg-gray-100 rounded-md hover:bg-gray-200"
+                                                >
+                                                    <Plus size={16} />
+                                                </button>
+                                            </div>
+                                            {(editingItem.items || []).map((item, index) => (
+                                                <div key={index} className="flex gap-2">
+                                                    <input
+                                                        type="text"
+                                                        value={item}
+                                                        onChange={(e) => {
+                                                            const newItems = [...(editingItem.items || [])]
+                                                            newItems[index] = e.target.value
+                                                            setEditingItem({ ...editingItem, items: newItems })
+                                                        }}
+                                                        className="flex-1 bg-gray-50 border-2 border-gray-100 rounded-xl px-4 py-2 focus:border-holi-primary outline-none text-sm"
+                                                        placeholder={`Item ${index + 1}`}
+                                                    />
+                                                    <button
+                                                        onClick={() => {
+                                                            const newItems = (editingItem.items || []).filter((_, i) => i !== index)
+                                                            setEditingItem({ ...editingItem, items: newItems })
+                                                        }}
+                                                        className="p-2 text-red-500 hover:bg-red-50 rounded-lg"
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </button>
+                                                </div>
+                                            ))}
+
+                                            <div className="flex justify-between items-center mt-4">
+                                                <span className="text-xs font-bold uppercase text-gray-500">Itens Completos (Modal)</span>
+                                                <button
+                                                    onClick={() => setEditingItem({ ...editingItem, full_items: [...(editingItem.full_items || []), ''] })}
+                                                    className="p-1 bg-gray-100 rounded-md hover:bg-gray-200"
+                                                >
+                                                    <Plus size={16} />
+                                                </button>
+                                            </div>
+                                            {(editingItem.full_items || []).map((item, index) => (
+                                                <div key={index} className="flex gap-2">
+                                                    <input
+                                                        type="text"
+                                                        value={item}
+                                                        onChange={(e) => {
+                                                            const newItems = [...(editingItem.full_items || [])]
+                                                            newItems[index] = e.target.value
+                                                            setEditingItem({ ...editingItem, full_items: newItems })
+                                                        }}
+                                                        className="flex-1 bg-gray-50 border-2 border-gray-100 rounded-xl px-4 py-2 focus:border-holi-primary outline-none text-sm"
+                                                        placeholder={`Item Completo ${index + 1}`}
+                                                    />
+                                                    <button
+                                                        onClick={() => {
+                                                            const newItems = (editingItem.full_items || []).filter((_, i) => i !== index)
+                                                            setEditingItem({ ...editingItem, full_items: newItems })
+                                                        }}
+                                                        className="p-2 text-red-500 hover:bg-red-50 rounded-lg"
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    {editingItem.type === 'quote' && (
+                                        <label className="block">
+                                            <span className="text-xs font-bold uppercase text-gray-500 mb-2 block">Autor da Citação</span>
+                                            <input
+                                                type="text"
+                                                value={editingItem.author || ''}
+                                                onChange={(e) => setEditingItem({ ...editingItem, author: e.target.value })}
+                                                className="w-full bg-gray-50 border-2 border-gray-100 rounded-xl px-4 py-3 focus:border-holi-primary outline-none transition-all"
+                                                placeholder="Nome do Autor"
+                                            />
+                                        </label>
+                                    )}
+
+                                    {editingItem.type === 'weather' && (
+                                        <label className="block">
+                                            <span className="text-xs font-bold uppercase text-gray-500 mb-2 block">Condição Completa (Modal)</span>
+                                            <textarea
+                                                rows={2}
+                                                value={editingItem.full_desc_weather || ''}
+                                                onChange={(e) => setEditingItem({ ...editingItem, full_desc_weather: e.target.value })}
+                                                className="w-full bg-gray-50 border-2 border-gray-100 rounded-xl px-4 py-3 focus:border-holi-primary outline-none transition-all"
+                                                placeholder="Ex: Sol forte durante todo o dia, beba muita água!"
+                                            />
+                                        </label>
+                                    )}
+
+                                    {editingItem.type === 'grid' && (
+                                        <div className="space-y-4">
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-xs font-bold uppercase text-gray-500">Imagens da Grade (URLs)</span>
+                                                <button
+                                                    onClick={() => setEditingItem({ ...editingItem, images: [...(editingItem.images || []), ''] })}
+                                                    className="p-1 bg-gray-100 rounded-md hover:bg-gray-200"
+                                                >
+                                                    <Plus size={16} />
+                                                </button>
+                                            </div>
+                                            {(editingItem.images || []).map((img, index) => (
+                                                <div key={index} className="flex gap-2">
+                                                    <input
+                                                        type="text"
+                                                        value={img}
+                                                        onChange={(e) => {
+                                                            const newImages = [...(editingItem.images || [])]
+                                                            newImages[index] = e.target.value
+                                                            setEditingItem({ ...editingItem, images: newImages })
+                                                        }}
+                                                        className="flex-1 bg-gray-50 border-2 border-gray-100 rounded-xl px-4 py-2 focus:border-holi-primary outline-none text-sm"
+                                                        placeholder="https://..."
+                                                    />
+                                                    <button
+                                                        onClick={() => {
+                                                            const newImages = (editingItem.images || []).filter((_, i) => i !== index)
+                                                            setEditingItem({ ...editingItem, images: newImages })
+                                                        }}
+                                                        className="p-2 text-red-500 hover:bg-red-50 rounded-lg"
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 

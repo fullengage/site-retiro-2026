@@ -1,4 +1,4 @@
-import { Instagram, Facebook, ArrowRight, User } from 'lucide-react'
+import { Instagram, ArrowRight, User } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 const RegistrationSection = () => {
@@ -40,10 +40,7 @@ const RegistrationSection = () => {
                         <div className="flex items-center gap-4 pt-6">
                             <span className="font-bold text-holi-accent uppercase tracking-wider text-sm">SIGA-NOS</span>
                             <div className="flex gap-4">
-                                <a href="#" className="w-12 h-12 rounded-full border border-gray-700 flex items-center justify-center hover:bg-holi-primary hover:border-holi-primary hover:scale-110 transition-all text-gray-400 hover:text-white shadow-lg">
-                                    <Facebook size={20} />
-                                </a>
-                                <a href="#" className="w-12 h-12 rounded-full border border-gray-700 flex items-center justify-center hover:bg-holi-secondary hover:border-holi-secondary hover:scale-110 transition-all text-gray-400 hover:text-black shadow-lg">
+                                <a href="https://www.instagram.com/juventude._adonai/" target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full border border-gray-700 flex items-center justify-center hover:bg-holi-secondary hover:border-holi-secondary hover:scale-110 transition-all text-gray-400 hover:text-black shadow-lg">
                                     <Instagram size={20} />
                                 </a>
                             </div>
@@ -73,7 +70,7 @@ const RegistrationSection = () => {
                             </div>
                             <h3 className="text-2xl font-bold mb-2 text-white uppercase tracking-tighter">Instagram</h3>
                             <p className="text-sm text-gray-400 mb-8 font-medium">Acompanhe todos os bastidores e novidades em tempo real.</p>
-                            <a href="#" className="w-full bg-white text-black font-black py-4 rounded-xl transition-all shadow-[0_4px_14px_0_rgba(255,255,255,0.2)] hover:shadow-[0_6px_20px_rgba(255,255,255,0.3)] hover:-translate-y-1 uppercase tracking-widest flex items-center justify-center gap-2">
+                            <a href="https://www.instagram.com/juventude._adonai/" target="_blank" rel="noopener noreferrer" className="w-full bg-white text-black font-black py-4 rounded-xl transition-all shadow-[0_4px_14px_0_rgba(255,255,255,0.2)] hover:shadow-[0_6px_20px_rgba(255,255,255,0.3)] hover:-translate-y-1 uppercase tracking-widest flex items-center justify-center gap-2">
                                 <span>Seguir Agora</span>
                                 <ArrowRight size={16} />
                             </a>

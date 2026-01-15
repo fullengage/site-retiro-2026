@@ -8,21 +8,21 @@ const InfoSection = () => {
             content: "Dos dias 14 a 17 de Fevereiro",
             icon: <Calendar className="text-6xl text-white drop-shadow-lg" />,
             color: "holi-primary",
-            img: "https://lh3.googleusercontent.com/aida-public/AB6AXuCh4saYWyhn9PcLb7f6qzVGuQdwv3JzjAYVMKRvCUhW_YmRikCF_s9qdQYWDAspahDdX6t9KiZq_aaASahnQbDAcBlgKxJBNnO7BMH_G6946GfpANGKagdoF71C0JrjrXecv335xbH7Xz_oWoksvJ73SCWIdJ6r3vlyTc8uGpQslfn8oIe5m_ig1AA-B8Fm6Q97HbUcM62GteivxZRb5AA8LM014ogHNg-_-WW0Yq_ZX2wr_k-gl_-TDlUMrr109eAfFAq1OcNVWjo4"
+            img: "/images/calendario_retiro.png"
         },
         {
             title: "Local",
             content: "Recinto de Rodeio de Novo Horizonte",
             icon: <MapPin className="text-6xl text-white drop-shadow-lg" />,
             color: "holi-secondary",
-            img: "https://lh3.googleusercontent.com/aida-public/AB6AXuBAKfUU_ND3d9J4dNkL5WAB4kcl06b2fXBVfHpmk1I0dwcyXOuFr4-0titXHUtikMp98UcPjGxWogWvSCSoM_UayoQqMQ3tzstCeFbKagNeISfsVYsbfvIISGNDOqhScNHTFK7F62awEmbQeJyRDOnphLnp88tB0IYzvWaUrEyEKX2QhVeh6fVwfw0tj5oXYH9yMCsdjCyb0AIx0CGbJqZd9imhPlYr3yTqxxc6Wxszc6LRrXFgBM8lsev5keGn6pcK2h2kQn01tP0-"
+            img: "/images/local_retiro.png"
         },
         {
             title: "Organização",
             content: "Comunidade Voz de Deus",
             icon: <Users className="text-6xl text-white drop-shadow-lg" />,
             color: "holi-accent",
-            img: "https://lh3.googleusercontent.com/aida-public/AB6AXuDk1-oSjrF0xQvlChsBcsXLdU8bdXFJ8RSsazWEYACC6NmhoZoYSI2TbrGOB26yAIfNiA2zmlFQRreVMjfFxHNHUz7bNydk7shMUrDV0mvKm0AUWJrtrS6vD7__QSezFSkUk6MRNMbDCKhaZksX6NoXaLrTqgmmX2wqBx74dqspG1B0CIGSw6rL2Al2fh5sNPLB4mZfugTNemXFvnDh7To-RttGa-fhsSU517rXLgtKxjYchgRkifpgmAI3q0rQqU3Ja6GTdoBW6wYG"
+            img: "/images/organizacao_logo.png"
         }
     ]
 

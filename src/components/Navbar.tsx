@@ -18,7 +18,7 @@ const Navbar = () => {
                     <div className="hidden md:flex space-x-8 items-center">
                         <a href="/#sobre" className="text-gray-300 hover:text-holi-primary transition-colors font-semibold uppercase tracking-wider text-sm">Sobre</a>
                         <a href="/#informacoes" className="text-gray-300 hover:text-holi-secondary transition-colors font-semibold uppercase tracking-wider text-sm">Informações</a>
-                        <Link to="/cronograma" className="text-gray-300 hover:text-holi-accent transition-colors font-semibold uppercase tracking-wider text-sm">Cronograma</Link>
+                        <Link to="/em-breve" className="text-gray-300 hover:text-holi-accent transition-colors font-semibold uppercase tracking-wider text-sm">Cronograma</Link>
                         <a href="/#galeria" className="text-gray-300 hover:text-white transition-colors font-semibold uppercase tracking-wider text-sm">Galeria</a>
                         <Link to="/doacoes" className="text-gray-300 hover:text-holi-primary transition-colors font-semibold uppercase tracking-wider text-sm">Doações</Link>
                         <Link to="/inscricao" className="bg-gradient-to-r from-holi-primary to-purple-600 hover:from-purple-600 hover:to-holi-primary text-white px-6 py-2.5 rounded-full font-bold transition-all hover:scale-105 shadow-[0_0_15px_rgba(217,70,239,0.5)] uppercase tracking-wide text-sm">
@@ -38,7 +38,7 @@ const Navbar = () => {
             {isMenuOpen && (
                 <div className="md:hidden bg-holi-dark border-b border-white/10 p-4 space-y-4">
                     <a href="/#sobre" className="block text-gray-300" onClick={() => setIsMenuOpen(false)}>Sobre</a>
-                    <Link to="/cronograma" className="block text-gray-300" onClick={() => setIsMenuOpen(false)}>Cronograma</Link>
+                    <Link to="/em-breve" className="block text-gray-300" onClick={() => setIsMenuOpen(false)}>Cronograma</Link>
                     <Link to="/doacoes" className="block text-gray-300" onClick={() => setIsMenuOpen(false)}>Doações</Link>
                     <Link to="/inscricao" className="block text-center bg-holi-primary text-white py-3 rounded-xl font-bold" onClick={() => setIsMenuOpen(false)}>INSCREVA-SE</Link>
                 </div>
