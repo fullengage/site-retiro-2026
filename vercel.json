@@ -1,4 +1,9 @@
 {
+    "github": {
+        "silent": true
+    },
+    "buildCommand": "npx vite build",
+    "outputDirectory": "dist",
     "framework": "vite",
     "rewrites": [
         {

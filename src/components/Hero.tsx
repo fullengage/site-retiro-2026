@@ -2,7 +2,7 @@ import { Play } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 const Hero = () => (
-    <section className="pt-24 pb-12 bg-holi-surface relative overflow-hidden"
+    <section className="hidden md:block pt-24 pb-12 bg-holi-surface relative overflow-hidden"
         style={{ backgroundImage: 'linear-gradient(to bottom, transparent, rgba(10,5,15,0.8))' }}>
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-holi-primary via-holi-secondary to-holi-accent"></div>
         <div className="absolute inset-0 bg-noise opacity-10 pointer-events-none"></div>

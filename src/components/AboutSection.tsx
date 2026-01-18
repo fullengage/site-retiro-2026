@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 
 const AboutSection = () => (
-    <section className="relative py-24 bg-holi-dark overflow-hidden" id="sobre">
+    <section className="relative py-24 bg-holi-dark overflow-hidden order-1 md:order-none" id="sobre">
         <div className="absolute top-0 inset-x-0 h-24 bg-gradient-to-b from-holi-dark to-transparent z-20 pointer-events-none"></div>
 
         <div className="absolute inset-0 z-0">

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 
 const RegistrationSection = () => {
     return (
-        <footer className="relative bg-[#050208] text-white pt-24 pb-12 overflow-hidden border-t-4 border-holi-primary">
+        <footer className="relative bg-[#050208] text-white pt-24 pb-12 overflow-hidden border-t-4 border-holi-primary" id="contato">
             <div className="absolute inset-0 z-0">
                 <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-holi-primary/20 rounded-full blur-[100px]"></div>
                 <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-holi-secondary/20 rounded-full blur-[100px]"></div>

@@ -48,7 +48,7 @@ const GallerySection = () => {
                 return
             }
 
-            const imageFiles = files.filter(file => 
+            const imageFiles = files.filter(file =>
                 file.name.match(/\.(jpg|jpeg|png|gif|webp)$/i)
             )
 
@@ -125,41 +125,66 @@ const GallerySection = () => {
                     </div>
                 </div>
 
-                <div className="relative w-full h-[1200px] md:h-[1000px]">
+                <div className="relative w-full min-h-[500px] md:h-[1000px]">
                     {loading ? (
                         <div className="absolute inset-0 flex items-center justify-center">
                             <div className="font-marker text-4xl opacity-20 animate-pulse">Carregando memórias...</div>
                         </div>
                     ) : (
                         <>
-                            {images.map((img) => (
-                                <motion.div
-                                    key={img.id}
-                                    drag
-                                    dragConstraints={{ left: -100, right: 100, top: -100, bottom: 100 }}
-                                    whileHover={{ scale: 1.1, zIndex: 100 }}
-                                    initial={{
-                                        rotate: img.rotate
-                                    }}
-                                    style={{
-                                        top: img.position_top,
-                                        left: img.position_left || 'auto',
-                                        right: img.position_right || 'auto',
-                                        zIndex: img.z_index
-                                    }}
-                                    className={`polaroid absolute ${img.width_class} bg-white cursor-pointer flex flex-col shadow-2xl p-2 ${img.label ? 'pb-10' : 'pb-2'}`}
-                                    onClick={() => setSelectedImg(img.url)}
-                                >
-                                    <div className={`${img.aspect_ratio} bg-gray-200 overflow-hidden`}>
-                                        <img src={img.url} className="w-full h-full object-cover" alt={img.label || 'Galeria'} />
-                                    </div>
-                                    {img.label && (
-                                        <div className={`font-marker ${img.label === 'HOLI 2026!' ? 'text-2xl text-red-600 mt-3' : 'text-lg text-black mt-2'} text-center`}>
-                                            {img.label}
+                            {/* Mobile Carousel View */}
+                            <div className="md:hidden flex overflow-x-auto gap-6 pb-12 snap-x snap-mandatory no-scrollbar px-2 pt-10">
+                                {images.map((img) => (
+                                    <motion.div
+                                        key={img.id}
+                                        whileTap={{ scale: 0.95 }}
+                                        className="flex-shrink-0 w-[280px] snap-center"
+                                        onClick={() => setSelectedImg(img.url)}
+                                    >
+                                        <div className="polaroid bg-white shadow-xl p-3 pb-12 rotate-2 transform-gpu">
+                                            <div className="aspect-square bg-gray-200 overflow-hidden">
+                                                <img src={img.url} className="w-full h-full object-cover" alt={img.label} />
+                                            </div>
+                                            {img.label && (
+                                                <div className="font-marker text-black text-xl mt-4 text-center leading-none">
+                                                    {img.label}
+                                                </div>
+                                            )}
                                         </div>
-                                    )}
-                                </motion.div>
-                            ))}
+                                    </motion.div>
+                                ))}
+                                <div className="flex-shrink-0 w-8"></div> {/* Spacer for better scrolling */}
+                            </div>
+
+                            {/* Desktop Polaroid View */}
+                            <div className="hidden md:block absolute inset-0">
+                                {images.map((img) => (
+                                    <motion.div
+                                        key={img.id}
+                                        drag
+                                        dragConstraints={{ left: -100, right: 100, top: -100, bottom: 100 }}
+                                        whileHover={{ scale: 1.1, zIndex: 100 }}
+                                        initial={{ rotate: img.rotate }}
+                                        style={{
+                                            top: img.position_top,
+                                            left: img.position_left || 'auto',
+                                            right: img.position_right || 'auto',
+                                            zIndex: img.z_index
+                                        }}
+                                        className={`polaroid absolute ${img.width_class} bg-white cursor-pointer flex flex-col shadow-2xl p-2 ${img.label ? 'pb-10' : 'pb-2'}`}
+                                        onClick={() => setSelectedImg(img.url)}
+                                    >
+                                        <div className={`${img.aspect_ratio} bg-gray-200 overflow-hidden`}>
+                                            <img src={img.url} className="w-full h-full object-cover" alt={img.label || 'Galeria'} />
+                                        </div>
+                                        {img.label && (
+                                            <div className={`font-marker ${img.label === 'HOLI 2026!' ? 'text-2xl text-red-600 mt-3' : 'text-lg text-black mt-2'} text-center`}>
+                                                {img.label}
+                                            </div>
+                                        )}
+                                    </motion.div>
+                                ))}
+                            </div>
                         </>
                     )}
 
@@ -170,9 +195,9 @@ const GallerySection = () => {
                         </div>
                     )}
 
-                    <div className="absolute top-[40%] right-[10%] text-[8rem] text-white opacity-5 font-marker transform -rotate-90 select-none z-0">MEMÓRIAS</div>
-                    <div className="absolute bottom-[10%] left-[5%] text-6xl text-holi-primary opacity-20 font-marker transform rotate-45 select-none z-0">FÉ</div>
-                    <div className="absolute top-[15%] left-[5%] w-72 h-64 bg-yellow-100 shadow-2xl p-6 flex items-center justify-center text-center -rotate-3 z-50 paper-tear transform hover:scale-110 transition-transform">
+                    <div className="absolute top-[40%] right-[10%] text-[8rem] text-white opacity-5 font-marker transform -rotate-90 select-none z-0 hidden md:block">MEMÓRIAS</div>
+                    <div className="absolute bottom-[10%] left-[5%] text-6xl text-holi-primary opacity-20 font-marker transform rotate-45 select-none z-0 hidden md:block">FÉ</div>
+                    <div className="hidden md:flex absolute top-[15%] left-[5%] w-72 h-64 bg-yellow-100 shadow-2xl p-6 items-center justify-center text-center -rotate-3 z-50 paper-tear transform hover:scale-110 transition-transform">
                         <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-red-500/20"></div>
                         <p className="font-marker text-3xl text-red-600 leading-tight">Deus tem algo <br />novo para você!</p>
                     </div>

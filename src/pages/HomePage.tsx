@@ -1,5 +1,6 @@
 import Hero from '../components/Hero'
 import HeroTitle from '../components/HeroTitle'
+import MobileNavigationGuide from '../components/MobileNavigationGuide'
 import Features from '../components/Features'
 import AboutSection from '../components/AboutSection'
 import InfoSection from '../components/InfoSection'
@@ -10,17 +11,20 @@ import RegistrationSection from '../components/RegistrationSection'
 
 const HomePage = () => {
     return (
-        <>
+        <div className="flex flex-col">
             <Hero />
             <HeroTitle />
-            <Features />
+            <MobileNavigationGuide />
             <AboutSection />
+            <Features />
             <InfoSection />
-            <Newspaper />
+            <div className="hidden md:block">
+                <Newspaper />
+            </div>
             <CalendarSection />
             <GallerySection />
             <RegistrationSection />
-        </>
+        </div>
     )
 }
 

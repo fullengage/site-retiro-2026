@@ -53,7 +53,7 @@ const RegistrationPage = () => {
 
     const handleReceiptUpload = async () => {
         if (!receiptFile || !registrationId) return
-        
+
         setUploadingReceipt(true)
         setError(null)
 
@@ -117,7 +117,7 @@ const RegistrationPage = () => {
                 .select()
 
             if (insertError) throw insertError
-            
+
             if (insertData && insertData[0]) {
                 setRegistrationId(insertData[0].id)
             }
@@ -160,8 +160,8 @@ const RegistrationPage = () => {
                             <div>
                                 <span className="text-gray-500 text-xs block uppercase">Valor</span>
                                 <span className="text-2xl font-black text-holi-secondary">
-                                    {formData.kit_option.includes('160') ? 'R$ 160,00' : 
-                                     formData.kit_option.includes('80') ? 'R$ 80,00' : 'R$ 30,00'}
+                                    {formData.kit_option.includes('160') ? 'R$ 160,00' :
+                                        formData.kit_option.includes('80') ? 'R$ 80,00' : 'R$ 30,00'}
                                 </span>
                             </div>
                         </div>
@@ -193,7 +193,7 @@ const RegistrationPage = () => {
                             <h4 className="text-white font-black uppercase text-sm mb-4 flex items-center gap-2">
                                 <Upload size={16} /> Enviar Comprovante
                             </h4>
-                            
+
                             <input
                                 type="file"
                                 accept="image/*,.pdf"
@@ -211,7 +211,7 @@ const RegistrationPage = () => {
                                 className="hidden"
                                 id="receipt-upload-confirm"
                             />
-                            
+
                             {!receiptFile ? (
                                 <label
                                     htmlFor="receipt-upload-confirm"
@@ -240,7 +240,7 @@ const RegistrationPage = () => {
                                             Trocar
                                         </button>
                                     </div>
-                                    
+
                                     <button
                                         onClick={handleReceiptUpload}
                                         disabled={uploadingReceipt}
@@ -260,7 +260,7 @@ const RegistrationPage = () => {
                                     </button>
                                 </div>
                             )}
-                            
+
                             {error && (
                                 <div className="mt-4 bg-red-500/10 border border-red-500/20 text-red-500 p-3 rounded-xl text-xs font-bold text-center">
                                     {error}
@@ -497,24 +497,38 @@ const RegistrationPage = () => {
                                     <span className="text-xs text-gray-500 uppercase tracking-widest">Selecione se for se alojar conosco</span>
                                 </div>
                             </label>
+
+                            {formData.staying_on_site && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="bg-holi-accent/10 border border-holi-accent/20 p-4 rounded-2xl flex gap-3 items-start"
+                                >
+                                    <Sparkles className="text-holi-accent shrink-0 mt-1" size={18} />
+                                    <p className="text-sm text-holi-accent leading-relaxed">
+                                        <strong className="block uppercase tracking-wider mb-1">Atenção:</strong>
+                                        Se você for dormir no local, lembre-se de trazer sua própria <span className="underline font-black">barraca</span>, colchão e itens de higiene pessoal.
+                                    </p>
+                                </motion.div>
+                            )}
                         </div>
 
                         <div className="md:col-span-2 space-y-2">
                             <label className="text-xs font-bold uppercase text-gray-400 ml-1">Escolha seu Kit</label>
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                 {[
-                                    { 
-                                        label: 'Kit 01 - Inscrição (R$ 30,00)', 
+                                    {
+                                        label: 'Kit 01 - Inscrição (R$ 30,00)',
                                         icon: <CheckCircle />,
                                         description: 'Sem camiseta'
                                     },
-                                    { 
-                                        label: 'Kit 02 - Inscrição + Camiseta (R$ 80,00)', 
+                                    {
+                                        label: 'Kit 02 - Inscrição + Camiseta (R$ 80,00)',
                                         icon: <Shirt />,
                                         description: 'Com 1 camiseta'
                                     },
-                                    { 
-                                        label: 'Kit 03 - Inscrição + 2 Camisetas + Kit Intocáveis (R$ 160,00)', 
+                                    {
+                                        label: 'Kit 03 - Inscrição + 2 Camisetas + Kit Intocáveis (R$ 160,00)',
                                         icon: <Package />,
                                         description: 'Com 2 camisetas + Kit Intocáveis'
                                     }

@@ -5,6 +5,7 @@ import Background from './components/Background'
 import HomePage from './pages/HomePage'
 import DonationPage from './pages/DonationPage'
 import SchedulePage from './pages/SchedulePage'
+import NewsPage from './pages/NewsPage'
 import NewsAdmin from './pages/NewsAdmin'
 import RegistrationPage from './pages/RegistrationPage'
 import RegistrationAdmin from './pages/RegistrationAdmin'
@@ -35,6 +36,7 @@ function AppContent() {
                 <Route path="/doacoes" element={<DonationPage />} />
                 <Route path="/cronograma" element={<SchedulePage />} />
                 <Route path="/inscricao" element={<RegistrationPage />} />
+                <Route path="/noticias" element={<NewsPage />} />
                 <Route path="/admin" element={<NewsAdmin />} />
                 <Route path="/admin/inscricoes" element={<RegistrationAdmin />} />
                 <Route path="/admin/galeria" element={<GalleryAdmin />} />
@@ -48,7 +50,7 @@ function AppContent() {
 
                         <div className="flex flex-wrap justify-center gap-8 mb-8 font-mono text-sm uppercase tracking-widest text-gray-400">
                             <Link to="/doacoes" className="hover:text-holi-primary transition-colors">Doações</Link>
-                            <a href="/#noticias" className="hover:text-holi-secondary transition-colors">Notícias</a>
+                            <Link to="/noticias" className="hover:text-holi-secondary transition-colors">Notícias</Link>
                             <Link to="/em-breve" className="hover:text-holi-accent transition-colors">Cronograma</Link>
                             <a href="/#sobre" className="hover:text-white transition-colors">Sobre Nós</a>
                         </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
     Search, Download, Users, CheckCircle,
@@ -23,6 +23,10 @@ interface Registration {
     payment_amount: number
     birth_date: string
     payment_receipt_url: string | null
+    gender: string | null
+    address: string | null
+    emergency_phone: string | null
+    staying_on_site: boolean | null
 }
 
 const RegistrationAdmin = () => {
@@ -111,7 +115,18 @@ const RegistrationAdmin = () => {
             .from('event_registrations')
             .update({
                 payment_status: editingReg.payment_status,
-                assigned_angel: editingReg.assigned_angel
+                assigned_angel: editingReg.assigned_angel,
+                payment_receipt_url: editingReg.payment_receipt_url,
+                full_name: editingReg.full_name,
+                phone: editingReg.phone,
+                emergency_phone: editingReg.emergency_phone,
+                address: editingReg.address,
+                city: editingReg.city,
+                parish: editingReg.parish,
+                tshirt_size: editingReg.tshirt_size,
+                tshirt_size_2: editingReg.tshirt_size_2,
+                staying_on_site: editingReg.staying_on_site,
+                gender: editingReg.gender
             })
             .eq('id', editingReg.id)
 
@@ -138,10 +153,22 @@ const RegistrationAdmin = () => {
         tshirts: registrations.filter(r => r.tshirt_size).length
     }
 
+    const calculateAge = (birthDate: string) => {
+        if (!birthDate) return 'N/A'
+        const birth = new Date(birthDate)
+        const today = new Date()
+        let age = today.getFullYear() - birth.getFullYear()
+        const m = today.getMonth() - birth.getMonth()
+        if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+            age--
+        }
+        return age
+    }
+
     const exportToCSV = () => {
-        const headers = ['Nome', 'Email', 'Telefone', 'Paróquia', 'Status Pagamento', 'Anjo', 'Camiseta', 'Kit', 'Cidade', 'Data Inscrição']
+        const headers = ['Nome', 'Email', 'Telefone', 'Fone Emergência', 'Paróquia', 'Status Pagamento', 'Anjo', 'Camiseta', 'Camiseta 2', 'Kit', 'Cidade', 'Idade', 'Gênero', 'Endereço', 'Ficará no Local', 'Data Inscrição']
         const rows = filtered.map(r => [
-            r.full_name, r.email, r.phone, r.parish, r.payment_status, r.assigned_angel || '', r.tshirt_size || 'N/A', r.kit_option, r.city, new Date(r.created_at).toLocaleDateString()
+            r.full_name, r.email, r.phone, r.emergency_phone || '', r.parish, r.payment_status, r.assigned_angel || '', r.tshirt_size || 'N/A', r.tshirt_size_2 || 'N/A', r.kit_option, r.city, calculateAge(r.birth_date), r.gender || '', r.address || '', r.staying_on_site ? 'Sim' : 'Não', new Date(r.created_at).toLocaleDateString()
         ])
 
         let csvContent = "data:text/csv;charset=utf-8," + headers.join(",") + "\n" + rows.map(e => e.join(",")).join("\n")
@@ -276,9 +303,20 @@ const RegistrationAdmin = () => {
                                     filtered.map(reg => (
                                         <tr key={reg.id} className="hover:bg-white/5 transition-colors group">
                                             <td className="p-6">
-                                                <div className="font-bold text-white">{reg.full_name}</div>
-                                                <div className="text-xs text-gray-500">{reg.email}</div>
-                                                <div className="text-xs text-holi-secondary mt-1">{reg.phone}</div>
+                                                <button
+                                                    onClick={() => setEditingReg(reg)}
+                                                    className="text-left hover:text-holi-primary transition-colors group/name"
+                                                >
+                                                    <div className="font-bold text-white group-hover/name:text-holi-primary">{reg.full_name}</div>
+                                                    <div className="text-xs text-gray-500">{reg.email}</div>
+                                                </button>
+                                                <div className="flex gap-2 items-center mt-1">
+                                                    <div className="text-[10px] bg-white/5 border border-white/10 px-2 py-0.5 rounded text-gray-400 font-bold uppercase tracking-widest">{calculateAge(reg.birth_date)} anos</div>
+                                                    <div className="text-xs text-holi-secondary">{reg.phone}</div>
+                                                </div>
+                                                {reg.emergency_phone && (
+                                                    <div className="text-[10px] text-red-400/80 mt-1 uppercase font-bold tracking-tighter">🚨 Pais: {reg.emergency_phone}</div>
+                                                )}
                                             </td>
                                             <td className="p-6">
                                                 <div className="text-sm font-bold text-gray-300">{reg.parish}</div>
@@ -294,8 +332,8 @@ const RegistrationAdmin = () => {
                                             </td>
                                             <td className="p-6">
                                                 <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-black uppercase border ${reg.payment_status === 'Pago' ? 'border-green-500/30 bg-green-500/10 text-green-500' :
-                                                        reg.payment_status === 'Pendente' ? 'border-yellow-500/30 bg-yellow-500/10 text-yellow-500' :
-                                                            'border-red-500/30 bg-red-500/10 text-red-500'
+                                                    reg.payment_status === 'Pendente' ? 'border-yellow-500/30 bg-yellow-500/10 text-yellow-500' :
+                                                        'border-red-500/30 bg-red-500/10 text-red-500'
                                                     }`}>
                                                     {reg.payment_status === 'Pago' ? <CheckCircle size={10} /> :
                                                         reg.payment_status === 'Pendente' ? <Clock size={10} /> : <XCircle size={10} />}
@@ -358,7 +396,131 @@ const RegistrationAdmin = () => {
                             <h2 className="text-2xl font-black uppercase tracking-tight mb-2">Editar Participante</h2>
                             <p className="text-gray-500 text-sm mb-8">{editingReg.full_name}</p>
 
-                            <form onSubmit={handleUpdateRegistration} className="space-y-6">
+                            <form onSubmit={handleUpdateRegistration} className="space-y-6 max-h-[60vh] overflow-y-auto pr-4 scrollbar-thin scrollbar-thumb-white/10">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="text-xs font-bold uppercase text-gray-500 mb-2 block tracking-widest">Nome Completo</label>
+                                        <input
+                                            type="text"
+                                            value={editingReg.full_name || ''}
+                                            onChange={e => setEditingReg({ ...editingReg, full_name: e.target.value })}
+                                            className="w-full bg-black/50 border border-white/10 rounded-2xl py-4 px-6 focus:border-holi-primary outline-none"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-xs font-bold uppercase text-gray-500 mb-2 block tracking-widest">Gênero</label>
+                                        <select
+                                            value={editingReg.gender || ''}
+                                            onChange={e => setEditingReg({ ...editingReg, gender: e.target.value })}
+                                            className="w-full bg-black/50 border border-white/10 rounded-2xl py-4 px-6 focus:border-holi-primary outline-none appearance-none"
+                                        >
+                                            <option value="">Selecione</option>
+                                            <option value="Masculino">Masculino</option>
+                                            <option value="Feminino">Feminino</option>
+                                            <option value="Outro">Outro</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="text-xs font-bold uppercase text-gray-500 mb-2 block tracking-widest">Telefone</label>
+                                        <input
+                                            type="text"
+                                            value={editingReg.phone || ''}
+                                            onChange={e => setEditingReg({ ...editingReg, phone: e.target.value })}
+                                            className="w-full bg-black/50 border border-white/10 rounded-2xl py-4 px-6 focus:border-holi-primary outline-none"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-xs font-bold uppercase text-gray-500 mb-2 block tracking-widest">Telefone Pais/Emergência</label>
+                                        <input
+                                            type="text"
+                                            value={editingReg.emergency_phone || ''}
+                                            onChange={e => setEditingReg({ ...editingReg, emergency_phone: e.target.value })}
+                                            className="w-full bg-black/50 border border-white/10 rounded-2xl py-4 px-6 focus:border-holi-primary outline-none text-red-400 font-bold"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="text-xs font-bold uppercase text-gray-500 mb-2 block tracking-widest">Endereço Completo</label>
+                                    <textarea
+                                        value={editingReg.address || ''}
+                                        onChange={e => setEditingReg({ ...editingReg, address: e.target.value })}
+                                        className="w-full bg-black/50 border border-white/10 rounded-2xl py-4 px-6 focus:border-holi-primary outline-none h-24 resize-none"
+                                    />
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="text-xs font-bold uppercase text-gray-500 mb-2 block tracking-widest">Paróquia</label>
+                                        <input
+                                            type="text"
+                                            value={editingReg.parish || ''}
+                                            onChange={e => setEditingReg({ ...editingReg, parish: e.target.value })}
+                                            className="w-full bg-black/50 border border-white/10 rounded-2xl py-4 px-6 focus:border-holi-primary outline-none"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-xs font-bold uppercase text-gray-500 mb-2 block tracking-widest">Cidade</label>
+                                        <input
+                                            type="text"
+                                            value={editingReg.city || ''}
+                                            onChange={e => setEditingReg({ ...editingReg, city: e.target.value })}
+                                            className="w-full bg-black/50 border border-white/10 rounded-2xl py-4 px-6 focus:border-holi-primary outline-none"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="text-xs font-bold uppercase text-gray-500 mb-2 block tracking-widest">Tamanho Camiseta 1</label>
+                                        <input
+                                            type="text"
+                                            value={editingReg.tshirt_size || ''}
+                                            onChange={e => setEditingReg({ ...editingReg, tshirt_size: e.target.value })}
+                                            className="w-full bg-black/50 border border-white/10 rounded-2xl py-4 px-6 focus:border-holi-primary outline-none"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-xs font-bold uppercase text-gray-500 mb-2 block tracking-widest">Tamanho Camiseta 2</label>
+                                        <input
+                                            type="text"
+                                            value={editingReg.tshirt_size_2 || ''}
+                                            onChange={e => setEditingReg({ ...editingReg, tshirt_size_2: e.target.value })}
+                                            className="w-full bg-black/50 border border-white/10 rounded-2xl py-4 px-6 focus:border-holi-primary outline-none"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/10">
+                                    <input
+                                        type="checkbox"
+                                        id="staying_on_site"
+                                        checked={editingReg.staying_on_site || false}
+                                        onChange={e => setEditingReg({ ...editingReg, staying_on_site: e.target.checked })}
+                                        className="w-5 h-5 accent-holi-primary"
+                                    />
+                                    <label htmlFor="staying_on_site" className="text-sm font-bold uppercase tracking-tight">Vai dormir no local do retiro?</label>
+                                </div>
+
+                                <div>
+                                    <label className="text-xs font-bold uppercase text-gray-500 mb-2 block tracking-widest">URL do Comprovante</label>
+                                    <input
+                                        type="text"
+                                        value={editingReg.payment_receipt_url || ''}
+                                        onChange={e => setEditingReg({ ...editingReg, payment_receipt_url: e.target.value })}
+                                        className="w-full bg-black/50 border border-white/10 rounded-2xl py-4 px-6 focus:border-holi-primary outline-none text-xs font-mono"
+                                        placeholder="https://..."
+                                    />
+                                    {editingReg.payment_receipt_url && (
+                                        <a href={editingReg.payment_receipt_url} target="_blank" rel="noopener noreferrer" className="text-[10px] text-holi-primary hover:underline mt-2 inline-flex items-center gap-1">
+                                            <ExternalLink size={10} /> Testar link do comprovante
+                                        </a>
+                                    )}
+                                </div>
+
                                 <div>
                                     <label className="text-xs font-bold uppercase text-gray-500 mb-2 block tracking-widest">Status Pagamento</label>
                                     <div className="grid grid-cols-3 gap-2">
@@ -393,7 +555,7 @@ const RegistrationAdmin = () => {
 
                                 <button
                                     disabled={isSaving}
-                                    className="w-full bg-holi-primary text-white font-black py-5 rounded-2xl hover:bg-holi-primary/80 transition-all flex items-center justify-center gap-2 mt-8 uppercase tracking-widest"
+                                    className="w-full bg-holi-primary text-white font-black py-5 rounded-2xl hover:bg-holi-primary/80 transition-all flex items-center justify-center gap-2 mt-8 uppercase tracking-widest sticky bottom-0"
                                 >
                                     {isSaving ? 'Salvando...' : <><Save size={20} /> Salvar Alterações</>}
                                 </button>
