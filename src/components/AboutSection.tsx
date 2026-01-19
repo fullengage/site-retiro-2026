@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 
 const AboutSection = () => (
-    <section className="relative py-24 bg-holi-dark overflow-hidden order-1 md:order-none" id="sobre">
+    <section className="relative py-24 bg-holi-dark overflow-hidden" id="sobre">
         <div className="absolute top-0 inset-x-0 h-24 bg-gradient-to-b from-holi-dark to-transparent z-20 pointer-events-none"></div>
 
         <div className="absolute inset-0 z-0">
@@ -27,11 +27,26 @@ const AboutSection = () => (
                 <div className="absolute -right-10 -top-10 w-32 h-32 bg-holi-primary rounded-full filter blur-[60px] opacity-40 group-hover:opacity-60 transition-opacity"></div>
                 <div className="absolute -left-10 -bottom-10 w-32 h-32 bg-holi-secondary rounded-full filter blur-[60px] opacity-40 group-hover:opacity-60 transition-opacity"></div>
 
-                <p className="text-lg md:text-xl text-gray-200 leading-relaxed font-medium relative z-10">
-                    Um projeto que começou em 2023, o <strong className="text-holi-primary">Retiro de Carnaval da Comunidade Voz de Deus</strong> já reuniu mais de 300 jovens no mesmo local para vivenciar uma experiência de amor com Cristo!
-                    <br /><br />
-                    Em 2026 pretendemos alcançar muitas almas com um carnaval bem diferente, cheio de <span className="text-holi-secondary font-marker">cor</span>, <span className="text-holi-accent font-marker">vida</span> e <span className="text-holi-primary font-marker">propósito</span>!
-                </p>
+                <div className="text-lg md:text-xl text-gray-200 leading-relaxed font-medium relative z-10 space-y-6">
+                    <p>
+                        O <strong className="text-holi-primary">Retiro de Carnaval da Comunidade Voz de Deus</strong> nasceu em Novo Horizonte – SP, em 2023, fruto do ardor missionário do Padre Fabinho, pároco da Matriz São José, em profunda comunhão com o fundador da nossa Comunidade, da qual o sacerdote é assessor espiritual.
+                    </p>
+
+                    <p>
+                        Desde sua origem, o Retiro tem se consolidado como um solo sagrado de encontro profundo com o Cristo Ressuscitado. Em nossa última edição, reunimos mais de <span className="text-holi-accent font-bold">300 jovens</span> unidos em um só propósito: viver uma experiência marcante de fé, conversão e do amor transbordante de Deus.
+                    </p>
+
+                    <p>
+                        Aqui, cada detalhe é orado e planejado para proporcionar dias inesquecíveis. Em um ambiente vibrante de alegria e comunhão fraterna, vivemos uma verdadeira explosão de graça e presença divina que transforma corações e renova vidas.
+                    </p>
+
+                    <p className="text-xl md:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-holi-accent to-holi-orange pt-4">
+                        Em 2026, nossa missão é ir ainda mais longe: alcançar novas almas com um Carnaval diferente,
+                        cheio de <span className="text-holi-secondary font-marker text-white">cor</span>,
+                        <span className="text-holi-accent font-marker text-white"> vida</span> e
+                        <span className="text-holi-primary font-marker text-white"> propósito</span>.
+                    </p>
+                </div>
             </motion.div>
         </div>
 

@@ -38,7 +38,7 @@ const HeroTitle = () => (
                         <a href="#sobre" className="w-full sm:w-auto inline-flex items-center justify-center bg-transparent border-2 border-white/30 text-white font-bold text-lg px-8 py-4 rounded-xl md:rounded-full hover:bg-white/10 hover:border-white transition-all duration-300 uppercase tracking-wide">
                             Saiba Mais
                         </a>
-                        <Link to="/doacoes" className="w-full sm:w-auto inline-flex items-center justify-center bg-transparent border-2 border-holi-accent/30 text-holi-accent font-bold text-lg md:text-xs px-8 py-4 md:px-5 md:py-2.5 rounded-xl md:rounded-full hover:bg-holi-accent/10 hover:border-holi-accent transition-all duration-300 uppercase tracking-wide opacity-80 hover:opacity-100">
+                        <Link to="/doacoes" className="w-full sm:w-auto inline-flex items-center justify-center bg-transparent border-2 border-holi-accent/50 text-holi-accent font-bold text-base md:text-xs px-8 py-4 md:px-5 md:py-2.5 rounded-xl md:rounded-full hover:bg-holi-accent/10 hover:border-holi-accent transition-all duration-300 uppercase tracking-wide">
                             <Heart size={14} className="mr-1.5" /> Faça uma doação
                         </Link>
                     </div>

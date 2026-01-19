@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Heart, Copy, Check, QrCode, Utensils, Truck, ArrowRight, Instagram, Phone, Mail, MapPin } from 'lucide-react'
+import { Heart, Copy, Check, QrCode, Utensils, Truck, ArrowRight, ArrowDown, Instagram, Phone, Mail, MapPin } from 'lucide-react'
 import { useState } from 'react'
 
 const DonationPage = () => {
@@ -24,7 +24,7 @@ const DonationPage = () => {
             <div className="h-20"></div>
 
             {/* Hero Section */}
-            <section className="pt-20 pb-20 relative overflow-hidden">
+            <section className="pt-10 md:pt-20 pb-6 md:pb-10 relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-holi-primary via-holi-secondary to-holi-accent"></div>
                 <div className="max-w-5xl mx-auto px-4 text-center relative z-10">
                     <motion.div
@@ -59,10 +59,14 @@ const DonationPage = () => {
                     <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.6, repeat: Infinity, duration: 2 }}
-                        className="mt-12 flex justify-center"
+                        transition={{ delay: 0.6 }}
+                        className="mt-12 flex flex-col items-center gap-4"
                     >
-                        <div className="w-1 h-8 bg-gradient-to-b from-white/20 to-transparent rounded-full animate-bounce"></div>
+                        <p className="font-marker text-holi-secondary text-2xl md:text-3xl">Escolha como deseja contribuir:</p>
+                        <div className="flex gap-8 md:gap-16 text-gray-400 text-[10px] md:text-xs font-black uppercase tracking-[0.2em]">
+                            <span className="flex items-center gap-2">Dinheiro <ArrowDown size={14} className="animate-bounce text-holi-primary" /></span>
+                            <span className="flex items-center gap-2">Alimentos <ArrowDown size={14} className="animate-bounce text-holi-secondary" /></span>
+                        </div>
                     </motion.div>
                 </div>
             </section>
@@ -110,10 +114,10 @@ const DonationPage = () => {
                                         </div>
                                         <div className="w-full text-center">
                                             <span className="text-sm font-bold text-holi-secondary tracking-widest uppercase mb-3 block">Chave PIX (CPF)</span>
-                                            <div className="font-mono text-2xl md:text-3xl text-white break-all mb-6 select-all bg-white/10 py-4 px-6 rounded-xl border border-holi-primary/30 shadow-[inset_0_0_10px_rgba(0,0,0,0.5)] flex items-center justify-between gap-4">
-                                                <span className="flex-1 text-center">{pixKey}</span>
-                                                <button onClick={copyToClipboard} className="text-holi-primary hover:text-white transition-colors flex-shrink-0">
-                                                    {copied ? <Check size={24} className="text-green-500" /> : <Copy size={24} />}
+                                            <div className="font-mono text-xl md:text-3xl text-white break-all mb-6 select-all bg-white/10 py-4 px-4 md:px-6 rounded-xl border border-holi-primary/30 shadow-[inset_0_0_10px_rgba(0,0,0,0.5)] flex items-center justify-between gap-2 md:gap-4">
+                                                <span className="flex-1 text-center tracking-tighter md:tracking-normal">{pixKey}</span>
+                                                <button onClick={copyToClipboard} className="text-holi-primary hover:text-white transition-colors flex-shrink-0 p-2">
+                                                    {copied ? <Check size={20} className="text-green-500" /> : <Copy size={20} />}
                                                 </button>
                                             </div>
                                             <div className="space-y-2 text-gray-200">

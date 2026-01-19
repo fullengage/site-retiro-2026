@@ -30,7 +30,7 @@ const Features = () => {
     ]
 
     return (
-        <section className="py-24 bg-holi-dark relative overflow-hidden order-2 md:order-none" id="features">
+        <section className="py-24 bg-holi-dark relative overflow-hidden" id="features">
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-purple-900/10 via-transparent to-transparent"></div>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 <h2 className="text-center text-3xl md:text-5xl font-black text-white mb-16 uppercase tracking-widest">

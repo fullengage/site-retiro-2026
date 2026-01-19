@@ -139,9 +139,10 @@ const RegistrationPage = () => {
                     <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-lg shadow-green-500/20">
                         <CheckCircle size={40} className="text-white" />
                     </div>
-                    <h2 className="text-4xl font-black mb-6 uppercase tracking-tight">Inscrição Realizada!</h2>
+                    <h2 className="text-4xl font-black mb-6 uppercase tracking-tight">✅ Inscrição confirmada!</h2>
                     <p className="text-gray-400 text-lg mb-10">
-                        Sua inscrição foi recebida com sucesso! <strong className="text-white">Agora realize o pagamento via PIX</strong> e envie o comprovante pelo WhatsApp.
+                        Estamos ansiosos para viver esses 4 dias com você! <br />
+                        <span className="text-sm opacity-80 mt-2 block font-normal tracking-normal text-white/60"> Realize o pagamento via PIX e envie o comprovante pelo anexo abaixo!.</span>
                     </p>
 
                     <div className="bg-black/40 border border-white/5 rounded-2xl p-6 mb-10 text-left">
@@ -502,13 +503,18 @@ const RegistrationPage = () => {
                                 <motion.div
                                     initial={{ opacity: 0, y: -10 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    className="bg-holi-accent/10 border border-holi-accent/20 p-4 rounded-2xl flex gap-3 items-start"
+                                    className="bg-holi-accent/10 border border-holi-accent/20 p-5 rounded-2xl flex gap-4 items-start shadow-[0_0_15px_rgba(var(--holi-accent),0.1)]"
                                 >
-                                    <Sparkles className="text-holi-accent shrink-0 mt-1" size={18} />
-                                    <p className="text-sm text-holi-accent leading-relaxed">
-                                        <strong className="block uppercase tracking-wider mb-1">Atenção:</strong>
-                                        Se você for dormir no local, lembre-se de trazer sua própria <span className="underline font-black">barraca</span>, colchão e itens de higiene pessoal.
-                                    </p>
+                                    <div className="w-10 h-10 rounded-full bg-holi-accent/20 flex items-center justify-center shrink-0">
+                                        <Sparkles className="text-holi-accent" size={20} />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <p className="text-sm text-white font-bold uppercase tracking-wider">⚠️ Importante:</p>
+                                        <p className="text-sm text-gray-300 leading-relaxed">
+                                            Para dormir no local será em formato <span className="text-holi-accent font-bold">camping</span>, sendo necessário levar <span className="underline decoration-holi-accent underline-offset-4 font-bold">barraca</span>.
+                                            Também haverá <span className="text-holi-primary font-bold">atividades radicais</span> com água, lama e tinta, então é recomendado levar <span className="underline decoration-holi-primary underline-offset-4 font-bold">troca de roupas</span>.
+                                        </p>
+                                    </div>
                                 </motion.div>
                             )}
                         </div>
@@ -619,7 +625,12 @@ const RegistrationPage = () => {
                             </div>
                         )}
 
-                        <div className="md:col-span-2 pt-8">
+                        <div className="md:col-span-2 space-y-4 pt-4">
+                            <div className="bg-black/40 border border-white/5 p-6 rounded-2xl">
+                                <p className="text-xs text-gray-400 font-medium leading-relaxed">
+                                    Ao finalizar sua inscrição, você confirma que está ciente da necessidade de levar barraca para hospedagem e roupas extras para as atividades radicais.
+                                </p>
+                            </div>
                             <button
                                 disabled={loading}
                                 className="w-full bg-white text-black font-black py-5 rounded-2xl hover:bg-holi-primary hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all uppercase tracking-[0.2em] flex items-center justify-center gap-3 shadow-[0_10px_30px_rgba(255,255,255,0.1)] hover:shadow-holi-primary/20 hover:-translate-y-1 group"

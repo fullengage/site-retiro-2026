@@ -81,18 +81,18 @@ const Newspaper = () => {
                             whileInView={{ opacity: 1, y: 0 }}
                             whileHover={{ rotate: 0, scale: 1.05, zIndex: 50, transition: { duration: 0.2 } }}
                             onClick={() => setSelectedNews(item.id)}
-                            className={`block break-inside-avoid shadow-[10px_10px_30px_rgba(0,0,0,0.5)] ${item.bg} p-8 ${item.torn ? 'torn-paper-edge' : 'rounded-sm'} ${item.rotate} transition-all duration-300 relative group cursor-pointer mb-12 border border-black/5`}
+                            className={`block break-inside-avoid shadow-[10px_10px_30px_rgba(0,0,0,0.5)] ${item.bg} p-5 md:p-8 ${item.torn ? 'torn-paper-edge' : 'rounded-sm'} ${item.rotate} transition-all duration-300 relative group cursor-pointer mb-12 border border-black/5`}
                         >
                             {/* Standard Newspaper Card */}
                             {item.type === 'standard' && (
                                 <div className={item.bg.includes('black') || item.bg.includes('gray-900') || item.bg.includes('holi') || item.bg.includes('red') ? 'text-white' : 'text-gray-900'}>
                                     <div className={`border-b-2 ${item.bg.includes('black') || item.bg.includes('gray-900') || item.bg.includes('holi') || item.bg.includes('red') ? 'border-white/40' : 'border-black/40'} mb-6 pb-2 flex justify-between items-end`}>
                                         <span className={`font-news font-bold italic text-xl ${item.bg.includes('black') || item.bg.includes('gray-900') || item.bg.includes('holi') || item.bg.includes('red') ? 'text-white/80' : 'text-black/80'}`}>{item.subtitle}</span>
-                                        {item.tag && <span className={`font-mono text-xs font-black ${item.bg.includes('black') || item.bg.includes('gray-900') || item.bg.includes('holi') || item.bg.includes('red') ? 'text-white/60' : 'text-black/60'} tracking-tighter`}>{item.tag}</span>}
+                                        {item.tag && <span className={`font-mono text-[10px] md:text-xs font-black ${item.bg.includes('black') || item.bg.includes('gray-900') || item.bg.includes('holi') || item.bg.includes('red') ? 'text-white/60' : 'text-black/60'} tracking-tighter`}>{item.tag}</span>}
                                     </div>
-                                    <h3 className={`font-news font-black text-4xl leading-[0.85] mb-6 uppercase tracking-tighter ${item.bg.includes('black') || item.bg.includes('gray-900') || item.bg.includes('holi') || item.bg.includes('red') ? 'text-white' : 'text-black'}`}>{item.title}</h3>
-                                    <div className={`font-news text-[15px] text-justify leading-snug mb-6 ${item.bg.includes('black') || item.bg.includes('gray-900') || item.bg.includes('holi') || item.bg.includes('red') ? 'text-gray-200' : 'text-gray-800'}`}>
-                                        <span className={`float-left text-6xl font-black mr-3 mt-[-8px] font-display ${item.bg.includes('black') || item.bg.includes('gray-900') || item.bg.includes('holi') || item.bg.includes('red') ? 'text-white' : 'text-black'}`}>
+                                    <h3 className={`font-news font-black text-2xl md:text-4xl leading-tight md:leading-[0.85] mb-6 uppercase tracking-tighter ${item.bg.includes('black') || item.bg.includes('gray-900') || item.bg.includes('holi') || item.bg.includes('red') ? 'text-white' : 'text-black'}`}>{item.title}</h3>
+                                    <div className={`font-news text-sm md:text-[15px] text-left md:text-justify leading-relaxed md:leading-snug mb-6 ${item.bg.includes('black') || item.bg.includes('gray-900') || item.bg.includes('holi') || item.bg.includes('red') ? 'text-gray-200' : 'text-gray-800'}`}>
+                                        <span className={`float-left text-5xl md:text-6xl font-black mr-2 md:mr-3 mt-[-4px] md:mt-[-8px] font-display ${item.bg.includes('black') || item.bg.includes('gray-900') || item.bg.includes('holi') || item.bg.includes('red') ? 'text-white' : 'text-black'}`}>
                                             {item.content?.charAt(0)}
                                         </span>
                                         {item.content?.substring(1)}
