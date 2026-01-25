@@ -15,6 +15,8 @@ const PARISHES = [
     'Outros'
 ]
 
+import CountdownTimer from '../components/CountdownTimer'
+
 const RegistrationPage = () => {
     const [loading, setLoading] = useState(false)
     const [submitted, setSubmitted] = useState(false)
@@ -310,10 +312,12 @@ const RegistrationPage = () => {
                     <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter mb-4">
                         Faça sua <span className="text-transparent bg-clip-text bg-gradient-to-r from-holi-primary via-holi-secondary to-holi-accent">Inscrição</span>
                     </h1>
-                    <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+                    <p className="text-gray-400 text-lg max-w-2xl mx-auto mb-8">
                         Participe do Retiro de Carnaval "Prova e vê como o Senhor é bom!".
                         Garanta sua vaga agora mesmo.
                     </p>
+
+                    <CountdownTimer targetDate="2026-01-26T00:00:00" />
                 </div>
 
                 <form onSubmit={handleSubmit} className="bg-holi-surface border border-white/10 rounded-[2.5rem] p-8 md:p-12 shadow-2xl relative overflow-hidden">
