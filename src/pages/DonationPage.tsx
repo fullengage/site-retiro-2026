@@ -1,9 +1,12 @@
 import { motion } from 'framer-motion'
 import { Heart, Copy, Check, QrCode, Utensils, Truck, ArrowRight, ArrowDown, Instagram, Phone, Mail, MapPin } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { supabase } from '@/lib/supabase'
 
 const DonationPage = () => {
     const [copied, setCopied] = useState(false)
+    const [donationCategories, setDonationCategories] = useState<{ title: string, items: any[] }[]>([])
+    const [loading, setLoading] = useState(true)
     const pixKey = "25598513854"
 
     const copyToClipboard = () => {
@@ -12,12 +15,68 @@ const DonationPage = () => {
         setTimeout(() => setCopied(false), 2000)
     }
 
+    useEffect(() => {
+        fetchDonations()
+
+        // Realtime subscription
+        const channel = supabase
+            .channel('public:donation_items')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'donation_items' }, () => {
+                fetchDonations()
+            })
+            .subscribe()
+
+        return () => {
+            supabase.removeChannel(channel)
+        }
+    }, [])
+
+    const fetchDonations = async () => {
+        const { data, error } = await supabase
+            .from('donation_items')
+            .select('*')
+            .order('category', { ascending: true })
+            .order('name', { ascending: true })
+
+        if (data) {
+            // Group by category
+            // Define custom order for categories
+            const categoryOrder = [
+                "Despensa & Básicos",
+                "Café da Manhã",
+                "Carnes",
+                "Hortifruti",
+                "Limpeza & Descartáveis"
+            ]
+
+            const grouped = data.reduce((acc: any, item) => {
+                if (!acc[item.category]) acc[item.category] = []
+                acc[item.category].push(item)
+                return acc
+            }, {})
+
+            // Sort categories based on custom order, putting unknown categories at the end
+            const sortedCategories = Object.keys(grouped).sort((a, b) => {
+                const indexA = categoryOrder.indexOf(a)
+                const indexB = categoryOrder.indexOf(b)
+
+                if (indexA !== -1 && indexB !== -1) return indexA - indexB
+                if (indexA !== -1) return -1
+                if (indexB !== -1) return 1
+                return a.localeCompare(b)
+            })
+
+            setDonationCategories(sortedCategories.map(cat => ({
+                title: cat,
+                items: grouped[cat]
+            })))
+        }
+        setLoading(false)
+    }
     return (
         <div className="bg-holi-dark text-gray-100 font-display selection:bg-holi-primary selection:text-white transition-colors duration-300 overflow-x-hidden min-h-screen">
             {/* Background Effects */}
-            {/* Background Effects removed per user request */}
             <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden opacity-5">
-                {/* Keeping logic for structure but removing visible colored elements */}
             </div>
 
             {/* Navbar Space */}
@@ -74,7 +133,6 @@ const DonationPage = () => {
             {/* Contribution Section */}
             <section className="py-12 md:py-20 relative bg-[#08040c]" id="contribuir">
                 <div className="absolute inset-0 bg-noise opacity-20 pointer-events-none"></div>
-                {/* Background blobs removed per user request */}
 
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
@@ -84,9 +142,9 @@ const DonationPage = () => {
                             initial={{ opacity: 0, x: -50 }}
                             whileInView={{ opacity: 1, x: 0 }}
                             viewport={{ once: true }}
-                            className="flex flex-col"
+                            className="flex flex-col h-full"
                         >
-                            <div className="bg-holi-surface border border-white/10 rounded-[2.5rem] p-8 md:p-10 relative overflow-hidden shadow-2xl h-full flex flex-col hover:border-holi-primary/30 transition-colors duration-500">
+                            <div className="bg-holi-surface border border-white/10 rounded-[2.5rem] p-8 md:p-10 relative overflow-hidden shadow-2xl h-full flex flex-col hover:border-holi-primary/30 transition-colors duration-500 sticky top-24">
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-holi-primary/20 to-transparent rounded-bl-[100%]"></div>
 
                                 <div className="flex items-center gap-4 mb-6">
@@ -97,10 +155,10 @@ const DonationPage = () => {
                                 </div>
 
                                 <p className="text-gray-400 mb-8 leading-relaxed text-lg">
-                                    Cada contribuição ajuda a cobrir custos essenciais como alimentação diária, som, iluminação e transporte dos pregadores. Seja um benfeitor dessa obra!
+                                    Ajude-nos a cobrir custos operacionais e infraestrutura do retiro. Qualquer valor faz a diferença!
                                 </p>
 
-                                <div className="bg-[#0f0816] rounded-2xl p-6 md:p-8 border-2 border-holi-primary/40 mb-2 relative group flex-1 flex flex-col items-center justify-center">
+                                <div className="bg-[#0f0816] rounded-2xl p-6 md:p-8 border-2 border-holi-primary/40 mb-2 relative group flex-col items-center justify-center flex-grow">
                                     <div className="absolute inset-0 bg-gradient-to-r from-holi-primary/10 via-holi-secondary/5 to-holi-primary/10 opacity-30 group-hover:opacity-50 transition-opacity duration-500 rounded-2xl"></div>
                                     <div className="flex flex-col items-center gap-6 relative z-10 w-full">
                                         <div className="bg-white p-5 rounded-2xl shadow-[0_0_40px_rgba(217,70,239,0.3)] transform group-hover:scale-105 transition-transform duration-300">
@@ -154,23 +212,45 @@ const DonationPage = () => {
                                 </div>
 
                                 <p className="text-gray-400 mb-8 leading-relaxed text-lg">
-                                    A cozinha é o coração do retiro! Recebemos doações de alimentos para preparar as refeições de todos os campistas e servos. Sua ajuda garante o sustento de todos durante o encontro.
+                                    A cozinha é o coração do retiro! Recebemos doações de alimentos para preparar as refeições de todos os campistas e servos.
                                 </p>
 
-                                <div className="bg-[#fffdf5] text-gray-800 p-6 md:p-10 rounded-lg shadow-lg relative transform -rotate-1 mb-10 flex-1 bg-paper-texture">
+                                <div className="bg-[#fffdf5] text-gray-800 p-6 md:p-8 rounded-lg shadow-lg relative transform -rotate-1 mb-10 flex-1 bg-paper-texture">
                                     <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-red-900 shadow-md z-20 border-2 border-white"></div>
                                     <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-[#111] z-10"></div>
 
-                                    <h3 className="font-marker text-2xl text-center text-red-700 mb-8 border-b-2 border-red-200 pb-2">Lista de Necessidades</h3>
-                                    <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6 font-news text-xl leading-tight">
-                                        {[
-                                            "Pães", "Café", "Peito de Frango", "Linguiça", "Batata", "Cenoura"
-                                        ].map((item) => (
-                                            <li key={item} className="flex items-center gap-3">
-                                                <div className="w-6 h-6 border-2 border-red-600 flex-shrink-0"></div> {item}
-                                            </li>
+                                    <h3 className="font-marker text-2xl text-center text-red-700 mb-6 border-b-2 border-red-200 pb-2">Lista de Necessidades</h3>
+
+                                    <div className="space-y-6">
+                                        {donationCategories.map((category, idx) => (
+                                            <div key={idx}>
+                                                <h4 className="font-black text-red-800/60 uppercase tracking-widest text-xs mb-3 border-b border-red-800/10 pb-1">{category.title}</h4>
+                                                <ul className="grid grid-cols-1 gap-2 font-news text-lg leading-tight">
+                                                    {category.items.map((item, i) => (
+                                                        <li key={i} className={`flex items-start justify-between gap-3 group ${item.checked ? 'opacity-50 line-through decoration-red-900/50' : ''}`}>
+                                                            <div className="flex items-center gap-3">
+                                                                <div className={`w-5 h-5 border-2 ${item.checked ? 'border-green-600 bg-green-100' : 'border-red-600'} flex-shrink-0 flex items-center justify-center`}>
+                                                                    {item.checked && <Check size={14} className="text-green-700" />}
+                                                                </div>
+                                                                <span className="font-bold text-gray-900">{item.name}</span>
+                                                            </div>
+                                                            <div className="flex flex-col items-end">
+                                                                <span className="font-mono text-sm text-red-700 font-bold whitespace-nowrap bg-red-50 px-2 py-0.5 rounded">
+                                                                    {item.quantity}
+                                                                </span>
+                                                                {!item.checked && item.received && (
+                                                                    <span className="text-[10px] font-bold text-green-600 mt-1 uppercase tracking-tighter">
+                                                                        Já temos: {item.received}
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
                                         ))}
-                                    </ul>
+                                    </div>
+
                                     <div className="mt-8 text-center">
                                         <span className="font-marker text-gray-500 rotate-2 inline-block text-lg">Obrigado! :)</span>
                                     </div>
@@ -184,10 +264,10 @@ const DonationPage = () => {
                                         Os alimentos podem ser entregues no endereço: Rua Carvalho Leme, número 1051 – Novo Horizonte, São Paulo.
                                     </p>
                                     <div className="flex items-center gap-3">
-                                        <a className="flex-1 bg-green-600 hover:bg-green-500 text-white py-3 rounded-lg text-center font-bold text-sm transition-colors flex items-center justify-center gap-2" href="https://wa.me/5511943436970">
+                                        <a className="flex-1 bg-green-600 hover:bg-green-500 text-white py-3 rounded-lg text-center font-bold text-sm transition-colors flex items-center justify-center gap-2 shadow-lg hover:-translate-y-0.5" href="https://wa.me/5511943436970">
                                             <Phone size={18} /> Falar com Julia
                                         </a>
-                                        <a className="flex-1 bg-green-600 hover:bg-green-500 text-white py-3 rounded-lg text-center font-bold text-sm transition-colors flex items-center justify-center gap-2" href="https://wa.me/5511955501090">
+                                        <a className="flex-1 bg-green-600 hover:bg-green-500 text-white py-3 rounded-lg text-center font-bold text-sm transition-colors flex items-center justify-center gap-2 shadow-lg hover:-translate-y-0.5" href="https://wa.me/5511955501090">
                                             <Phone size={18} /> Falar com Wagner
                                         </a>
                                     </div>

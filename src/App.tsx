@@ -10,7 +10,9 @@ import NewsAdmin from './pages/NewsAdmin'
 import RegistrationPage from './pages/RegistrationPage'
 import RegistrationAdmin from './pages/RegistrationAdmin'
 import GalleryAdmin from './pages/GalleryAdmin'
+import DonationAdmin from './pages/DonationAdmin'
 import ComingSoonPage from './pages/ComingSoonPage'
+import AdminLayout from './components/AdminLayout'
 
 // Scroll to top on route change
 function ScrollToTop() {
@@ -37,9 +39,14 @@ function AppContent() {
                 <Route path="/cronograma" element={<SchedulePage />} />
                 <Route path="/inscricao" element={<RegistrationPage />} />
                 <Route path="/noticias" element={<NewsPage />} />
-                <Route path="/admin" element={<NewsAdmin />} />
-                <Route path="/admin/inscricoes" element={<RegistrationAdmin />} />
-                <Route path="/admin/galeria" element={<GalleryAdmin />} />
+                <Route path="/noticias" element={<NewsPage />} />
+
+                <Route path="/admin" element={<AdminLayout />}>
+                    <Route index element={<NewsAdmin />} />
+                    <Route path="inscricoes" element={<RegistrationAdmin />} />
+                    <Route path="galeria" element={<GalleryAdmin />} />
+                    <Route path="doacoes" element={<DonationAdmin />} />
+                </Route>
                 <Route path="/em-breve" element={<ComingSoonPage />} />
             </Routes>
 

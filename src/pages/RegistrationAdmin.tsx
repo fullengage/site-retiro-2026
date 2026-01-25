@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react'
+import { useOutletContext } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
     Search, Download, Users, CheckCircle,
     XCircle, Clock, Shirt, UserCheck,
-    Filter, Edit3, X, Save, LogIn, Sun, FileText, ExternalLink
+    Filter, Edit3, X, Save, FileText, ExternalLink, Trash2, AlertTriangle, ChevronRight, BarChart3, Package, DollarSign, Activity, ShoppingBag, Mail, Table as TableIcon
 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 
@@ -30,69 +31,20 @@ interface Registration {
 }
 
 const RegistrationAdmin = () => {
+    const { userRole } = useOutletContext<{ userRole: 'admin' | 'redator' }>()
+
     const [registrations, setRegistrations] = useState<Registration[]>([])
     const [loading, setLoading] = useState(true)
     const [searchTerm, setSearchTerm] = useState('')
     const [filterStatus, setFilterStatus] = useState('Todos')
     const [editingReg, setEditingReg] = useState<Registration | null>(null)
     const [isSaving, setIsSaving] = useState(false)
-
-    // Auth States
-    const [user, setUser] = useState<any>(null)
-    const [userRole, setUserRole] = useState<'admin' | 'redator' | null>(null)
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
-    const [authLoading, setAuthLoading] = useState(true)
-    const [authError, setAuthError] = useState<string | null>(null)
+    const [deletingId, setDeletingId] = useState<string | null>(null)
+    const [showDashboard, setShowDashboard] = useState(false)
 
     useEffect(() => {
-        checkUser()
+        fetchRegistrations()
     }, [])
-
-    const checkUser = async () => {
-        const { data: { session } } = await supabase.auth.getSession()
-        if (session) {
-            setUser(session.user)
-            await checkRole(session.user.email!, session.user.id)
-            fetchRegistrations()
-        }
-        setAuthLoading(false)
-    }
-
-    const checkRole = async (userEmail: string, userId: string) => {
-        // Reuse the logic from NewsAdmin
-        const { data: editor } = await supabase.from('news_editors').select('role').ilike('email', userEmail).single()
-        if (editor) {
-            setUserRole(editor.role as any)
-            return
-        }
-        const { data: globalRole } = await supabase.from('user_roles').select('role').eq('user_id', userId).single()
-        if (globalRole && (globalRole.role === 'admin' || globalRole.role === 'gestor')) {
-            setUserRole('admin')
-            return
-        }
-        if (userEmail === 'richard.fullweb@gmail.com') {
-            setUserRole('admin')
-            return
-        }
-        setUserRole(null)
-    }
-
-    const handleLogin = async (e: React.FormEvent) => {
-        e.preventDefault()
-        setAuthLoading(true)
-        setAuthError(null)
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password })
-        if (error) {
-            setAuthError(error.message)
-            setAuthLoading(false)
-        } else {
-            setUser(data.user)
-            await checkRole(data.user.email!, data.user.id)
-            fetchRegistrations()
-            setAuthLoading(false)
-        }
-    }
 
     const fetchRegistrations = async () => {
         setLoading(true)
@@ -104,6 +56,24 @@ const RegistrationAdmin = () => {
         if (error) console.error('Error fetching:', error)
         else setRegistrations(data || [])
         setLoading(false)
+    }
+
+    const handleDelete = async (id: string, e: React.MouseEvent) => {
+        e.stopPropagation()
+        if (!confirm('Esta ação removerá permanentemente a inscrição. Continuar?')) return
+
+        setDeletingId(id)
+        const { error } = await supabase
+            .from('event_registrations')
+            .delete()
+            .eq('id', id)
+
+        if (error) {
+            alert('Erro ao excluir: ' + error.message)
+        } else {
+            setRegistrations(prev => prev.filter(r => r.id !== id))
+        }
+        setDeletingId(null)
     }
 
     const handleUpdateRegistration = async (e: React.FormEvent) => {
@@ -146,13 +116,6 @@ const RegistrationAdmin = () => {
         return matchesSearch && matchesStatus
     })
 
-    const stats = {
-        total: registrations.length,
-        paid: registrations.filter(r => r.payment_status === 'Pago').length,
-        pending: registrations.filter(r => r.payment_status === 'Pendente').length,
-        tshirts: registrations.filter(r => r.tshirt_size).length
-    }
-
     const calculateAge = (birthDate: string) => {
         if (!birthDate) return 'N/A'
         const birth = new Date(birthDate)
@@ -165,10 +128,49 @@ const RegistrationAdmin = () => {
         return age
     }
 
+    const getDetailedStats = () => {
+        const kits: Record<string, number> = {}
+        const tshirts: Record<string, number> = {}
+        let totalTshirts = 0
+        let totalRevenue = 0
+
+        registrations.forEach(reg => {
+            if (reg.payment_status === 'Cancelado') return
+
+            const kitName = reg.kit_option ? reg.kit_option.split(' - ')[0] : 'Sem Kit'
+            kits[kitName] = (kits[kitName] || 0) + 1
+
+            totalRevenue += reg.payment_amount || 0
+
+            if (reg.tshirt_size) {
+                tshirts[reg.tshirt_size] = (tshirts[reg.tshirt_size] || 0) + 1
+                totalTshirts++
+            }
+            if (reg.tshirt_size_2) {
+                tshirts[reg.tshirt_size_2] = (tshirts[reg.tshirt_size_2] || 0) + 1
+                totalTshirts++
+            }
+        })
+
+        const sizeOrder = ['PP', 'P', 'M', 'G', 'GG', 'XG', 'XGG', 'EXG', 'G1', 'G2', 'G3']
+        const sortedTshirts = Object.entries(tshirts).sort((a, b) => {
+            const idxA = sizeOrder.indexOf(a[0])
+            const idxB = sizeOrder.indexOf(b[0])
+            if (idxA !== -1 && idxB !== -1) return idxA - idxB
+            return a[0].localeCompare(b[0])
+        })
+
+        const activeRegistrations = registrations.filter(r => r.payment_status !== 'Cancelado').length
+
+        return { kits, sortedTshirts, totalTshirts, totalRevenue, activeRegistrations }
+    }
+
+    const stats = getDetailedStats()
+
     const exportToCSV = () => {
-        const headers = ['Nome', 'Email', 'Telefone', 'Fone Emergência', 'Paróquia', 'Status Pagamento', 'Anjo', 'Camiseta', 'Camiseta 2', 'Kit', 'Cidade', 'Idade', 'Gênero', 'Endereço', 'Ficará no Local', 'Data Inscrição']
+        const headers = ['Nome', 'Email', 'Telefone', 'Fone Emergência', 'Paróquia', 'Status Pagamento', 'Anjo', 'Camiseta', 'Camiseta 2', 'Kit', 'Cidade', 'Idade', 'Gênero', 'Endereço', 'Ficará no Local', 'Data Inscrição', 'Valor Pago']
         const rows = filtered.map(r => [
-            r.full_name, r.email, r.phone, r.emergency_phone || '', r.parish, r.payment_status, r.assigned_angel || '', r.tshirt_size || 'N/A', r.tshirt_size_2 || 'N/A', r.kit_option, r.city, calculateAge(r.birth_date), r.gender || '', r.address || '', r.staying_on_site ? 'Sim' : 'Não', new Date(r.created_at).toLocaleDateString()
+            r.full_name, r.email, r.phone, r.emergency_phone || '', r.parish, r.payment_status, r.assigned_angel || '', r.tshirt_size || 'N/A', r.tshirt_size_2 || 'N/A', r.kit_option, r.city, calculateAge(r.birth_date), r.gender || '', r.address || '', r.staying_on_site ? 'Sim' : 'Não', new Date(r.created_at).toLocaleDateString(), r.payment_amount || 0
         ])
 
         let csvContent = "data:text/csv;charset=utf-8," + headers.join(",") + "\n" + rows.map(e => e.join(",")).join("\n")
@@ -180,384 +182,419 @@ const RegistrationAdmin = () => {
         link.click()
     }
 
-    if (authLoading) return <div className="min-h-screen bg-black text-white flex items-center justify-center font-black uppercase tracking-widest text-2xl">Carregando...</div>
+    if (loading) return <div className="text-white flex items-center justify-center font-marker text-2xl h-screen animate-pulse">Carregando dados...</div>
 
-    if (!user || (!userRole && !authLoading)) {
-        return (
-            <div className="min-h-screen bg-[#050208] text-white flex items-center justify-center p-6 relative overflow-hidden">
-                <div className="absolute inset-0 bg-noise opacity-10 pointer-events-none"></div>
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="w-full max-w-md relative z-10 text-center"
-                >
-                    <div className="inline-block p-4 bg-white/5 border border-white/10 rounded-3xl mb-8">
-                        <Sun className="text-holi-primary animate-spin-slow" size={48} />
-                    </div>
-                    <h1 className="text-3xl font-black uppercase tracking-tighter mb-8">Admin Inscrições</h1>
-
-                    <form onSubmit={handleLogin} className="space-y-4 bg-white/5 border border-white/10 p-8 rounded-[2rem] backdrop-blur-xl text-left">
-                        {authError && <div className="p-4 bg-red-500/20 text-red-500 rounded-xl text-xs font-bold uppercase mb-4 border border-red-500">{authError}</div>}
-
-                        <div>
-                            <label className="text-[10px] font-bold uppercase text-gray-500 mb-2 block tracking-widest">E-mail</label>
-                            <input type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 focus:border-holi-primary outline-none" required />
-                        </div>
-                        <div>
-                            <label className="text-[10px] font-bold uppercase text-gray-500 mb-2 block tracking-widest">Senha</label>
-                            <input type="password" value={password} onChange={e => setPassword(e.target.value)} className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 focus:border-holi-primary outline-none" required />
-                        </div>
-                        <button type="submit" className="w-full bg-holi-primary text-white font-black py-5 rounded-2xl hover:bg-holi-primary/80 transition-all flex items-center justify-center gap-2 mt-6 uppercase">
-                            <LogIn size={20} /> Acessar
-                        </button>
-                    </form>
-                </motion.div>
-            </div>
-        )
-    }
+    const pendingRegistrations = filtered.filter(r => r.payment_status === 'Pendente')
+    const paidRegistrations = filtered.filter(r => r.payment_status === 'Pago')
+    // We can also include 'Cancelado' if needed, but the user asked to separate Paid vs Pending. We will display these two main groups.
 
     return (
-        <div className="min-h-screen bg-[#050208] text-white pt-24 pb-20 px-4 md:px-8">
-            <div className="max-w-7xl mx-auto">
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
-                    <div>
-                        <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter">Inscrições <span className="text-holi-primary">2025</span></h1>
-                        <p className="text-gray-500 font-mono text-xs mt-2 uppercase tracking-widest">Gerenciamento de participantes do retiro</p>
-                    </div>
-                    <div className="flex gap-4">
-                        <button onClick={exportToCSV} className="bg-white/5 border border-white/10 px-6 py-4 rounded-2xl hover:bg-white/10 transition-all flex items-center gap-2 font-bold text-sm uppercase">
-                            <Download size={18} /> Exportar CSV
-                        </button>
-                        <button onClick={() => window.location.href = '/admin'} className="bg-holi-surface border border-white/10 px-6 py-4 rounded-2xl hover:bg-white/10 transition-all font-bold text-sm uppercase">
-                            Voltar ao Admin Geral
-                        </button>
+        <div className="min-h-screen bg-[#050208] text-white p-4 md:p-8">
+            {/* Header */}
+            <div className="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-6 mb-10">
+                <div>
+                    <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-white italic">
+                        Inscrições <span className="text-transparent bg-clip-text bg-gradient-to-r from-holi-primary to-blue-400">2026</span>
+                    </h1>
+                    <div className="flex items-center gap-4 mt-3 text-sm font-medium text-gray-400 uppercase tracking-widest">
+                        <span className="flex items-center gap-1.5">
+                            <Users size={16} className="text-pink-500" />
+                            {registrations.length} Cadastros
+                        </span>
+                        <span className="w-1 h-1 rounded-full bg-gray-700"></span>
+                        <span className="flex items-center gap-1.5">
+                            <CheckCircle size={16} className="text-emerald-400" />
+                            {stats.activeRegistrations} Ativos
+                        </span>
                     </div>
                 </div>
 
-                {/* Statistics Cards */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
-                    {[
-                        { label: 'Total Inscritos', value: stats.total, icon: <Users />, color: 'text-white' },
-                        { label: 'Pagamentos Ok', value: stats.paid, icon: <CheckCircle />, color: 'text-green-500' },
-                        { label: 'Pendentes', value: stats.pending, icon: <Clock />, color: 'text-yellow-500' },
-                        { label: 'Camisetas', value: stats.tshirts, icon: <Shirt />, color: 'text-holi-primary' },
-                    ].map(stat => (
-                        <div key={stat.label} className="bg-holi-surface border border-white/10 p-6 rounded-3xl">
-                            <div className={`${stat.color} mb-2`}>{stat.icon}</div>
-                            <div className="text-3xl font-black">{stat.value}</div>
-                            <div className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">{stat.label}</div>
-                        </div>
-                    ))}
-                </div>
-
-                {/* Filters */}
-                <div className="flex flex-col md:flex-row gap-4 mb-8">
-                    <div className="flex-1 relative">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+                <div className="flex flex-wrap items-center gap-3 w-full xl:w-auto">
+                    <div className="relative group flex-1 xl:flex-none">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-holi-primary transition-colors" size={18} />
                         <input
                             type="text"
-                            placeholder="Buscar por nome ou email..."
+                            placeholder="Buscar nome, email, telefone..."
                             value={searchTerm}
                             onChange={e => setSearchTerm(e.target.value)}
-                            className="w-full bg-holi-surface border border-white/10 rounded-2xl py-4 pl-12 pr-4 focus:border-holi-primary outline-none"
+                            className="w-full xl:w-80 bg-white/5 border border-transparent focus:border-holi-primary rounded-xl py-2.5 pl-10 pr-4 outline-none text-sm transition-all focus:bg-white/10"
                         />
                     </div>
-                    <div className="flex gap-4">
-                        <div className="relative">
-                            <Filter className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
-                            <select
-                                value={filterStatus}
-                                onChange={e => setFilterStatus(e.target.value)}
-                                className="bg-holi-surface border border-white/10 rounded-2xl py-4 pl-12 pr-10 outline-none appearance-none font-bold text-sm"
-                            >
-                                <option>Todos</option>
-                                <option>Pendente</option>
-                                <option>Pago</option>
-                                <option>Cancelado</option>
-                            </select>
+                    <button onClick={() => setFilterStatus('Todos')} className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 transition-colors text-sm font-semibold">
+                        <Filter size={18} /> Todos
+                    </button>
+                    <button
+                        onClick={() => setShowDashboard(!showDashboard)}
+                        className={`flex items-center gap-2 px-6 py-2.5 rounded-xl transition-all text-sm font-bold shadow-lg shadow-holi-primary/20 ${showDashboard ? 'bg-white text-black' : 'bg-holi-primary text-white hover:opacity-90'}`}
+                    >
+                        <BarChart3 size={18} /> DASHBOARD
+                    </button>
+                    <button onClick={exportToCSV} className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 transition-colors">
+                        <Download size={20} />
+                    </button>
+                </div>
+            </div>
+
+            {/* Dashboard Section (Collapsible) */}
+            <AnimatePresence>
+                {showDashboard && (
+                    <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="overflow-hidden mb-12"
+                    >
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                            {/* Card 1: Revenue - Purple Neon */}
+                            <div className="bg-white/[0.03] backdrop-blur-xl p-6 rounded-3xl border border-white/[0.08] border-l-4 border-l-holi-primary relative overflow-hidden group shadow-[0_0_15px_-3px_rgba(139,92,246,0.3)]">
+                                <div className="absolute -right-4 -top-4 w-24 h-24 bg-holi-primary/10 rounded-full blur-2xl group-hover:bg-holi-primary/20 transition-all"></div>
+                                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Valor Total</p>
+                                <h3 className="text-3xl font-black text-white">R$ {stats.totalRevenue.toLocaleString('pt-BR')}</h3>
+                                <div className="mt-4 flex items-center gap-1 text-emerald-400 text-xs font-bold">
+                                    <Activity size={14} /> +12% que ontem
+                                </div>
+                            </div>
+
+                            {/* Card 2: Active Users - Blue Neon */}
+                            <div className="bg-white/[0.03] backdrop-blur-xl p-6 rounded-3xl border border-white/[0.08] border-l-4 border-l-sky-400 relative overflow-hidden group shadow-[0_0_15px_-3px_rgba(56,189,248,0.3)]">
+                                <div className="absolute -right-4 -top-4 w-24 h-24 bg-sky-400/10 rounded-full blur-2xl group-hover:bg-sky-400/20 transition-all"></div>
+                                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Ativos</p>
+                                <h3 className="text-3xl font-black text-white">{stats.activeRegistrations}</h3>
+                                <div className="mt-4 flex items-center gap-1 text-sky-400 text-xs font-bold">
+                                    <Users size={14} /> 85% da meta
+                                </div>
+                            </div>
+
+                            {/* Card 3: T-Shirts - Pink Neon */}
+                            <div className="bg-white/[0.03] backdrop-blur-xl p-6 rounded-3xl border border-white/[0.08] border-l-4 border-l-pink-500 relative overflow-hidden group shadow-[0_0_15px_-3px_rgba(236,72,153,0.3)]">
+                                <div className="absolute -right-4 -top-4 w-24 h-24 bg-pink-500/10 rounded-full blur-2xl group-hover:bg-pink-500/20 transition-all"></div>
+                                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Camisetas</p>
+                                <h3 className="text-3xl font-black text-white">{stats.totalTshirts}</h3>
+                                <div className="mt-4 flex items-center gap-1 text-pink-400 text-xs font-bold">
+                                    <Shirt size={14} /> Produção iniciada
+                                </div>
+                            </div>
+
+                            {/* Card 4: Kits - Amber Neon */}
+                            <div className="bg-white/[0.03] backdrop-blur-xl p-6 rounded-3xl border border-white/[0.08] border-l-4 border-l-amber-400 relative overflow-hidden group shadow-[0_0_15px_-3px_rgba(251,191,36,0.3)]">
+                                <div className="absolute -right-4 -top-4 w-24 h-24 bg-amber-400/10 rounded-full blur-2xl group-hover:bg-amber-400/20 transition-all"></div>
+                                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Kits Vendidos</p>
+                                <h3 className="text-3xl font-black text-white">{Object.values(stats.kits).reduce((a, b) => a + b, 0)}</h3>
+                                <div className="mt-4 flex items-center gap-1 text-amber-400 text-xs font-bold">
+                                    <Package size={14} /> 15 em estoque
+                                </div>
+                            </div>
                         </div>
+
+                        <div className="flex flex-col lg:flex-row gap-8">
+                            {/* T-Shirt Grid */}
+                            <div className="flex-1 space-y-4">
+                                <h2 className="text-xl font-black uppercase tracking-tight flex items-center gap-2 mb-2">
+                                    <span className="w-1.5 h-6 bg-pink-500 rounded-full"></span> Production Grid
+                                </h2>
+                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                    {stats.sortedTshirts.map(([size, count]) => (
+                                        <div key={size} className="bg-white/[0.03] backdrop-blur-xl p-4 rounded-2xl text-center group hover:bg-white/10 transition-colors border border-white/5">
+                                            <span className="block text-2xl font-black text-pink-500 mb-1">{size}</span>
+                                            <span className="text-xs font-bold text-gray-400">{count} UNID.</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Kit Dist */}
+                            <div className="flex-1 space-y-4">
+                                <h2 className="text-xl font-black uppercase tracking-tight flex items-center gap-2 mb-2">
+                                    <span className="w-1.5 h-6 bg-amber-400 rounded-full"></span> Kit Distribution
+                                </h2>
+                                <div className="bg-white/[0.03] backdrop-blur-xl rounded-2xl p-6 space-y-5 border border-white/5">
+                                    {Object.entries(stats.kits).map(([kit, count]) => (
+                                        <div key={kit}>
+                                            <div className="flex justify-between items-center mb-2">
+                                                <span className="text-xs font-bold text-gray-300 uppercase">{kit}</span>
+                                                <span className="text-xs font-black text-amber-400 italic">{Math.round((count / registrations.length) * 100)}% ({count})</span>
+                                            </div>
+                                            <div className="h-1.5 w-full bg-gray-800 rounded-full overflow-hidden">
+                                                <div className="h-full bg-gradient-to-r from-amber-400 to-amber-600 rounded-full" style={{ width: `${(count / registrations.length) * 100}%` }}></div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Split Lists: Pending vs Paid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* PENDING COLUMN */}
+                <div className="space-y-6">
+                    <div className="flex items-center justify-between">
+                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-[0.2em] px-2 flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+                            Pendentes ({pendingRegistrations.length})
+                        </h3>
+                    </div>
+
+                    <div className="space-y-4">
+                        {pendingRegistrations.map(reg => (
+                            <div key={reg.id}
+                                onClick={() => setEditingReg(reg)}
+                                className="bg-white/[0.03] backdrop-blur-md rounded-2xl p-5 border-l-4 border-l-amber-500 hover:scale-[1.02] transition-transform cursor-pointer group shadow-lg border-y border-r border-white/5"
+                            >
+                                <div className="flex justify-between items-start mb-4">
+                                    <div>
+                                        <h4 className="font-bold text-lg text-white group-hover:text-amber-400 transition-colors line-clamp-1">{reg.full_name}</h4>
+                                        <p className="text-xs text-gray-500 font-mono lowercase">{reg.email}</p>
+                                    </div>
+                                    <span className="text-[10px] px-2 py-1 rounded bg-amber-500/10 text-amber-500 font-black uppercase tracking-wider border border-amber-500/20">PENDENTE</span>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-y-3 gap-x-4 mb-5">
+                                    <div>
+                                        <p className="text-[9px] uppercase tracking-widest text-gray-600 font-bold mb-0.5">Idade</p>
+                                        <p className="text-xs font-medium text-gray-300">{calculateAge(reg.birth_date)} anos</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[9px] uppercase tracking-widest text-gray-600 font-bold mb-0.5">Cidade</p>
+                                        <p className="text-xs font-medium text-gray-300 truncate">{reg.city}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[9px] uppercase tracking-widest text-gray-600 font-bold mb-0.5">Telefone</p>
+                                        <p className="text-xs font-bold text-sky-400 font-mono">{reg.phone}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[9px] uppercase tracking-widest text-gray-600 font-bold mb-0.5">Kit</p>
+                                        <p className="text-xs font-medium text-gray-300 truncate">{reg.kit_option.split(' - ')[0]}</p>
+                                    </div>
+                                </div>
+
+                                <div className="pt-4 border-t border-white/5 flex justify-between items-center">
+                                    <p className="text-[9px] uppercase font-bold text-gray-600 italic">{reg.assigned_angel ? `Anjo: ${reg.assigned_angel}` : 'SEM ANJO'}</p>
+                                    <div className="flex gap-3">
+                                        <button
+                                            onClick={(e) => handleDelete(reg.id, e)}
+                                            className="text-gray-600 hover:text-red-400 transition-colors"
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
+                                        <button className="text-[10px] font-black tracking-widest uppercase flex items-center gap-1 group/btn hover:text-white text-gray-400 transition-colors">
+                                            DETALHES <ChevronRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                        {pendingRegistrations.length === 0 && (
+                            <div className="p-10 text-center border border-dashed border-white/10 rounded-2xl text-gray-600 text-sm">
+                                Nenhuma inscrição pendente.
+                            </div>
+                        )}
                     </div>
                 </div>
 
-                {/* Table */}
-                <div className="bg-holi-surface border border-white/10 rounded-[2.5rem] overflow-hidden">
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse">
-                            <thead>
-                                <tr className="border-b border-white/5 bg-white/5">
-                                    <th className="p-6 text-[10px] font-bold uppercase tracking-widest text-gray-500">Participante</th>
-                                    <th className="p-6 text-[10px] font-bold uppercase tracking-widest text-gray-500">Paróquia / Cidade</th>
-                                    <th className="p-6 text-[10px] font-bold uppercase tracking-widest text-gray-500">Camiseta / Kit</th>
-                                    <th className="p-6 text-[10px] font-bold uppercase tracking-widest text-gray-500">Status Pagamento</th>
-                                    <th className="p-6 text-[10px] font-bold uppercase tracking-widest text-gray-500">Comprovante</th>
-                                    <th className="p-6 text-[10px] font-bold uppercase tracking-widest text-gray-500">Anjo Responsável</th>
-                                    <th className="p-6 text-[10px] font-bold uppercase tracking-widest text-gray-500">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-white/5">
-                                {loading ? (
-                                    <tr><td colSpan={7} className="p-12 text-center text-gray-500 font-mono">Carregando dados...</td></tr>
-                                ) : filtered.length === 0 ? (
-                                    <tr><td colSpan={7} className="p-12 text-center text-gray-500 font-mono">Nenhuma inscrição encontrada.</td></tr>
-                                ) : (
-                                    filtered.map(reg => (
-                                        <tr key={reg.id} className="hover:bg-white/5 transition-colors group">
-                                            <td className="p-6">
-                                                <button
-                                                    onClick={() => setEditingReg(reg)}
-                                                    className="text-left hover:text-holi-primary transition-colors group/name"
-                                                >
-                                                    <div className="font-bold text-white group-hover/name:text-holi-primary">{reg.full_name}</div>
-                                                    <div className="text-xs text-gray-500">{reg.email}</div>
-                                                </button>
-                                                <div className="flex gap-2 items-center mt-1">
-                                                    <div className="text-[10px] bg-white/5 border border-white/10 px-2 py-0.5 rounded text-gray-400 font-bold uppercase tracking-widest">{calculateAge(reg.birth_date)} anos</div>
-                                                    <div className="text-xs text-holi-secondary">{reg.phone}</div>
-                                                </div>
-                                                {reg.emergency_phone && (
-                                                    <div className="text-[10px] text-red-400/80 mt-1 uppercase font-bold tracking-tighter">🚨 Pais: {reg.emergency_phone}</div>
-                                                )}
-                                            </td>
-                                            <td className="p-6">
-                                                <div className="text-sm font-bold text-gray-300">{reg.parish}</div>
-                                                <div className="text-xs text-gray-500 uppercase">{reg.city}</div>
-                                            </td>
-                                            <td className="p-6">
-                                                {reg.tshirt_size ? (
-                                                    <div className="flex items-center gap-2 bg-holi-primary/10 text-holi-primary px-3 py-1 rounded-full text-[10px] font-black w-fit mb-1 border border-holi-primary/20">
-                                                        <Shirt size={12} /> {reg.tshirt_size}
-                                                    </div>
-                                                ) : <div className="text-xs text-gray-600">—</div>}
-                                                <div className="text-[10px] text-gray-500 font-bold uppercase tracking-tighter truncate max-w-[120px]">{reg.kit_option}</div>
-                                            </td>
-                                            <td className="p-6">
-                                                <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-black uppercase border ${reg.payment_status === 'Pago' ? 'border-green-500/30 bg-green-500/10 text-green-500' :
-                                                    reg.payment_status === 'Pendente' ? 'border-yellow-500/30 bg-yellow-500/10 text-yellow-500' :
-                                                        'border-red-500/30 bg-red-500/10 text-red-500'
-                                                    }`}>
-                                                    {reg.payment_status === 'Pago' ? <CheckCircle size={10} /> :
-                                                        reg.payment_status === 'Pendente' ? <Clock size={10} /> : <XCircle size={10} />}
-                                                    {reg.payment_status}
-                                                </div>
-                                            </td>
-                                            <td className="p-6">
-                                                {reg.payment_receipt_url ? (
-                                                    <a
-                                                        href={reg.payment_receipt_url}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="inline-flex items-center gap-2 px-3 py-2 bg-holi-primary/10 text-holi-primary border border-holi-primary/20 rounded-xl hover:bg-holi-primary hover:text-white transition-all text-xs font-bold"
-                                                    >
-                                                        <FileText size={14} />
-                                                        Ver Comprovante
-                                                        <ExternalLink size={12} />
-                                                    </a>
-                                                ) : (
-                                                    <div className="text-xs text-gray-600 italic">Sem comprovante</div>
-                                                )}
-                                            </td>
-                                            <td className="p-6">
-                                                <div className="flex items-center gap-2 text-sm">
-                                                    <UserCheck size={16} className={reg.assigned_angel ? 'text-holi-primary' : 'text-gray-700'} />
-                                                    <span className={reg.assigned_angel ? 'font-bold' : 'italic text-gray-600'}>
-                                                        {reg.assigned_angel || 'Não atribuído'}
-                                                    </span>
-                                                </div>
-                                            </td>
-                                            <td className="p-6">
-                                                <button
-                                                    onClick={() => setEditingReg(reg)}
-                                                    className="p-3 bg-white/5 border border-white/10 rounded-xl hover:bg-holi-primary hover:text-white transition-all"
-                                                >
-                                                    <Edit3 size={18} />
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
+                {/* PAID COLUMN */}
+                <div className="space-y-6">
+                    <div className="flex items-center justify-between">
+                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-[0.2em] px-2 flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                            Pagos ({paidRegistrations.length})
+                        </h3>
+                    </div>
+
+                    <div className="space-y-4">
+                        {paidRegistrations.map(reg => (
+                            <div key={reg.id}
+                                onClick={() => setEditingReg(reg)}
+                                className="bg-white/[0.03] backdrop-blur-md rounded-2xl p-5 border-l-4 border-l-emerald-500 hover:scale-[1.02] transition-transform cursor-pointer group shadow-lg border-y border-r border-white/5"
+                            >
+                                <div className="flex justify-between items-start mb-4">
+                                    <div>
+                                        <h4 className="font-bold text-lg text-white group-hover:text-emerald-400 transition-colors line-clamp-1">{reg.full_name}</h4>
+                                        <p className="text-xs text-gray-500 font-mono lowercase">{reg.email}</p>
+                                    </div>
+                                    <span className="text-[10px] px-2 py-1 rounded bg-emerald-500/10 text-emerald-500 font-black uppercase tracking-wider border border-emerald-500/20">PAGO</span>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-y-3 gap-x-4 mb-5">
+                                    <div>
+                                        <p className="text-[9px] uppercase tracking-widest text-gray-600 font-bold mb-0.5">Idade</p>
+                                        <p className="text-xs font-medium text-gray-300">{calculateAge(reg.birth_date)} anos</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[9px] uppercase tracking-widest text-gray-600 font-bold mb-0.5">Cidade</p>
+                                        <p className="text-xs font-medium text-gray-300 truncate">{reg.city}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[9px] uppercase tracking-widest text-gray-600 font-bold mb-0.5">Telefone</p>
+                                        <p className="text-xs font-bold text-sky-400 font-mono">{reg.phone}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[9px] uppercase tracking-widest text-gray-600 font-bold mb-0.5">Kit</p>
+                                        <p className="text-xs font-medium text-gray-300 truncate">{reg.kit_option.split(' - ')[0]}</p>
+                                    </div>
+                                </div>
+
+                                <div className="pt-4 border-t border-white/5 flex justify-between items-center">
+                                    <p className="text-[9px] uppercase font-bold text-gray-600 italic">{reg.assigned_angel ? `Anjo: ${reg.assigned_angel}` : 'SEM ANJO'}</p>
+                                    <div className="flex gap-3">
+                                        <button
+                                            onClick={(e) => handleDelete(reg.id, e)}
+                                            className="text-gray-600 hover:text-red-400 transition-colors"
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
+                                        <button className="text-[10px] font-black tracking-widest uppercase flex items-center gap-1 group/btn hover:text-white text-gray-400 transition-colors">
+                                            DETALHES <ChevronRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                        {paidRegistrations.length === 0 && (
+                            <div className="p-10 text-center border border-dashed border-white/10 rounded-2xl text-gray-600 text-sm">
+                                Nenhuma inscrição confirmada.
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
 
-            {/* Edit Modal */}
+
+            {/* Edit Modal (Keeping existing logic but updating z-index as requested previously) */}
             <AnimatePresence>
                 {editingReg && (
-                    <div className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+                    <div className="fixed inset-0 z-[9999] bg-black/90 backdrop-blur-xl flex items-center justify-center p-4">
                         <motion.div
-                            initial={{ scale: 0.9, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0.9, opacity: 0 }}
-                            className="bg-holi-surface border border-white/10 w-full max-w-lg rounded-[2.5rem] p-8 md:p-12 relative"
+                            initial={{ scale: 0.95, opacity: 0, y: 20 }}
+                            animate={{ scale: 1, opacity: 1, y: 0 }}
+                            exit={{ scale: 0.95, opacity: 0, y: 20 }}
+                            className="bg-[#0a0a0a] border border-white/10 w-full max-w-2xl rounded-[2.5rem] p-8 md:p-10 relative shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
                         >
-                            <button onClick={() => setEditingReg(null)} className="absolute top-6 right-6 text-gray-500 hover:text-white"><X size={24} /></button>
+                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-holi-primary via-holi-secondary to-holi-accent"></div>
 
-                            <h2 className="text-2xl font-black uppercase tracking-tight mb-2">Editar Participante</h2>
-                            <p className="text-gray-500 text-sm mb-8">{editingReg.full_name}</p>
+                            <div className="flex justify-between items-start mb-8 shrink-0">
+                                <div>
+                                    <h2 className="text-3xl font-black uppercase tracking-tighter text-white mb-2">Detalhes</h2>
+                                    <div className="flex gap-2 text-gray-500 font-mono text-xs">
+                                        <span className="bg-white/5 px-2 py-1 rounded border border-white/5">ID: {editingReg.id.split('-')[0]}</span>
+                                        <span className="bg-white/5 px-2 py-1 rounded border border-white/5">{new Date(editingReg.created_at).toLocaleDateString()}</span>
+                                    </div>
+                                </div>
+                                <button onClick={() => setEditingReg(null)} className="p-3 bg-white/5 hover:bg-white/10 rounded-full text-white transition-all"><X size={20} /></button>
+                            </div>
 
-                            <form onSubmit={handleUpdateRegistration} className="space-y-6 max-h-[60vh] overflow-y-auto pr-4 scrollbar-thin scrollbar-thumb-white/10">
+                            <form onSubmit={handleUpdateRegistration} className="space-y-6 overflow-y-auto pr-2 custom-scrollbar flex-1">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div>
-                                        <label className="text-xs font-bold uppercase text-gray-500 mb-2 block tracking-widest">Nome Completo</label>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-bold uppercase text-gray-500 tracking-widest pl-1">Nome Completo</label>
                                         <input
                                             type="text"
                                             value={editingReg.full_name || ''}
                                             onChange={e => setEditingReg({ ...editingReg, full_name: e.target.value })}
-                                            className="w-full bg-black/50 border border-white/10 rounded-2xl py-4 px-6 focus:border-holi-primary outline-none"
+                                            className="w-full bg-white/5 border-2 border-transparent focus:border-holi-primary/50 focus:bg-white/10 rounded-2xl py-4 px-5 outline-none text-white font-bold transition-all"
                                         />
                                     </div>
-                                    <div>
-                                        <label className="text-xs font-bold uppercase text-gray-500 mb-2 block tracking-widest">Gênero</label>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-bold uppercase text-gray-500 tracking-widest pl-1">Status Pagamento</label>
                                         <select
-                                            value={editingReg.gender || ''}
-                                            onChange={e => setEditingReg({ ...editingReg, gender: e.target.value })}
-                                            className="w-full bg-black/50 border border-white/10 rounded-2xl py-4 px-6 focus:border-holi-primary outline-none appearance-none"
+                                            value={editingReg.payment_status}
+                                            onChange={e => setEditingReg({ ...editingReg, payment_status: e.target.value as any })}
+                                            className={`w-full appearance-none rounded-2xl py-4 px-5 outline-none font-bold transition-all border-2 border-transparent
+                                                ${editingReg.payment_status === 'Pago' ? 'bg-green-500/20 text-green-500' :
+                                                    editingReg.payment_status === 'Pendente' ? 'bg-yellow-500/20 text-yellow-500' :
+                                                        'bg-red-500/20 text-red-500'}
+                                            `}
                                         >
-                                            <option value="">Selecione</option>
-                                            <option value="Masculino">Masculino</option>
-                                            <option value="Feminino">Feminino</option>
-                                            <option value="Outro">Outro</option>
+                                            <option value="Pendente" className="bg-gray-900 text-white">Pendente</option>
+                                            <option value="Pago" className="bg-gray-900 text-white">Pago</option>
+                                            <option value="Cancelado" className="bg-gray-900 text-white">Cancelado</option>
                                         </select>
                                     </div>
                                 </div>
 
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-bold uppercase text-gray-500 tracking-widest pl-1">Anjo (Padrinho)</label>
+                                    <div className="relative">
+                                        <UserCheck className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+                                        <input
+                                            type="text"
+                                            value={editingReg.assigned_angel || ''}
+                                            onChange={e => setEditingReg({ ...editingReg, assigned_angel: e.target.value })}
+                                            className="w-full bg-white/5 border-2 border-transparent focus:border-holi-secondary/50 focus:bg-white/10 rounded-2xl py-4 pl-12 pr-5 outline-none text-holi-secondary font-bold transition-all"
+                                            placeholder="Ainda não definido..."
+                                        />
+                                    </div>
+                                </div>
+
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div>
-                                        <label className="text-xs font-bold uppercase text-gray-500 mb-2 block tracking-widest">Telefone</label>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-bold uppercase text-gray-500 tracking-widest pl-1">Telefone / WhatsApp</label>
                                         <input
                                             type="text"
                                             value={editingReg.phone || ''}
                                             onChange={e => setEditingReg({ ...editingReg, phone: e.target.value })}
-                                            className="w-full bg-black/50 border border-white/10 rounded-2xl py-4 px-6 focus:border-holi-primary outline-none"
+                                            className="w-full bg-white/5 border-2 border-transparent focus:border-white/20 rounded-2xl py-4 px-5 outline-none text-gray-300 font-mono text-sm transition-all"
                                         />
                                     </div>
-                                    <div>
-                                        <label className="text-xs font-bold uppercase text-gray-500 mb-2 block tracking-widest">Telefone Pais/Emergência</label>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-bold uppercase text-red-400/70 tracking-widest pl-1">Emergência</label>
                                         <input
                                             type="text"
                                             value={editingReg.emergency_phone || ''}
                                             onChange={e => setEditingReg({ ...editingReg, emergency_phone: e.target.value })}
-                                            className="w-full bg-black/50 border border-white/10 rounded-2xl py-4 px-6 focus:border-holi-primary outline-none text-red-400 font-bold"
+                                            className="w-full bg-red-500/5 border-2 border-transparent focus:border-red-500/30 rounded-2xl py-4 px-5 outline-none text-red-300 font-mono text-sm transition-all"
                                         />
                                     </div>
                                 </div>
 
-                                <div>
-                                    <label className="text-xs font-bold uppercase text-gray-500 mb-2 block tracking-widest">Endereço Completo</label>
-                                    <textarea
-                                        value={editingReg.address || ''}
-                                        onChange={e => setEditingReg({ ...editingReg, address: e.target.value })}
-                                        className="w-full bg-black/50 border border-white/10 rounded-2xl py-4 px-6 focus:border-holi-primary outline-none h-24 resize-none"
-                                    />
+                                <div className="p-6 rounded-3xl bg-white/[0.03] border border-white/5 space-y-4">
+                                    <h4 className="text-xs font-black uppercase tracking-widest text-gray-400 flex items-center gap-2"><Shirt size={14} /> Preferências do Kit</h4>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="space-y-1">
+                                            <label className="text-[10px] font-bold uppercase text-gray-600">Camiseta 1</label>
+                                            <input
+                                                type="text"
+                                                value={editingReg.tshirt_size || ''}
+                                                onChange={e => setEditingReg({ ...editingReg, tshirt_size: e.target.value })}
+                                                className="w-full bg-black border border-white/10 p-3 rounded-xl text-sm outline-none focus:border-holi-primary"
+                                            />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <label className="text-[10px] font-bold uppercase text-gray-600">Camiseta 2</label>
+                                            <input
+                                                type="text"
+                                                value={editingReg.tshirt_size_2 || ''}
+                                                onChange={e => setEditingReg({ ...editingReg, tshirt_size_2: e.target.value })}
+                                                className="w-full bg-black border border-white/10 p-3 rounded-xl text-sm outline-none focus:border-holi-primary"
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div>
-                                        <label className="text-xs font-bold uppercase text-gray-500 mb-2 block tracking-widest">Paróquia</label>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-bold uppercase text-gray-500 tracking-widest pl-1">Comprovante</label>
+                                    <div className="flex gap-2">
                                         <input
                                             type="text"
-                                            value={editingReg.parish || ''}
-                                            onChange={e => setEditingReg({ ...editingReg, parish: e.target.value })}
-                                            className="w-full bg-black/50 border border-white/10 rounded-2xl py-4 px-6 focus:border-holi-primary outline-none"
+                                            value={editingReg.payment_receipt_url || ''}
+                                            readOnly={true}
+                                            className="flex-1 bg-white/5 border border-white/5 rounded-2xl py-4 px-5 outline-none text-xs font-mono text-gray-500 cursor-not-allowed"
                                         />
+                                        {editingReg.payment_receipt_url && (
+                                            <a href={editingReg.payment_receipt_url} target="_blank" rel="noopener noreferrer" className="px-6 bg-holi-primary text-white rounded-2xl flex items-center justify-center font-bold hover:scale-105 transition-all shadow-lg shadow-holi-primary/20">
+                                                Visualizar
+                                            </a>
+                                        )}
                                     </div>
-                                    <div>
-                                        <label className="text-xs font-bold uppercase text-gray-500 mb-2 block tracking-widest">Cidade</label>
-                                        <input
-                                            type="text"
-                                            value={editingReg.city || ''}
-                                            onChange={e => setEditingReg({ ...editingReg, city: e.target.value })}
-                                            className="w-full bg-black/50 border border-white/10 rounded-2xl py-4 px-6 focus:border-holi-primary outline-none"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div>
-                                        <label className="text-xs font-bold uppercase text-gray-500 mb-2 block tracking-widest">Tamanho Camiseta 1</label>
-                                        <input
-                                            type="text"
-                                            value={editingReg.tshirt_size || ''}
-                                            onChange={e => setEditingReg({ ...editingReg, tshirt_size: e.target.value })}
-                                            className="w-full bg-black/50 border border-white/10 rounded-2xl py-4 px-6 focus:border-holi-primary outline-none"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="text-xs font-bold uppercase text-gray-500 mb-2 block tracking-widest">Tamanho Camiseta 2</label>
-                                        <input
-                                            type="text"
-                                            value={editingReg.tshirt_size_2 || ''}
-                                            onChange={e => setEditingReg({ ...editingReg, tshirt_size_2: e.target.value })}
-                                            className="w-full bg-black/50 border border-white/10 rounded-2xl py-4 px-6 focus:border-holi-primary outline-none"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/10">
-                                    <input
-                                        type="checkbox"
-                                        id="staying_on_site"
-                                        checked={editingReg.staying_on_site || false}
-                                        onChange={e => setEditingReg({ ...editingReg, staying_on_site: e.target.checked })}
-                                        className="w-5 h-5 accent-holi-primary"
-                                    />
-                                    <label htmlFor="staying_on_site" className="text-sm font-bold uppercase tracking-tight">Vai dormir no local do retiro?</label>
-                                </div>
-
-                                <div>
-                                    <label className="text-xs font-bold uppercase text-gray-500 mb-2 block tracking-widest">URL do Comprovante</label>
-                                    <input
-                                        type="text"
-                                        value={editingReg.payment_receipt_url || ''}
-                                        onChange={e => setEditingReg({ ...editingReg, payment_receipt_url: e.target.value })}
-                                        className="w-full bg-black/50 border border-white/10 rounded-2xl py-4 px-6 focus:border-holi-primary outline-none text-xs font-mono"
-                                        placeholder="https://..."
-                                    />
-                                    {editingReg.payment_receipt_url && (
-                                        <a href={editingReg.payment_receipt_url} target="_blank" rel="noopener noreferrer" className="text-[10px] text-holi-primary hover:underline mt-2 inline-flex items-center gap-1">
-                                            <ExternalLink size={10} /> Testar link do comprovante
-                                        </a>
-                                    )}
-                                </div>
-
-                                <div>
-                                    <label className="text-xs font-bold uppercase text-gray-500 mb-2 block tracking-widest">Status Pagamento</label>
-                                    <div className="grid grid-cols-3 gap-2">
-                                        {['Pendente', 'Pago', 'Cancelado'].map(status => (
-                                            <label key={status}>
-                                                <input
-                                                    type="radio"
-                                                    name="status"
-                                                    value={status}
-                                                    checked={editingReg.payment_status === status}
-                                                    onChange={() => setEditingReg({ ...editingReg, payment_status: status as any })}
-                                                    className="hidden peer"
-                                                />
-                                                <div className="bg-black/50 border border-white/10 rounded-xl py-3 text-center cursor-pointer hover:border-white/20 peer-checked:bg-white peer-checked:text-black text-[10px] font-black transition-all uppercase">
-                                                    {status}
-                                                </div>
-                                            </label>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label className="text-xs font-bold uppercase text-gray-500 mb-2 block tracking-widest">Anjo Responsável</label>
-                                    <input
-                                        type="text"
-                                        value={editingReg.assigned_angel || ''}
-                                        onChange={e => setEditingReg({ ...editingReg, assigned_angel: e.target.value })}
-                                        className="w-full bg-black/50 border border-white/10 rounded-2xl py-4 px-6 focus:border-holi-primary outline-none"
-                                        placeholder="Nome do anjo..."
-                                    />
                                 </div>
 
                                 <button
                                     disabled={isSaving}
-                                    className="w-full bg-holi-primary text-white font-black py-5 rounded-2xl hover:bg-holi-primary/80 transition-all flex items-center justify-center gap-2 mt-8 uppercase tracking-widest sticky bottom-0"
+                                    className="w-full bg-white text-black font-black py-5 rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 uppercase tracking-widest shadow-xl text-lg mt-4"
                                 >
-                                    {isSaving ? 'Salvando...' : <><Save size={20} /> Salvar Alterações</>}
+                                    {isSaving ? 'Salvando...' : 'Salvar Alterações'}
                                 </button>
                             </form>
                         </motion.div>

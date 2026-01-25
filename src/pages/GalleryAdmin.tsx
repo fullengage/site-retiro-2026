@@ -147,57 +147,52 @@ const GalleryAdmin = () => {
     }
 
     return (
-        <div className="min-h-screen bg-[#050208] text-white p-8">
-            <div className="max-w-6xl mx-auto">
-                <div className="flex justify-between items-center mb-12">
-                    <div>
-                        <h1 className="text-4xl font-black uppercase tracking-tighter">Gestão da <span className="text-holi-primary">Galeria</span></h1>
-                        <p className="text-gray-500 font-mono text-xs mt-1">POSICIONAMENTO TIPO POLAROID NO SITE</p>
-                    </div>
-                    <div className="flex gap-4">
-                        <label className="bg-white text-black px-6 py-4 rounded-full font-bold flex items-center gap-2 cursor-pointer hover:bg-gray-100 transition-all shadow-lg">
-                            {uploading ? <Loader2 size={18} className="animate-spin" /> : <Plus size={18} />}
-                            Upload Nova Foto
-                            <input type="file" className="hidden" accept="image/*" onChange={handleFileUpload} disabled={uploading} />
-                        </label>
-                        <button onClick={() => window.location.href = '/admin'} className="bg-holi-surface border border-white/10 px-6 py-4 rounded-full font-bold transition-all text-xs uppercase tracking-widest text-gray-400 hover:text-white">
-                            Sair
-                        </button>
-                    </div>
+        <div className="p-8 max-w-7xl mx-auto">
+            <div className="flex justify-between items-center mb-12">
+                <div>
+                    <h1 className="text-4xl font-black uppercase tracking-tighter text-white">Gestão da <span className="text-holi-primary">Galeria</span></h1>
+                    <p className="text-gray-500 font-mono text-xs mt-1">POSICIONAMENTO TIPO POLAROID NO SITE</p>
                 </div>
+                <div className="flex gap-4">
+                    <label className="bg-white text-black px-6 py-4 rounded-full font-bold flex items-center gap-2 cursor-pointer hover:bg-gray-100 transition-all shadow-lg">
+                        {uploading ? <Loader2 size={18} className="animate-spin" /> : <Plus size={18} />}
+                        Upload Nova Foto
+                        <input type="file" className="hidden" accept="image/*" onChange={handleFileUpload} disabled={uploading} />
+                    </label>
+                </div>
+            </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {loading ? (
-                        <div className="col-span-full py-20 text-center font-marker text-4xl opacity-20">Carregando Galeria...</div>
-                    ) : images.length === 0 ? (
-                        <div className="col-span-full py-20 text-center text-gray-500 border-2 border-dashed border-white/5 rounded-3xl">
-                            Nenhuma foto na galeria. Faça um upload para começar!
-                        </div>
-                    ) : (
-                        images.map(img => (
-                            <div key={img.id} className="bg-holi-surface border border-white/10 rounded-2xl overflow-hidden group">
-                                <div className="aspect-video relative overflow-hidden bg-black/50">
-                                    <img src={img.url} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
-                                        <button onClick={() => setEditingImage(img)} className="bg-white text-black p-3 rounded-full hover:scale-110 transition-transform">
-                                            <ImageIcon size={20} />
-                                        </button>
-                                        <button onClick={() => handleDelete(img.id, img.url)} className="bg-red-500 text-white p-3 rounded-full hover:scale-110 transition-transform">
-                                            <Trash2 size={20} />
-                                        </button>
-                                    </div>
-                                </div>
-                                <div className="p-4 border-t border-white/5 space-y-2">
-                                    <div className="text-xs font-bold uppercase tracking-widest text-holi-secondary truncate">{img.label || 'Sem Legenda'}</div>
-                                    <div className="flex justify-between items-center text-[10px] text-gray-500 font-mono">
-                                        <span>Z-INDEX: {img.z_index}</span>
-                                        <span>ROT: {img.rotate}°</span>
-                                    </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {loading ? (
+                    <div className="col-span-full py-20 text-center font-marker text-4xl opacity-20 text-white">Carregando Galeria...</div>
+                ) : images.length === 0 ? (
+                    <div className="col-span-full py-20 text-center text-gray-500 border-2 border-dashed border-white/5 rounded-3xl">
+                        Nenhuma foto na galeria. Faça um upload para começar!
+                    </div>
+                ) : (
+                    images.map(img => (
+                        <div key={img.id} className="bg-holi-surface border border-white/10 rounded-2xl overflow-hidden group">
+                            <div className="aspect-video relative overflow-hidden bg-black/50">
+                                <img src={img.url} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
+                                    <button onClick={() => setEditingImage(img)} className="bg-white text-black p-3 rounded-full hover:scale-110 transition-transform">
+                                        <ImageIcon size={20} />
+                                    </button>
+                                    <button onClick={() => handleDelete(img.id, img.url)} className="bg-red-500 text-white p-3 rounded-full hover:scale-110 transition-transform">
+                                        <Trash2 size={20} />
+                                    </button>
                                 </div>
                             </div>
-                        ))
-                    )}
-                </div>
+                            <div className="p-4 border-t border-white/5 space-y-2">
+                                <div className="text-xs font-bold uppercase tracking-widest text-holi-secondary truncate">{img.label || 'Sem Legenda'}</div>
+                                <div className="flex justify-between items-center text-[10px] text-gray-500 font-mono">
+                                    <span>Z-INDEX: {img.z_index}</span>
+                                    <span>ROT: {img.rotate}°</span>
+                                </div>
+                            </div>
+                        </div>
+                    ))
+                )}
             </div>
 
             {/* Editing Modal */}
@@ -230,7 +225,7 @@ const GalleryAdmin = () => {
 
                             <form onSubmit={handleUpdate} className="p-8 md:p-10 space-y-6">
                                 <div className="flex justify-between items-center mb-4">
-                                    <h3 className="text-2xl font-black uppercase tracking-tight">Personalizar Foto</h3>
+                                    <h3 className="text-2xl font-black uppercase tracking-tight text-white">Personalizar Foto</h3>
                                     <button type="button" onClick={() => setEditingImage(null)} className="text-gray-500 hover:text-white"><X size={24} /></button>
                                 </div>
 
@@ -241,7 +236,7 @@ const GalleryAdmin = () => {
                                             type="text"
                                             value={editingImage.label || ''}
                                             onChange={e => setEditingImage({ ...editingImage, label: e.target.value })}
-                                            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:border-holi-primary outline-none text-sm"
+                                            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:border-holi-primary outline-none text-sm text-white"
                                             placeholder="Ex: Alegria!"
                                         />
                                     </label>
@@ -253,7 +248,7 @@ const GalleryAdmin = () => {
                                                 type="number"
                                                 value={editingImage.rotate}
                                                 onChange={e => setEditingImage({ ...editingImage, rotate: parseInt(e.target.value) })}
-                                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:border-holi-primary outline-none text-sm"
+                                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:border-holi-primary outline-none text-sm text-white"
                                             />
                                         </label>
                                         <label className="block">
@@ -262,7 +257,7 @@ const GalleryAdmin = () => {
                                                 type="number"
                                                 value={editingImage.z_index}
                                                 onChange={e => setEditingImage({ ...editingImage, z_index: parseInt(e.target.value) })}
-                                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:border-holi-primary outline-none text-sm"
+                                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:border-holi-primary outline-none text-sm text-white"
                                             />
                                         </label>
                                     </div>
@@ -274,7 +269,7 @@ const GalleryAdmin = () => {
                                                 type="text"
                                                 value={editingImage.position_top || ''}
                                                 onChange={e => setEditingImage({ ...editingImage, position_top: e.target.value })}
-                                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:border-holi-primary outline-none text-sm"
+                                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:border-holi-primary outline-none text-sm text-white"
                                                 placeholder="Ex: 15%"
                                             />
                                         </label>
@@ -284,7 +279,7 @@ const GalleryAdmin = () => {
                                                 type="text"
                                                 value={editingImage.position_left || ''}
                                                 onChange={e => setEditingImage({ ...editingImage, position_left: e.target.value })}
-                                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:border-holi-primary outline-none text-sm"
+                                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:border-holi-primary outline-none text-sm text-white"
                                                 placeholder="Ex: 20%"
                                             />
                                         </label>
@@ -296,7 +291,7 @@ const GalleryAdmin = () => {
                                             <select
                                                 value={editingImage.aspect_ratio}
                                                 onChange={e => setEditingImage({ ...editingImage, aspect_ratio: e.target.value })}
-                                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 outline-none text-sm"
+                                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 outline-none text-sm text-white"
                                             >
                                                 <option value="aspect-square">Quadrado</option>
                                                 <option value="aspect-video">Widescreen</option>
@@ -309,7 +304,7 @@ const GalleryAdmin = () => {
                                             <select
                                                 value={editingImage.width_class}
                                                 onChange={e => setEditingImage({ ...editingImage, width_class: e.target.value })}
-                                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 outline-none text-sm"
+                                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 outline-none text-sm text-white"
                                             >
                                                 <option value="w-32">Pequeno (w-32)</option>
                                                 <option value="w-40">médio (w-40)</option>
