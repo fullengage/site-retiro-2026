@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
     Search, Download, Users, CheckCircle,
     XCircle, Clock, Shirt, UserCheck,
-    Filter, Edit3, X, Save, FileText, ExternalLink, Trash2, AlertTriangle, ChevronRight, BarChart3, Package, DollarSign, Activity, ShoppingBag, Mail, Table as TableIcon
+    Filter, Edit3, X, Save, FileText, ExternalLink, Trash2, AlertTriangle, ChevronRight, BarChart3, Package, DollarSign, Activity, ShoppingBag, Mail, Table as TableIcon, Loader2, Upload
 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 
@@ -41,6 +41,7 @@ const RegistrationAdmin = () => {
     const [isSaving, setIsSaving] = useState(false)
     const [deletingId, setDeletingId] = useState<string | null>(null)
     const [showDashboard, setShowDashboard] = useState(false)
+    const [uploadingReceipt, setUploadingReceipt] = useState(false)
 
     useEffect(() => {
         fetchRegistrations()
@@ -88,6 +89,7 @@ const RegistrationAdmin = () => {
                 assigned_angel: editingReg.assigned_angel,
                 payment_receipt_url: editingReg.payment_receipt_url,
                 full_name: editingReg.full_name,
+                email: editingReg.email,
                 phone: editingReg.phone,
                 emergency_phone: editingReg.emergency_phone,
                 address: editingReg.address,
@@ -96,7 +98,9 @@ const RegistrationAdmin = () => {
                 tshirt_size: editingReg.tshirt_size,
                 tshirt_size_2: editingReg.tshirt_size_2,
                 staying_on_site: editingReg.staying_on_site,
-                gender: editingReg.gender
+                gender: editingReg.gender,
+                birth_date: editingReg.birth_date,
+                kit_option: editingReg.kit_option
             })
             .eq('id', editingReg.id)
 
@@ -107,6 +111,45 @@ const RegistrationAdmin = () => {
             setEditingReg(null)
         }
         setIsSaving(false)
+    }
+
+    const handleAdminReceiptUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (!e.target.files || !e.target.files[0] || !editingReg) return
+
+        const file = e.target.files[0]
+        if (file.size > 5 * 1024 * 1024) {
+            alert('O arquivo deve ter no máximo 5MB')
+            return
+        }
+
+        setUploadingReceipt(true)
+
+        try {
+            const fileExt = file.name.split('.').pop()
+            const fileName = `${Date.now()}_${editingReg.email.replace(/[^a-zA-Z0-9]/g, '_')}.${fileExt}`
+            const filePath = `${fileName}`
+
+            const { error: uploadError } = await supabase.storage
+                .from('pagamentos')
+                .upload(filePath, file, {
+                    cacheControl: '3600',
+                    upsert: false
+                })
+
+            if (uploadError) throw new Error('Erro ao fazer upload: ' + uploadError.message)
+
+            const { data: { publicUrl } } = supabase.storage
+                .from('pagamentos')
+                .getPublicUrl(filePath)
+
+            setEditingReg({ ...editingReg, payment_receipt_url: publicUrl })
+
+        } catch (err: any) {
+            console.error('Upload error:', err)
+            alert(err.message || 'Erro ao enviar comprovante')
+        } finally {
+            setUploadingReceipt(false)
+        }
     }
 
     const filtered = registrations.filter(reg => {
@@ -497,6 +540,24 @@ const RegistrationAdmin = () => {
                                         />
                                     </div>
                                     <div className="space-y-2">
+                                        <label className="text-[10px] font-bold uppercase text-gray-500 tracking-widest pl-1">Email</label>
+                                        <input
+                                            type="email"
+                                            value={editingReg.email || ''}
+                                            onChange={e => setEditingReg({ ...editingReg, email: e.target.value })}
+                                            className="w-full bg-white/5 border-2 border-transparent focus:border-holi-primary/50 focus:bg-white/10 rounded-2xl py-4 px-5 outline-none text-gray-300 font-medium transition-all"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-bold uppercase text-gray-500 tracking-widest pl-1">Data Nascimento (Idade: {calculateAge(editingReg.birth_date)})</label>
+                                        <input
+                                            type="date"
+                                            value={editingReg.birth_date || ''}
+                                            onChange={e => setEditingReg({ ...editingReg, birth_date: e.target.value })}
+                                            className="w-full bg-white/5 border-2 border-transparent focus:border-holi-primary/50 focus:bg-white/10 rounded-2xl py-4 px-5 outline-none text-white font-mono transition-all"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
                                         <label className="text-[10px] font-bold uppercase text-gray-500 tracking-widest pl-1">Status Pagamento</label>
                                         <select
                                             value={editingReg.payment_status}
@@ -549,6 +610,83 @@ const RegistrationAdmin = () => {
                                     </div>
                                 </div>
 
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-bold uppercase text-gray-500 tracking-widest pl-1">Endereço</label>
+                                        <input
+                                            type="text"
+                                            value={editingReg.address || ''}
+                                            onChange={e => setEditingReg({ ...editingReg, address: e.target.value })}
+                                            className="w-full bg-white/5 border-2 border-transparent focus:border-white/20 rounded-2xl py-4 px-5 outline-none text-gray-300 text-sm transition-all"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-bold uppercase text-gray-500 tracking-widest pl-1">Cidade</label>
+                                        <input
+                                            type="text"
+                                            value={editingReg.city || ''}
+                                            onChange={e => setEditingReg({ ...editingReg, city: e.target.value })}
+                                            className="w-full bg-white/5 border-2 border-transparent focus:border-white/20 rounded-2xl py-4 px-5 outline-none text-gray-300 text-sm transition-all"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-bold uppercase text-gray-500 tracking-widest pl-1">Paróquia</label>
+                                        <select
+                                            value={editingReg.parish || ''}
+                                            onChange={e => setEditingReg({ ...editingReg, parish: e.target.value })}
+                                            className="w-full bg-white/5 border-2 border-transparent focus:border-white/20 rounded-2xl py-4 px-5 outline-none text-gray-300 text-sm transition-all appearance-none"
+                                        >
+                                            <option value="" disabled className="bg-gray-900">Selecione...</option>
+                                            <option value="Paróquia São José da Santíssima Trindade" className="bg-gray-900">Paróquia São José da Santíssima Trindade</option>
+                                            <option value="Paróquia Santa Clara de Assis" className="bg-gray-900">Paróquia Santa Clara de Assis</option>
+                                            <option value="Paróquia São Sebastião" className="bg-gray-900">Paróquia São Sebastião</option>
+                                            <option value="Outros" className="bg-gray-900">Outros</option>
+                                        </select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-bold uppercase text-gray-500 tracking-widest pl-1">Sexo</label>
+                                        <select
+                                            value={editingReg.gender || ''}
+                                            onChange={e => setEditingReg({ ...editingReg, gender: e.target.value })}
+                                            className="w-full bg-white/5 border-2 border-transparent focus:border-white/20 rounded-2xl py-4 px-5 outline-none text-gray-300 text-sm transition-all appearance-none"
+                                        >
+                                            <option value="" disabled className="bg-gray-900">Selecione...</option>
+                                            <option value="Masculino" className="bg-gray-900">Masculino</option>
+                                            <option value="Feminino" className="bg-gray-900">Feminino</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div className="p-4 bg-white/5 rounded-2xl border border-white/5 flex flex-col sm:flex-row gap-4 sm:items-center">
+                                    <div className="flex-1">
+                                        <label className="text-[10px] font-bold uppercase text-gray-500 tracking-widest pl-1 block mb-2">Opção de Kit</label>
+                                        <select
+                                            value={editingReg.kit_option || ''}
+                                            onChange={e => setEditingReg({ ...editingReg, kit_option: e.target.value })}
+                                            className="w-full bg-black/20 border border-white/10 rounded-xl py-2 px-3 outline-none text-white text-sm transition-all"
+                                        >
+                                            <option value="Kit 01 - Inscrição (R$ 30,00)" className="bg-gray-900">Kit 01 (R$ 30)</option>
+                                            <option value="Kit 02 - Inscrição + Camiseta (R$ 80,00)" className="bg-gray-900">Kit 02 (R$ 80)</option>
+                                            <option value="Kit 03 - Inscrição + 2 Camisetas + Kit Intocáveis (R$ 160,00)" className="bg-gray-900">Kit 03 (R$ 160)</option>
+                                        </select>
+                                    </div>
+                                    <div className="flex items-center gap-3 pt-4 sm:pt-0">
+                                        <input
+                                            type="checkbox"
+                                            checked={editingReg.staying_on_site || false}
+                                            onChange={e => setEditingReg({ ...editingReg, staying_on_site: e.target.checked })}
+                                            className="w-5 h-5 accent-holi-primary"
+                                            id="staying_check"
+                                        />
+                                        <label htmlFor="staying_check" className="text-sm font-bold text-white cursor-pointer select-none">
+                                            Dormir no local?
+                                        </label>
+                                    </div>
+                                </div>
+
                                 <div className="p-6 rounded-3xl bg-white/[0.03] border border-white/5 space-y-4">
                                     <h4 className="text-xs font-black uppercase tracking-widest text-gray-400 flex items-center gap-2"><Shirt size={14} /> Preferências do Kit</h4>
                                     <div className="grid grid-cols-2 gap-4">
@@ -575,18 +713,50 @@ const RegistrationAdmin = () => {
 
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-bold uppercase text-gray-500 tracking-widest pl-1">Comprovante</label>
-                                    <div className="flex gap-2">
-                                        <input
-                                            type="text"
-                                            value={editingReg.payment_receipt_url || ''}
-                                            readOnly={true}
-                                            className="flex-1 bg-white/5 border border-white/5 rounded-2xl py-4 px-5 outline-none text-xs font-mono text-gray-500 cursor-not-allowed"
-                                        />
-                                        {editingReg.payment_receipt_url && (
-                                            <a href={editingReg.payment_receipt_url} target="_blank" rel="noopener noreferrer" className="px-6 bg-holi-primary text-white rounded-2xl flex items-center justify-center font-bold hover:scale-105 transition-all shadow-lg shadow-holi-primary/20">
-                                                Visualizar
-                                            </a>
-                                        )}
+                                    <div className="flex flex-col gap-2">
+                                        <div className="flex gap-2">
+                                            <input
+                                                type="text"
+                                                value={editingReg.payment_receipt_url || ''}
+                                                readOnly={true}
+                                                className="flex-1 bg-white/5 border border-white/5 rounded-2xl py-4 px-5 outline-none text-xs font-mono text-gray-500 cursor-not-allowed"
+                                                placeholder="Nenhum comprovante enviado"
+                                            />
+                                            {editingReg.payment_receipt_url && (
+                                                <a href={editingReg.payment_receipt_url} target="_blank" rel="noopener noreferrer" className="px-6 bg-holi-primary text-white rounded-2xl flex items-center justify-center font-bold hover:scale-105 transition-all shadow-lg shadow-holi-primary/20">
+                                                    Visualizar
+                                                </a>
+                                            )}
+                                        </div>
+
+                                        <div className="relative">
+                                            <input
+                                                type="file"
+                                                accept="image/*,.pdf"
+                                                onChange={handleAdminReceiptUpload}
+                                                disabled={uploadingReceipt}
+                                                className="hidden"
+                                                id="admin-receipt-upload"
+                                            />
+                                            <label
+                                                htmlFor="admin-receipt-upload"
+                                                className={`w-full flex items-center justify-center gap-2 py-3 rounded-2xl border border-dashed border-white/20 hover:bg-white/5 cursor-pointer transition-all ${uploadingReceipt ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                            >
+                                                {uploadingReceipt ? (
+                                                    <>
+                                                        <Loader2 className="animate-spin text-white" size={16} />
+                                                        <span className="text-xs font-bold text-gray-400">Enviando...</span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Upload className="text-gray-400" size={16} />
+                                                        <span className="text-xs font-bold text-gray-400">
+                                                            {editingReg.payment_receipt_url ? 'Substituir Comprovante' : 'Enviar Comprovante (Admin)'}
+                                                        </span>
+                                                    </>
+                                                )}
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
 
