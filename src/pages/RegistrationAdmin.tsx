@@ -668,9 +668,9 @@ const RegistrationAdmin = () => {
                                             onChange={e => setEditingReg({ ...editingReg, kit_option: e.target.value })}
                                             className="w-full bg-black/20 border border-white/10 rounded-xl py-2 px-3 outline-none text-white text-sm transition-all"
                                         >
-                                            <option value="Kit 01 - Inscrição (R$ 30,00)" className="bg-gray-900">Kit 01 (R$ 30)</option>
-                                            <option value="Kit 02 - Inscrição + Camiseta (R$ 80,00)" className="bg-gray-900">Kit 02 (R$ 80)</option>
-                                            <option value="Kit 03 - Inscrição + 2 Camisetas + Kit Intocáveis (R$ 160,00)" className="bg-gray-900">Kit 03 (R$ 160)</option>
+                                            <option value="Kit 01 - Inscrição (R$ 50,00)" className="bg-gray-900">Kit 01 (R$ 50)</option>
+                                            <option value="Kit 02 - Inscrição + Camiseta (R$ 100,00)" className="bg-gray-900">Kit 02 (R$ 100)</option>
+                                            <option value="Kit 03 - Inscrição + 2 Camisetas + Kit Radical (R$ 200,00)" className="bg-gray-900">Kit 03 (R$ 200)</option>
                                         </select>
                                     </div>
                                     <div className="flex items-center gap-3 pt-4 sm:pt-0">

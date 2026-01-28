@@ -37,7 +37,7 @@ const RegistrationPage = () => {
         emergency_phone: '',
         parish: '',
         staying_on_site: false,
-        kit_option: 'Kit 01 - Inscrição (R$ 30,00)',
+        kit_option: 'Kit 01 - Inscrição (R$ 50,00)',
         tshirt_size: '',
         tshirt_size_2: '',
         payment_receipt_url: ''
@@ -103,10 +103,10 @@ const RegistrationPage = () => {
         setError(null)
 
         try {
-            let payment_amount = 30
-            if (formData.kit_option.includes('160')) payment_amount = 160
-            else if (formData.kit_option.includes('80')) payment_amount = 80
-            else if (formData.kit_option.includes('30')) payment_amount = 30
+            let payment_amount = 50
+            if (formData.kit_option.includes('200')) payment_amount = 200
+            else if (formData.kit_option.includes('100')) payment_amount = 100
+            else if (formData.kit_option.includes('50')) payment_amount = 50
 
             const { data: insertData, error: insertError } = await supabase
                 .from('event_registrations')
@@ -163,8 +163,8 @@ const RegistrationPage = () => {
                             <div>
                                 <span className="text-gray-500 text-xs block uppercase">Valor</span>
                                 <span className="text-2xl font-black text-holi-secondary">
-                                    {formData.kit_option.includes('160') ? 'R$ 160,00' :
-                                        formData.kit_option.includes('80') ? 'R$ 80,00' : 'R$ 30,00'}
+                                    {formData.kit_option.includes('200') ? 'R$ 200,00' :
+                                        formData.kit_option.includes('100') ? 'R$ 100,00' : 'R$ 50,00'}
                                 </span>
                             </div>
                         </div>
@@ -528,19 +528,19 @@ const RegistrationPage = () => {
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                 {[
                                     {
-                                        label: 'Kit 01 - Inscrição (R$ 30,00)',
+                                        label: 'Kit 01 - Inscrição (R$ 50,00)',
                                         icon: <CheckCircle />,
                                         description: 'Sem camiseta'
                                     },
                                     {
-                                        label: 'Kit 02 - Inscrição + Camiseta (R$ 80,00)',
+                                        label: 'Kit 02 - Inscrição + Camiseta (R$ 100,00)',
                                         icon: <Shirt />,
                                         description: 'Com 1 camiseta'
                                     },
                                     {
-                                        label: 'Kit 03 - Inscrição + 2 Camisetas + Kit Intocáveis (R$ 160,00)',
+                                        label: 'Kit 03 - Inscrição + 2 Camisetas + Kit Radical (R$ 200,00)',
                                         icon: <Package />,
-                                        description: 'Com 2 camisetas + Kit Intocáveis'
+                                        description: 'Com 2 camisetas + Kit Radical'
                                     }
                                 ].map(option => (
                                     <label key={option.label} className="flex-1">
@@ -565,14 +565,14 @@ const RegistrationPage = () => {
                             </div>
                         </div>
 
-                        {(formData.kit_option.includes('80') || formData.kit_option.includes('160')) && (
+                        {(formData.kit_option.includes('100') || formData.kit_option.includes('200')) && (
                             <motion.div
                                 initial={{ opacity: 0, height: 0 }}
                                 animate={{ opacity: 1, height: 'auto' }}
                                 className="md:col-span-2 space-y-2 overflow-hidden"
                             >
                                 <label className="text-xs font-bold uppercase text-gray-400 ml-1">
-                                    Tamanho da Camiseta {formData.kit_option.includes('160') ? '(1ª Camiseta)' : ''}
+                                    Tamanho da Camiseta {formData.kit_option.includes('200') ? '(1ª Camiseta)' : ''}
                                 </label>
                                 <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
                                     {TSHIRT_SIZES.map(size => (
@@ -594,7 +594,7 @@ const RegistrationPage = () => {
                             </motion.div>
                         )}
 
-                        {formData.kit_option.includes('160') && (
+                        {formData.kit_option.includes('200') && (
                             <motion.div
                                 initial={{ opacity: 0, height: 0 }}
                                 animate={{ opacity: 1, height: 'auto' }}

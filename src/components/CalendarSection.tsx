@@ -37,8 +37,8 @@ const CalendarSection = () => {
                         </h2>
                         <ul className="space-y-6 mb-10">
                             {[
-                                { batch: "PRIMEIRO LOTE", dates: "10 JAN - 25 JAN", status: "Liberado" },
-                                { batch: "SEGUNDO LOTE", dates: "25 JAN - 07 FEV", status: "EM BREVE" },
+                                { batch: "PRIMEIRO LOTE", dates: "10 JAN - 25 JAN", status: "Encerrado" },
+                                { batch: "SEGUNDO LOTE", dates: "25 JAN - 07 FEV", status: "Liberado" },
                                 { batch: "TERCEIRO LOTE", dates: "07 FEV - 10 FEV", status: "EM BREVE" }
                             ].map((item, idx) => (
                                 <li key={idx} className={`flex items-center justify-between ${idx !== 2 ? 'border-b border-white/10 pb-4' : 'pb-4'}`}>
