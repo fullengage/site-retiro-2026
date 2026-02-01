@@ -4,9 +4,11 @@ import { Clock, AlertTriangle } from 'lucide-react'
 
 interface CountdownTimerProps {
     targetDate: string
+    title?: string
+    subtitle?: React.ReactNode
 }
 
-const CountdownTimer = ({ targetDate }: CountdownTimerProps) => {
+const CountdownTimer = ({ targetDate, title = "Últimas Horas - 1º Lote", subtitle }: CountdownTimerProps) => {
     const [timeLeft, setTimeLeft] = useState(calculateTimeLeft())
     const [isExpired, setIsExpired] = useState(false)
 
@@ -73,7 +75,7 @@ const CountdownTimer = ({ targetDate }: CountdownTimerProps) => {
                 <div className="text-center">
                     <h3 className="text-red-400 font-bold uppercase tracking-[0.2em] text-sm mb-6 flex items-center justify-center gap-2">
                         <AlertTriangle size={16} className="animate-pulse" />
-                        Últimas Horas - 1º Lote
+                        {title}
                     </h3>
 
                     <div className="flex justify-center items-center gap-2 sm:gap-6">
@@ -103,10 +105,14 @@ const CountdownTimer = ({ targetDate }: CountdownTimerProps) => {
                         </div>
                     </div>
 
-                    <p className="mt-6 text-sm text-gray-400 max-w-sm mx-auto leading-relaxed">
-                        O primeiro lote encerra hoje às 00:00. <br />
-                        <span className="text-white font-bold">Garanta o menor preço agora!</span>
-                    </p>
+                    <div className="mt-6 text-sm text-gray-400 max-w-sm mx-auto leading-relaxed">
+                        {subtitle || (
+                            <>
+                                O primeiro lote encerra hoje às 00:00. <br />
+                                <span className="text-white font-bold">Garanta o menor preço agora!</span>
+                            </>
+                        )}
+                    </div>
                 </div>
             </div>
         </motion.div>
