@@ -15,7 +15,7 @@ const PARISHES = [
     'Outros'
 ]
 
-import CountdownTimer from '../components/CountdownTimer'
+
 
 const RegistrationPage = () => {
     const [loading, setLoading] = useState(false)
@@ -41,7 +41,7 @@ const RegistrationPage = () => {
         tshirt_size: '',
         tshirt_size_2: '',
         payment_receipt_url: '',
-        indicated_by: '' // New field for the campaign
+
     })
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -117,7 +117,7 @@ const RegistrationPage = () => {
                     payment_amount,
                     payment_status: 'Pendente',
                     payment_receipt_url: null,
-                    indicated_by: formData.indicated_by || null
+
                 }])
                 .select()
 
@@ -320,55 +320,7 @@ const RegistrationPage = () => {
                         Garanta sua vaga agora mesmo.
                     </p>
 
-                    <CountdownTimer
-                        targetDate="2026-02-02T00:00:00"
-                        title="Fim da Promoção Kit em Dobro"
-                        subtitle={<>
-                            Essa promoção encerra hoje às 23:59. <br />
-                            <span className="text-white font-bold">Compre 1 e leve 2!</span>
-                        </>}
-                    />
 
-                    {/* CAMPAIGN BANNER - KIT EM DOBRO */}
-                    <motion.div
-                        initial={{ scale: 0.9, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        className="mt-12 mb-8 bg-gradient-to-r from-red-600 via-orange-600 to-red-600 p-1 rounded-3xl shadow-[0_0_40px_rgba(220,38,38,0.5)]"
-                    >
-                        <div className="bg-black/80 rounded-[1.3rem] p-6 md:p-8 backdrop-blur-sm relative overflow-hidden">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/20 rounded-full blur-[50px] pointer-events-none"></div>
-                            <div className="absolute bottom-0 left-0 w-32 h-32 bg-red-500/20 rounded-full blur-[50px] pointer-events-none"></div>
-
-                            <div className="relative z-10 text-center">
-                                <div className="inline-flex items-center gap-2 bg-red-600 text-white px-4 py-1 rounded-full text-xs font-black uppercase tracking-widest mb-4 animate-pulse">
-                                    🔥 Ação Relâmpago
-                                </div>
-                                <h2 className="text-3xl md:text-5xl font-black text-white italic uppercase tracking-tighter mb-4">
-                                    Kit em <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">Dobro</span>
-                                </h2>
-                                <p className="text-lg md:text-xl text-gray-200 font-medium mb-6 max-w-2xl mx-auto leading-relaxed">
-                                    Comprou um kit → Indicou um amigo → <strong className="text-white bg-red-600/20 px-1 rounded">Os dois recebem o mesmo kit!</strong>
-                                    <br />
-                                    <span className="text-sm opacity-75 block mt-2">(Válido apenas HOJE às 23:59)</span>
-                                </p>
-
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-left max-w-3xl mx-auto bg-white/5 border border-white/10 rounded-xl p-4">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center font-bold text-white shrink-0">1</div>
-                                        <p className="text-xs text-gray-300 font-bold uppercase leading-tight">Faça sua inscrição e garanta seu kit</p>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center font-bold text-white shrink-0">2</div>
-                                        <p className="text-xs text-gray-300 font-bold uppercase leading-tight">Indique o nome de um amigo no formulário</p>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded-full bg-yellow-500 flex items-center justify-center font-bold text-black shrink-0">3</div>
-                                        <p className="text-xs text-gray-300 font-bold uppercase leading-tight">Os dois confirmam e ganham upgrade!</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </motion.div>
                 </div>
 
                 <form onSubmit={handleSubmit} className="bg-holi-surface border border-white/10 rounded-[2.5rem] p-8 md:p-12 shadow-2xl relative overflow-hidden">
@@ -532,31 +484,7 @@ const RegistrationPage = () => {
                             </div>
                         </div>
 
-                        <div className="md:col-span-2 space-y-2 relative">
-                            <motion.div
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                className="absolute -top-3 right-0 bg-red-600 text-white text-[10px] font-black px-2 py-1 rounded shadow-lg uppercase tracking-wider z-10"
-                            >
-                                🔥 Obrigatório para a Promoção
-                            </motion.div>
-                            <label className="text-xs font-bold uppercase text-yellow-500 ml-1 flex items-center gap-2">
-                                <Sparkles size={12} /> Quem te indicou? (Promoção Kit em Dobro)
-                            </label>
-                            <div className="relative">
-                                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-yellow-500" size={18} />
-                                <input
-                                    name="indicated_by"
-                                    value={formData.indicated_by}
-                                    onChange={handleChange}
-                                    className="w-full bg-yellow-500/10 border border-yellow-500/30 rounded-2xl py-4 pl-12 pr-4 focus:border-yellow-500 transition-all outline-none text-white placeholder-white/30"
-                                    placeholder="Digite o nome do amigo que te indicou (ou que você está indicando)"
-                                />
-                            </div>
-                            <p className="text-[10px] text-gray-400 pl-4">
-                                * Para validar a promoção, o nome deve ser o mesmo em ambas as inscrições.
-                            </p>
-                        </div>
+
 
                         {/* Event Details Section */}
                         <div className="md:col-span-2 pt-4">
