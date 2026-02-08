@@ -216,22 +216,20 @@ const RegistrationAdmin = () => {
 
         // Age Distribution
         const ageDist: Record<string, number> = {
-            '18-24': 0,
-            '25-29': 0,
-            '30-34': 0,
-            '35-39': 0,
-            '40+': 0
+            '12-13': 0,
+            '14-16': 0,
+            '17-20': 0,
+            '> 20': 0
         }
 
         registrations.forEach(reg => {
             if (reg.payment_status === 'Cancelado') return
             const age = calculateAge(reg.birth_date)
             if (typeof age === 'number') {
-                if (age < 25) ageDist['18-24']++
-                else if (age < 30) ageDist['25-29']++
-                else if (age < 35) ageDist['30-34']++
-                else if (age < 40) ageDist['35-39']++
-                else ageDist['40+']++
+                if (age >= 12 && age <= 13) ageDist['12-13']++
+                else if (age >= 14 && age <= 16) ageDist['14-16']++
+                else if (age >= 17 && age <= 20) ageDist['17-20']++
+                else if (age > 20) ageDist['> 20']++
             }
         })
 
@@ -419,7 +417,7 @@ const RegistrationAdmin = () => {
                                 <span className="w-1.5 h-6 bg-sky-400 rounded-full"></span> Faixa Etária
                             </h2>
                             <div className="bg-white/[0.03] backdrop-blur-xl rounded-2xl p-6 border border-white/5">
-                                <div className="grid grid-cols-1 sm:grid-cols-5 gap-4">
+                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                                     {Object.entries(stats.ageDist).map(([range, count]) => {
                                         const maxCount = Math.max(...Object.values(stats.ageDist))
                                         const percentage = maxCount > 0 ? (count / maxCount) * 100 : 0
