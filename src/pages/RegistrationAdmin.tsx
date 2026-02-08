@@ -421,16 +421,22 @@ const RegistrationAdmin = () => {
                                     {Object.entries(stats.ageDist).map(([range, count]) => {
                                         const maxCount = Math.max(...Object.values(stats.ageDist))
                                         const percentage = maxCount > 0 ? (count / maxCount) * 100 : 0
+                                        const total = registrations.filter(r => r.payment_status !== 'Cancelado').length
+                                        const realPercentage = total > 0 ? Math.round((count / total) * 100) : 0
+
                                         return (
-                                            <div key={range} className="flex flex-col items-center justify-end h-40 group relative">
-                                                <span className="text-sky-400 font-black text-xl mb-2 opacity-0 group-hover:opacity-100 transition-opacity absolute -top-2">{count}</span>
-                                                <div className="w-full max-w-[60px] bg-gray-800/50 rounded-t-xl relative overflow-hidden flex items-end h-full">
+                                            <div key={range} className="flex flex-col items-center justify-end h-40 group relative mt-6">
+                                                <div className="absolute -top-8 w-full text-center flex flex-col items-center transition-all">
+                                                    <span className="text-sky-400 font-black text-2xl drop-shadow-lg">{count}</span>
+                                                    <span className="text-[10px] text-gray-500 font-bold">{realPercentage}%</span>
+                                                </div>
+                                                <div className="w-full max-w-[60px] bg-gray-800/50 rounded-t-xl relative overflow-hidden flex items-end h-full border-b border-white/5">
                                                     <div
-                                                        className="w-full bg-gradient-to-t from-sky-400 to-blue-500 rounded-t-xl transition-all duration-1000 ease-out group-hover:brightness-110"
+                                                        className="w-full bg-gradient-to-t from-sky-400 to-blue-600 rounded-t-xl transition-all duration-1000 ease-out hover:brightness-110"
                                                         style={{ height: `${percentage}%` }}
                                                     ></div>
                                                 </div>
-                                                <span className="text-xs font-bold text-gray-400 mt-3 uppercase tracking-wider">{range}</span>
+                                                <span className="text-xs font-bold text-gray-300 mt-3 uppercase tracking-wider">{range}</span>
                                                 <span className="text-[10px] font-mono text-gray-600">anos</span>
                                             </div>
                                         )
