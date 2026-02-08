@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
     Search, Download, Users, CheckCircle,
     XCircle, Clock, Shirt, UserCheck,
-    Filter, Edit3, X, Save, FileText, ExternalLink, Trash2, AlertTriangle, ChevronRight, BarChart3, Package, DollarSign, Activity, ShoppingBag, Mail, Table as TableIcon, Loader2, Upload
+    Filter, Edit3, X, Save, FileText, ExternalLink, Trash2, AlertTriangle, ChevronRight, BarChart3, Package, DollarSign, Activity, ShoppingBag, Mail, Table as TableIcon, Loader2, Upload, ChevronDown
 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 
@@ -37,6 +37,7 @@ const RegistrationAdmin = () => {
     const [loading, setLoading] = useState(true)
     const [searchTerm, setSearchTerm] = useState('')
     const [filterStatus, setFilterStatus] = useState('Todos')
+    const [filterAngel, setFilterAngel] = useState('Todos')
     const [editingReg, setEditingReg] = useState<Registration | null>(null)
     const [isSaving, setIsSaving] = useState(false)
     const [deletingId, setDeletingId] = useState<string | null>(null)
@@ -152,11 +153,19 @@ const RegistrationAdmin = () => {
         }
     }
 
+    const uniqueAngels = Array.from(new Set(registrations.map(r => r.assigned_angel).filter(Boolean))).sort()
+
     const filtered = registrations.filter(reg => {
         const matchesSearch = reg.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
             reg.email.toLowerCase().includes(searchTerm.toLowerCase())
         const matchesStatus = filterStatus === 'Todos' || reg.payment_status === filterStatus
-        return matchesSearch && matchesStatus
+        const matchesAngel = filterAngel === 'Todos'
+            ? true
+            : filterAngel === 'Sem Anjo'
+                ? !reg.assigned_angel
+                : reg.assigned_angel === filterAngel
+
+        return matchesSearch && matchesStatus && matchesAngel
     })
 
     const calculateAge = (birthDate: string) => {
@@ -205,7 +214,28 @@ const RegistrationAdmin = () => {
 
         const activeRegistrations = registrations.filter(r => r.payment_status !== 'Cancelado').length
 
-        return { kits, sortedTshirts, totalTshirts, totalRevenue, activeRegistrations }
+        // Age Distribution
+        const ageDist: Record<string, number> = {
+            '18-24': 0,
+            '25-29': 0,
+            '30-34': 0,
+            '35-39': 0,
+            '40+': 0
+        }
+
+        registrations.forEach(reg => {
+            if (reg.payment_status === 'Cancelado') return
+            const age = calculateAge(reg.birth_date)
+            if (typeof age === 'number') {
+                if (age < 25) ageDist['18-24']++
+                else if (age < 30) ageDist['25-29']++
+                else if (age < 35) ageDist['30-34']++
+                else if (age < 40) ageDist['35-39']++
+                else ageDist['40+']++
+            }
+        })
+
+        return { kits, sortedTshirts, totalTshirts, totalRevenue, activeRegistrations, ageDist }
     }
 
     const stats = getDetailedStats()
@@ -262,6 +292,21 @@ const RegistrationAdmin = () => {
                             onChange={e => setSearchTerm(e.target.value)}
                             className="w-full xl:w-80 bg-white/5 border border-transparent focus:border-holi-primary rounded-xl py-2.5 pl-10 pr-4 outline-none text-sm transition-all focus:bg-white/10"
                         />
+                    </div>
+
+                    <div className="relative group">
+                        <select
+                            value={filterAngel}
+                            onChange={e => setFilterAngel(e.target.value)}
+                            className="appearance-none bg-white/5 border border-transparent focus:border-holi-primary rounded-xl py-2.5 pl-4 pr-10 outline-none text-sm font-semibold transition-all cursor-pointer hover:bg-white/10 text-gray-300 min-w-[160px]"
+                        >
+                            <option value="Todos" className="bg-gray-900">Todos os Anjos</option>
+                            <option value="Sem Anjo" className="bg-gray-900">Sem Anjo</option>
+                            {uniqueAngels.map(angel => (
+                                <option key={angel as string} value={angel as string} className="bg-gray-900">{angel as string}</option>
+                            ))}
+                        </select>
+                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none group-hover:text-holi-primary transition-colors" size={16} />
                     </div>
                     <button onClick={() => setFilterStatus('Todos')} className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 transition-colors text-sm font-semibold">
                         <Filter size={18} /> Todos
@@ -341,6 +386,8 @@ const RegistrationAdmin = () => {
                                             <span className="block text-2xl font-black text-pink-500 mb-1">{size}</span>
                                             <span className="text-xs font-bold text-gray-400">{count} UNID.</span>
                                         </div>
+
+
                                     ))}
                                 </div>
                             </div>
@@ -362,6 +409,34 @@ const RegistrationAdmin = () => {
                                             </div>
                                         </div>
                                     ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Age Distribution Row */}
+                        <div className="mt-8">
+                            <h2 className="text-xl font-black uppercase tracking-tight flex items-center gap-2 mb-4">
+                                <span className="w-1.5 h-6 bg-sky-400 rounded-full"></span> Faixa Etária
+                            </h2>
+                            <div className="bg-white/[0.03] backdrop-blur-xl rounded-2xl p-6 border border-white/5">
+                                <div className="grid grid-cols-1 sm:grid-cols-5 gap-4">
+                                    {Object.entries(stats.ageDist).map(([range, count]) => {
+                                        const maxCount = Math.max(...Object.values(stats.ageDist))
+                                        const percentage = maxCount > 0 ? (count / maxCount) * 100 : 0
+                                        return (
+                                            <div key={range} className="flex flex-col items-center justify-end h-40 group relative">
+                                                <span className="text-sky-400 font-black text-xl mb-2 opacity-0 group-hover:opacity-100 transition-opacity absolute -top-2">{count}</span>
+                                                <div className="w-full max-w-[60px] bg-gray-800/50 rounded-t-xl relative overflow-hidden flex items-end h-full">
+                                                    <div
+                                                        className="w-full bg-gradient-to-t from-sky-400 to-blue-500 rounded-t-xl transition-all duration-1000 ease-out group-hover:brightness-110"
+                                                        style={{ height: `${percentage}%` }}
+                                                    ></div>
+                                                </div>
+                                                <span className="text-xs font-bold text-gray-400 mt-3 uppercase tracking-wider">{range}</span>
+                                                <span className="text-[10px] font-mono text-gray-600">anos</span>
+                                            </div>
+                                        )
+                                    })}
                                 </div>
                             </div>
                         </div>
@@ -771,7 +846,7 @@ const RegistrationAdmin = () => {
                     </div>
                 )}
             </AnimatePresence>
-        </div>
+        </div >
     )
 }
 
