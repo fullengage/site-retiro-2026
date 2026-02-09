@@ -185,6 +185,8 @@ const RegistrationAdmin = () => {
         const tshirts: Record<string, number> = {}
         let totalTshirts = 0
         let totalRevenue = 0
+        let maleCount = 0
+        let femaleCount = 0
 
         registrations.forEach(reg => {
             if (reg.payment_status === 'Cancelado') return
@@ -202,6 +204,9 @@ const RegistrationAdmin = () => {
                 tshirts[reg.tshirt_size_2] = (tshirts[reg.tshirt_size_2] || 0) + 1
                 totalTshirts++
             }
+
+            if (reg.gender === 'Masculino') maleCount++
+            else if (reg.gender === 'Feminino') femaleCount++
         })
 
         const sizeOrder = ['PP', 'P', 'M', 'G', 'GG', 'XG', 'XGG', 'EXG', 'G1', 'G2', 'G3']
@@ -233,7 +238,7 @@ const RegistrationAdmin = () => {
             }
         })
 
-        return { kits, sortedTshirts, totalTshirts, totalRevenue, activeRegistrations, ageDist }
+        return { kits, sortedTshirts, totalTshirts, totalRevenue, activeRegistrations, ageDist, maleCount, femaleCount }
     }
 
     const stats = getDetailedStats()
@@ -407,6 +412,44 @@ const RegistrationAdmin = () => {
                                             </div>
                                         </div>
                                     ))}
+                                </div>
+                            </div>
+
+                            {/* Gender Distribution */}
+                            <div className="mt-8">
+                                <h2 className="text-xl font-black uppercase tracking-tight flex items-center gap-2 mb-4">
+                                    <span className="w-1.5 h-6 bg-purple-500 rounded-full"></span> Gênero
+                                </h2>
+                                <div className="bg-white/[0.03] backdrop-blur-xl rounded-2xl p-6 border border-white/5 grid grid-cols-2 gap-8">
+                                    {/* Boys */}
+                                    <div className="relative group p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 text-center hover:bg-blue-500/20 transition-all">
+                                        <div className="absolute top-0 right-0 p-2">
+                                            <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></div>
+                                        </div>
+                                        <span className="block text-4xl font-black text-blue-400 mb-1">{stats.maleCount}</span>
+                                        <span className="text-xs font-bold text-blue-200 uppercase tracking-widest">Meninos</span>
+                                        <div className="mt-3 h-1.5 w-full bg-gray-800 rounded-full overflow-hidden">
+                                            <div
+                                                className="h-full bg-blue-500 rounded-full"
+                                                style={{ width: `${(stats.maleCount / stats.activeRegistrations) * 100}%` }}
+                                            ></div>
+                                        </div>
+                                    </div>
+
+                                    {/* Girls */}
+                                    <div className="relative group p-4 rounded-xl bg-pink-500/10 border border-pink-500/20 text-center hover:bg-pink-500/20 transition-all">
+                                        <div className="absolute top-0 right-0 p-2">
+                                            <div className="w-2 h-2 rounded-full bg-pink-400 animate-pulse"></div>
+                                        </div>
+                                        <span className="block text-4xl font-black text-pink-400 mb-1">{stats.femaleCount}</span>
+                                        <span className="text-xs font-bold text-pink-200 uppercase tracking-widest">Meninas</span>
+                                        <div className="mt-3 h-1.5 w-full bg-gray-800 rounded-full overflow-hidden">
+                                            <div
+                                                className="h-full bg-pink-500 rounded-full"
+                                                style={{ width: `${(stats.femaleCount / stats.activeRegistrations) * 100}%` }}
+                                            ></div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
