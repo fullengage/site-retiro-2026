@@ -13,6 +13,7 @@ import GalleryAdmin from './pages/GalleryAdmin'
 import DonationAdmin from './pages/DonationAdmin'
 import ComingSoonPage from './pages/ComingSoonPage'
 import AdminLayout from './components/AdminLayout'
+import AuthGuard from './components/AuthGuard'
 
 // Scroll to top on route change
 function ScrollToTop() {
@@ -38,15 +39,12 @@ function AppContent() {
                 <Route path="/doacoes" element={<DonationPage />} />
                 <Route path="/cronograma" element={<SchedulePage />} />
                 <Route path="/inscricao" element={<RegistrationPage />} />
-                <Route path="/noticias" element={<NewsPage />} />
-                <Route path="/noticias" element={<NewsPage />} />
-
                 <Route path="/admin" element={<AdminLayout />}>
                     <Route index element={<NewsAdmin />} />
-                    <Route path="inscricoes" element={<RegistrationAdmin />} />
                     <Route path="galeria" element={<GalleryAdmin />} />
                     <Route path="doacoes" element={<DonationAdmin />} />
                 </Route>
+                <Route path="/admin/inscricoes" element={<AuthGuard><RegistrationAdmin /></AuthGuard>} />
                 <Route path="/em-breve" element={<ComingSoonPage />} />
             </Routes>
 

@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { useOutletContext } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
     Search, Download, Users, CheckCircle,
-    XCircle, Clock, Shirt, UserCheck,
-    Filter, Edit3, X, Save, FileText, ExternalLink, Trash2, AlertTriangle, ChevronRight, BarChart3, Package, DollarSign, Activity, ShoppingBag, Mail, Table as TableIcon, Loader2, Upload, ChevronDown
+    Shirt, UserCheck,
+    X, Trash2, ChevronRight, Package, Activity, Loader2, Upload, ChevronDown
 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 
@@ -31,17 +30,15 @@ interface Registration {
 }
 
 const RegistrationAdmin = () => {
-    const { userRole } = useOutletContext<{ userRole: 'admin' | 'redator' }>()
-
     const [registrations, setRegistrations] = useState<Registration[]>([])
     const [loading, setLoading] = useState(true)
     const [searchTerm, setSearchTerm] = useState('')
     const [filterStatus, setFilterStatus] = useState('Todos')
     const [filterAngel, setFilterAngel] = useState('Todos')
+    const [activeTab, setActiveTab] = useState<'list' | 'dashboard'>('list')
     const [editingReg, setEditingReg] = useState<Registration | null>(null)
     const [isSaving, setIsSaving] = useState(false)
     const [deletingId, setDeletingId] = useState<string | null>(null)
-    const [showDashboard, setShowDashboard] = useState(false)
     const [uploadingReceipt, setUploadingReceipt] = useState(false)
 
     useEffect(() => {
@@ -153,17 +150,22 @@ const RegistrationAdmin = () => {
         }
     }
 
-    const uniqueAngels = Array.from(new Set(registrations.map(r => r.assigned_angel).filter(Boolean))).sort()
+    const uniqueAngels = Array.from(new Set(registrations.map(r => r.assigned_angel?.trim()).filter(Boolean))).sort()
 
     const filtered = registrations.filter(reg => {
-        const matchesSearch = reg.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            reg.email.toLowerCase().includes(searchTerm.toLowerCase())
+        const lowerSearch = searchTerm.toLowerCase().trim()
+        const matchesSearch =
+            reg.full_name.toLowerCase().includes(lowerSearch) ||
+            reg.email.toLowerCase().includes(lowerSearch) ||
+            (reg.phone || '').includes(lowerSearch) ||
+            (reg.assigned_angel || '').toLowerCase().includes(lowerSearch)
+
         const matchesStatus = filterStatus === 'Todos' || reg.payment_status === filterStatus
         const matchesAngel = filterAngel === 'Todos'
             ? true
             : filterAngel === 'Sem Anjo'
-                ? !reg.assigned_angel
-                : reg.assigned_angel === filterAngel
+                ? !reg.assigned_angel || reg.assigned_angel.trim() === ''
+                : reg.assigned_angel?.trim() === filterAngel
 
         return matchesSearch && matchesStatus && matchesAngel
     })
@@ -187,6 +189,7 @@ const RegistrationAdmin = () => {
         let totalRevenue = 0
         let maleCount = 0
         let femaleCount = 0
+        let stayingOnSiteCount = 0
 
         registrations.forEach(reg => {
             if (reg.payment_status === 'Cancelado') return
@@ -207,10 +210,12 @@ const RegistrationAdmin = () => {
 
             if (reg.gender === 'Masculino') maleCount++
             else if (reg.gender === 'Feminino') femaleCount++
+
+            if (reg.staying_on_site) stayingOnSiteCount++
         })
 
-        const sizeOrder = ['PP', 'P', 'M', 'G', 'GG', 'XG', 'XGG', 'EXG', 'G1', 'G2', 'G3']
-        const sortedTshirts = Object.entries(tshirts).sort((a, b) => {
+        const sizeOrder = ['PP', 'P', 'M', 'G', 'GG', 'XG', 'G1', 'G2', 'G3']
+        const sortedTshirts = Object.entries(tshirts).sort((a: [string, number], b: [string, number]) => {
             const idxA = sizeOrder.indexOf(a[0])
             const idxB = sizeOrder.indexOf(b[0])
             if (idxA !== -1 && idxB !== -1) return idxA - idxB
@@ -219,7 +224,6 @@ const RegistrationAdmin = () => {
 
         const activeRegistrations = registrations.filter(r => r.payment_status !== 'Cancelado').length
 
-        // Age Distribution
         const ageDist: Record<string, number> = {
             '12-13': 0,
             '14-16': 0,
@@ -238,7 +242,7 @@ const RegistrationAdmin = () => {
             }
         })
 
-        return { kits, sortedTshirts, totalTshirts, totalRevenue, activeRegistrations, ageDist, maleCount, femaleCount }
+        return { kits, sortedTshirts, totalTshirts, totalRevenue, activeRegistrations, ageDist, maleCount, femaleCount, stayingOnSiteCount }
     }
 
     const stats = getDetailedStats()
@@ -253,7 +257,7 @@ const RegistrationAdmin = () => {
         const encodedUri = encodeURI(csvContent)
         const link = document.createElement("a")
         link.setAttribute("href", encodedUri)
-        link.setAttribute("download", "inscritos_retiro_2025.csv")
+        link.setAttribute("download", "inscritos_retiro_2026.csv")
         document.body.appendChild(link)
         link.click()
     }
@@ -262,12 +266,10 @@ const RegistrationAdmin = () => {
 
     const pendingRegistrations = filtered.filter(r => r.payment_status === 'Pendente')
     const paidRegistrations = filtered.filter(r => r.payment_status === 'Pago')
-    // We can also include 'Cancelado' if needed, but the user asked to separate Paid vs Pending. We will display these two main groups.
 
     return (
         <div className="min-h-screen bg-[#050208] text-white p-4 md:p-8">
-            {/* Header */}
-            <div className="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-6 mb-10">
+            <div className="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-6 mb-8">
                 <div>
                     <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-white italic">
                         Inscrições <span className="text-transparent bg-clip-text bg-gradient-to-r from-holi-primary to-blue-400">2026</span>
@@ -286,14 +288,29 @@ const RegistrationAdmin = () => {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3 w-full xl:w-auto">
+                    <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10 mr-2">
+                        <button
+                            onClick={() => setActiveTab('list')}
+                            className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === 'list' ? 'bg-white text-black shadow-lg' : 'text-gray-500 hover:text-white'}`}
+                        >
+                            Lista
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('dashboard')}
+                            className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === 'dashboard' ? 'bg-white text-black shadow-lg' : 'text-gray-500 hover:text-white'}`}
+                        >
+                            Dashboard
+                        </button>
+                    </div>
+
                     <div className="relative group flex-1 xl:flex-none">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-holi-primary transition-colors" size={18} />
                         <input
                             type="text"
-                            placeholder="Buscar nome, email, telefone..."
+                            placeholder="Buscar nome, email, anjo..."
                             value={searchTerm}
                             onChange={e => setSearchTerm(e.target.value)}
-                            className="w-full xl:w-80 bg-white/5 border border-transparent focus:border-holi-primary rounded-xl py-2.5 pl-10 pr-4 outline-none text-sm transition-all focus:bg-white/10"
+                            className="w-full xl:w-64 bg-white/5 border border-transparent focus:border-holi-primary rounded-xl py-2.5 pl-10 pr-4 outline-none text-sm transition-all focus:bg-white/10"
                         />
                     </div>
 
@@ -301,85 +318,86 @@ const RegistrationAdmin = () => {
                         <select
                             value={filterAngel}
                             onChange={e => setFilterAngel(e.target.value)}
-                            className="appearance-none bg-white/5 border border-transparent focus:border-holi-primary rounded-xl py-2.5 pl-4 pr-10 outline-none text-sm font-semibold transition-all cursor-pointer hover:bg-white/10 text-gray-300 min-w-[160px]"
+                            className="appearance-none bg-white/5 border border-transparent focus:border-holi-primary rounded-xl py-2.5 pl-4 pr-10 outline-none text-sm font-semibold transition-all cursor-pointer hover:bg-white/10 text-gray-300 min-w-[140px]"
                         >
-                            <option value="Todos" className="bg-gray-900">Todos os Anjos</option>
+                            <option value="Todos" className="bg-gray-900">Anjos: Todos</option>
                             <option value="Sem Anjo" className="bg-gray-900">Sem Anjo</option>
                             {uniqueAngels.map(angel => (
-                                <option key={angel as string} value={angel as string} className="bg-gray-900">{angel as string}</option>
+                                <option key={angel} value={angel} className="bg-gray-900">{angel}</option>
                             ))}
                         </select>
                         <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none group-hover:text-holi-primary transition-colors" size={16} />
                     </div>
-                    <button onClick={() => setFilterStatus('Todos')} className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 transition-colors text-sm font-semibold">
-                        <Filter size={18} /> Todos
-                    </button>
-                    <button
-                        onClick={() => setShowDashboard(!showDashboard)}
-                        className={`flex items-center gap-2 px-6 py-2.5 rounded-xl transition-all text-sm font-bold shadow-lg shadow-holi-primary/20 ${showDashboard ? 'bg-white text-black' : 'bg-holi-primary text-white hover:opacity-90'}`}
-                    >
-                        <BarChart3 size={18} /> DASHBOARD
-                    </button>
-                    <button onClick={exportToCSV} className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 transition-colors">
+
+                    <div className="relative group">
+                        <select
+                            value={filterStatus}
+                            onChange={e => setFilterStatus(e.target.value)}
+                            className="appearance-none bg-white/5 border border-transparent focus:border-holi-primary rounded-xl py-2.5 pl-4 pr-10 outline-none text-sm font-semibold transition-all cursor-pointer hover:bg-white/10 text-gray-300 min-w-[140px]"
+                        >
+                            <option value="Todos" className="bg-gray-900">Status: Todos</option>
+                            <option value="Pendente" className="bg-gray-900">Pendentes</option>
+                            <option value="Pago" className="bg-gray-900">Pagos</option>
+                            <option value="Cancelado" className="bg-gray-900">Cancelados</option>
+                        </select>
+                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none group-hover:text-holi-primary transition-colors" size={16} />
+                    </div>
+
+                    <button onClick={exportToCSV} className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 transition-colors" title="Exportar CSV">
                         <Download size={20} />
                     </button>
                 </div>
             </div>
 
-            {/* Dashboard Section (Collapsible) */}
-            <AnimatePresence>
-                {showDashboard && (
+            <AnimatePresence mode="wait">
+                {activeTab === 'dashboard' ? (
                     <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        className="overflow-hidden mb-12"
+                        key="dashboard"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="mb-12"
                     >
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                            {/* Card 1: Revenue - Purple Neon */}
                             <div className="bg-white/[0.03] backdrop-blur-xl p-6 rounded-3xl border border-white/[0.08] border-l-4 border-l-holi-primary relative overflow-hidden group shadow-[0_0_15px_-3px_rgba(139,92,246,0.3)]">
                                 <div className="absolute -right-4 -top-4 w-24 h-24 bg-holi-primary/10 rounded-full blur-2xl group-hover:bg-holi-primary/20 transition-all"></div>
                                 <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Valor Total</p>
                                 <h3 className="text-3xl font-black text-white">R$ {stats.totalRevenue.toLocaleString('pt-BR')}</h3>
                                 <div className="mt-4 flex items-center gap-1 text-emerald-400 text-xs font-bold">
-                                    <Activity size={14} /> +12% que ontem
+                                    <Activity size={14} /> Em tempo real
                                 </div>
                             </div>
 
-                            {/* Card 2: Active Users - Blue Neon */}
                             <div className="bg-white/[0.03] backdrop-blur-xl p-6 rounded-3xl border border-white/[0.08] border-l-4 border-l-sky-400 relative overflow-hidden group shadow-[0_0_15px_-3px_rgba(56,189,248,0.3)]">
                                 <div className="absolute -right-4 -top-4 w-24 h-24 bg-sky-400/10 rounded-full blur-2xl group-hover:bg-sky-400/20 transition-all"></div>
                                 <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Ativos</p>
                                 <h3 className="text-3xl font-black text-white">{stats.activeRegistrations}</h3>
                                 <div className="mt-4 flex items-center gap-1 text-sky-400 text-xs font-bold">
-                                    <Users size={14} /> 85% da meta
+                                    <Users size={14} /> Confirmados e Pendentes
                                 </div>
                             </div>
 
-                            {/* Card 3: T-Shirts - Pink Neon */}
                             <div className="bg-white/[0.03] backdrop-blur-xl p-6 rounded-3xl border border-white/[0.08] border-l-4 border-l-pink-500 relative overflow-hidden group shadow-[0_0_15px_-3px_rgba(236,72,153,0.3)]">
                                 <div className="absolute -right-4 -top-4 w-24 h-24 bg-pink-500/10 rounded-full blur-2xl group-hover:bg-pink-500/20 transition-all"></div>
                                 <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Camisetas</p>
                                 <h3 className="text-3xl font-black text-white">{stats.totalTshirts}</h3>
                                 <div className="mt-4 flex items-center gap-1 text-pink-400 text-xs font-bold">
-                                    <Shirt size={14} /> Produção iniciada
+                                    <Shirt size={14} /> Total de peças
                                 </div>
                             </div>
 
-                            {/* Card 4: Kits - Amber Neon */}
                             <div className="bg-white/[0.03] backdrop-blur-xl p-6 rounded-3xl border border-white/[0.08] border-l-4 border-l-amber-400 relative overflow-hidden group shadow-[0_0_15px_-3px_rgba(251,191,36,0.3)]">
                                 <div className="absolute -right-4 -top-4 w-24 h-24 bg-amber-400/10 rounded-full blur-2xl group-hover:bg-amber-400/20 transition-all"></div>
                                 <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Kits Vendidos</p>
                                 <h3 className="text-3xl font-black text-white">{Object.values(stats.kits).reduce((a, b) => a + b, 0)}</h3>
                                 <div className="mt-4 flex items-center gap-1 text-amber-400 text-xs font-bold">
-                                    <Package size={14} /> 15 em estoque
+                                    <Package size={14} /> Kits selecionados
                                 </div>
                             </div>
                         </div>
 
-                        <div className="flex flex-col lg:flex-row gap-8">
-                            {/* T-Shirt Grid */}
-                            <div className="flex-1 space-y-4">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <div className="space-y-4">
                                 <h2 className="text-xl font-black uppercase tracking-tight flex items-center gap-2 mb-2">
                                     <span className="w-1.5 h-6 bg-pink-500 rounded-full"></span> Production Grid
                                 </h2>
@@ -389,14 +407,11 @@ const RegistrationAdmin = () => {
                                             <span className="block text-2xl font-black text-pink-500 mb-1">{size}</span>
                                             <span className="text-xs font-bold text-gray-400">{count} UNID.</span>
                                         </div>
-
-
                                     ))}
                                 </div>
                             </div>
 
-                            {/* Kit Dist */}
-                            <div className="flex-1 space-y-4">
+                            <div className="space-y-4">
                                 <h2 className="text-xl font-black uppercase tracking-tight flex items-center gap-2 mb-2">
                                     <span className="w-1.5 h-6 bg-amber-400 rounded-full"></span> Kit Distribution
                                 </h2>
@@ -405,82 +420,51 @@ const RegistrationAdmin = () => {
                                         <div key={kit}>
                                             <div className="flex justify-between items-center mb-2">
                                                 <span className="text-xs font-bold text-gray-300 uppercase">{kit}</span>
-                                                <span className="text-xs font-black text-amber-400 italic">{Math.round((count / registrations.length) * 100)}% ({count})</span>
+                                                <span className="text-xs font-black text-amber-400 italic">{Math.round((count / (registrations.length || 1)) * 100)}% ({count})</span>
                                             </div>
                                             <div className="h-1.5 w-full bg-gray-800 rounded-full overflow-hidden">
-                                                <div className="h-full bg-gradient-to-r from-amber-400 to-amber-600 rounded-full" style={{ width: `${(count / registrations.length) * 100}%` }}></div>
+                                                <div className="h-full bg-gradient-to-r from-amber-400 to-amber-600 rounded-full" style={{ width: `${(count / (registrations.length || 1)) * 100}%` }}></div>
                                             </div>
                                         </div>
                                     ))}
                                 </div>
                             </div>
 
-                            {/* Gender Distribution */}
-                            <div className="mt-8">
+                            <div className="space-y-4">
                                 <h2 className="text-xl font-black uppercase tracking-tight flex items-center gap-2 mb-4">
-                                    <span className="w-1.5 h-6 bg-purple-500 rounded-full"></span> Gênero
+                                    <span className="w-1.5 h-6 bg-purple-500 rounded-full"></span> Gênero & Alojamento
                                 </h2>
-                                <div className="bg-white/[0.03] backdrop-blur-xl rounded-2xl p-6 border border-white/5 grid grid-cols-2 gap-8">
-                                    {/* Boys */}
-                                    <div className="relative group p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 text-center hover:bg-blue-500/20 transition-all">
-                                        <div className="absolute top-0 right-0 p-2">
-                                            <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></div>
-                                        </div>
-                                        <span className="block text-4xl font-black text-blue-400 mb-1">{stats.maleCount}</span>
-                                        <span className="text-xs font-bold text-blue-200 uppercase tracking-widest">Meninos</span>
-                                        <div className="mt-3 h-1.5 w-full bg-gray-800 rounded-full overflow-hidden">
-                                            <div
-                                                className="h-full bg-blue-500 rounded-full"
-                                                style={{ width: `${(stats.maleCount / stats.activeRegistrations) * 100}%` }}
-                                            ></div>
-                                        </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 text-center">
+                                        <span className="block text-3xl font-black text-blue-400">{stats.maleCount}</span>
+                                        <span className="text-[10px] font-bold text-blue-200 uppercase tracking-widest">Meninos</span>
                                     </div>
-
-                                    {/* Girls */}
-                                    <div className="relative group p-4 rounded-xl bg-pink-500/10 border border-pink-500/20 text-center hover:bg-pink-500/20 transition-all">
-                                        <div className="absolute top-0 right-0 p-2">
-                                            <div className="w-2 h-2 rounded-full bg-pink-400 animate-pulse"></div>
-                                        </div>
-                                        <span className="block text-4xl font-black text-pink-400 mb-1">{stats.femaleCount}</span>
-                                        <span className="text-xs font-bold text-pink-200 uppercase tracking-widest">Meninas</span>
-                                        <div className="mt-3 h-1.5 w-full bg-gray-800 rounded-full overflow-hidden">
-                                            <div
-                                                className="h-full bg-pink-500 rounded-full"
-                                                style={{ width: `${(stats.femaleCount / stats.activeRegistrations) * 100}%` }}
-                                            ></div>
-                                        </div>
+                                    <div className="p-4 rounded-xl bg-pink-500/10 border border-pink-500/20 text-center">
+                                        <span className="block text-3xl font-black text-pink-400">{stats.femaleCount}</span>
+                                        <span className="text-[10px] font-bold text-pink-200 uppercase tracking-widest">Meninas</span>
+                                    </div>
+                                    <div className="col-span-2 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-center">
+                                        <span className="block text-3xl font-black text-emerald-400">{stats.stayingOnSiteCount}</span>
+                                        <span className="text-[10px] font-bold text-emerald-200 uppercase tracking-widest">Dormirão no Local</span>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        {/* Age Distribution Row */}
-                        <div className="mt-8">
-                            <h2 className="text-xl font-black uppercase tracking-tight flex items-center gap-2 mb-4">
-                                <span className="w-1.5 h-6 bg-sky-400 rounded-full"></span> Faixa Etária
-                            </h2>
-                            <div className="bg-white/[0.03] backdrop-blur-xl rounded-2xl p-6 border border-white/5">
-                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                            <div className="space-y-4">
+                                <h2 className="text-xl font-black uppercase tracking-tight flex items-center gap-2 mb-4">
+                                    <span className="w-1.5 h-6 bg-sky-400 rounded-full"></span> Faixa Etária
+                                </h2>
+                                <div className="grid grid-cols-4 gap-2 h-[120px] items-end">
                                     {Object.entries(stats.ageDist).map(([range, count]) => {
                                         const maxCount = Math.max(...Object.values(stats.ageDist))
                                         const percentage = maxCount > 0 ? (count / maxCount) * 100 : 0
-                                        const total = registrations.filter(r => r.payment_status !== 'Cancelado').length
-                                        const realPercentage = total > 0 ? Math.round((count / total) * 100) : 0
-
                                         return (
-                                            <div key={range} className="flex flex-col items-center justify-end h-40 group relative mt-6">
-                                                <div className="absolute -top-8 w-full text-center flex flex-col items-center transition-all">
-                                                    <span className="text-sky-400 font-black text-2xl drop-shadow-lg">{count}</span>
-                                                    <span className="text-[10px] text-gray-500 font-bold">{realPercentage}%</span>
+                                            <div key={range} className="flex flex-col items-center gap-2">
+                                                <span className="text-[10px] font-bold text-sky-400">{count}</span>
+                                                <div className="w-full bg-sky-400/20 rounded-t-lg relative" style={{ height: `${percentage}%`, minHeight: '4px' }}>
+                                                    <div className="absolute inset-0 bg-sky-400 rounded-t-lg opacity-50"></div>
                                                 </div>
-                                                <div className="w-full max-w-[60px] bg-gray-800/50 rounded-t-xl relative overflow-hidden flex items-end h-full border-b border-white/5">
-                                                    <div
-                                                        className="w-full bg-gradient-to-t from-sky-400 to-blue-600 rounded-t-xl transition-all duration-1000 ease-out hover:brightness-110"
-                                                        style={{ height: `${percentage}%` }}
-                                                    ></div>
-                                                </div>
-                                                <span className="text-xs font-bold text-gray-300 mt-3 uppercase tracking-wider">{range}</span>
-                                                <span className="text-[10px] font-mono text-gray-600">anos</span>
+                                                <span className="text-[8px] font-bold text-gray-500 uppercase">{range}</span>
                                             </div>
                                         )
                                     })}
@@ -488,146 +472,98 @@ const RegistrationAdmin = () => {
                             </div>
                         </div>
                     </motion.div>
+                ) : (
+                    <motion.div
+                        key="list"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                    >
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <div className="space-y-6">
+                                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-[0.2em] px-2 flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+                                    Pendentes ({pendingRegistrations.length})
+                                </h3>
+                                <div className="space-y-4">
+                                    {pendingRegistrations.map(reg => (
+                                        <div key={reg.id}
+                                            onClick={() => setEditingReg(reg)}
+                                            className="bg-white/[0.03] backdrop-blur-md rounded-2xl p-5 border-l-4 border-l-amber-500 hover:scale-[1.02] transition-transform cursor-pointer group shadow-lg border-y border-r border-white/5"
+                                        >
+                                            <div className="flex justify-between items-start mb-4">
+                                                <div>
+                                                    <h4 className="font-bold text-lg text-white group-hover:text-amber-400 transition-colors line-clamp-1">{reg.full_name}</h4>
+                                                    <p className="text-xs text-gray-500 font-mono lowercase">{reg.email}</p>
+                                                </div>
+                                                <span className="text-[10px] px-2 py-1 rounded bg-amber-500/10 text-amber-500 font-black uppercase tracking-wider border border-amber-500/20">PENDENTE</span>
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-y-3 gap-x-4 mb-5 text-[11px]">
+                                                <p className="text-gray-400 font-medium">Idade: {calculateAge(reg.birth_date)} anos</p>
+                                                <p className="text-gray-400 font-medium truncate">Cidade: {reg.city}</p>
+                                                <p className="text-sky-400 font-bold font-mono">WhatsApp: {reg.phone}</p>
+                                                <p className="text-gray-400 font-medium truncate">Kit: {reg.kit_option.split(' - ')[0]}</p>
+                                            </div>
+                                            <div className="pt-4 border-t border-white/5 flex justify-between items-center">
+                                                <p className="text-[9px] uppercase font-bold text-gray-600 italic">{reg.assigned_angel ? `Anjo: ${reg.assigned_angel}` : 'SEM ANJO'}</p>
+                                                <button onClick={(e) => handleDelete(reg.id, e)} className="text-gray-600 hover:text-red-400 transition-colors">
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {pendingRegistrations.length === 0 && (
+                                        <div className="p-10 text-center border border-dashed border-white/10 rounded-2xl text-gray-600 text-sm">
+                                            Nenhuma inscrição pendente.
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="space-y-6">
+                                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-[0.2em] px-2 flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                    Pagos ({paidRegistrations.length})
+                                </h3>
+                                <div className="space-y-4">
+                                    {paidRegistrations.map(reg => (
+                                        <div key={reg.id}
+                                            onClick={() => setEditingReg(reg)}
+                                            className="bg-white/[0.03] backdrop-blur-md rounded-2xl p-5 border-l-4 border-l-emerald-500 hover:scale-[1.02] transition-transform cursor-pointer group shadow-lg border-y border-r border-white/5"
+                                        >
+                                            <div className="flex justify-between items-start mb-4">
+                                                <div>
+                                                    <h4 className="font-bold text-lg text-white group-hover:text-emerald-400 transition-colors line-clamp-1">{reg.full_name}</h4>
+                                                    <p className="text-xs text-gray-500 font-mono lowercase">{reg.email}</p>
+                                                </div>
+                                                <span className="text-[10px] px-2 py-1 rounded bg-emerald-500/10 text-emerald-500 font-black uppercase tracking-wider border border-emerald-500/20">PAGO</span>
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-y-3 gap-x-4 mb-5 text-[11px]">
+                                                <p className="text-gray-400 font-medium">Idade: {calculateAge(reg.birth_date)} anos</p>
+                                                <p className="text-gray-400 font-medium truncate">Cidade: {reg.city}</p>
+                                                <p className="text-sky-400 font-bold font-mono">WhatsApp: {reg.phone}</p>
+                                                <p className="text-gray-400 font-medium truncate">Kit: {reg.kit_option.split(' - ')[0]}</p>
+                                            </div>
+                                            <div className="pt-4 border-t border-white/5 flex justify-between items-center">
+                                                <p className="text-[9px] uppercase font-bold text-gray-600 italic">{reg.assigned_angel ? `Anjo: ${reg.assigned_angel}` : 'SEM ANJO'}</p>
+                                                <button onClick={(e) => handleDelete(reg.id, e)} className="text-gray-600 hover:text-red-400 transition-colors">
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {paidRegistrations.length === 0 && (
+                                        <div className="p-10 text-center border border-dashed border-white/10 rounded-2xl text-gray-600 text-sm">
+                                            Nenhuma inscrição confirmada.
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
                 )}
             </AnimatePresence>
 
-            {/* Split Lists: Pending vs Paid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* PENDING COLUMN */}
-                <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-[0.2em] px-2 flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-amber-500"></span>
-                            Pendentes ({pendingRegistrations.length})
-                        </h3>
-                    </div>
-
-                    <div className="space-y-4">
-                        {pendingRegistrations.map(reg => (
-                            <div key={reg.id}
-                                onClick={() => setEditingReg(reg)}
-                                className="bg-white/[0.03] backdrop-blur-md rounded-2xl p-5 border-l-4 border-l-amber-500 hover:scale-[1.02] transition-transform cursor-pointer group shadow-lg border-y border-r border-white/5"
-                            >
-                                <div className="flex justify-between items-start mb-4">
-                                    <div>
-                                        <h4 className="font-bold text-lg text-white group-hover:text-amber-400 transition-colors line-clamp-1">{reg.full_name}</h4>
-                                        <p className="text-xs text-gray-500 font-mono lowercase">{reg.email}</p>
-                                    </div>
-                                    <span className="text-[10px] px-2 py-1 rounded bg-amber-500/10 text-amber-500 font-black uppercase tracking-wider border border-amber-500/20">PENDENTE</span>
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-y-3 gap-x-4 mb-5">
-                                    <div>
-                                        <p className="text-[9px] uppercase tracking-widest text-gray-600 font-bold mb-0.5">Idade</p>
-                                        <p className="text-xs font-medium text-gray-300">{calculateAge(reg.birth_date)} anos</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-[9px] uppercase tracking-widest text-gray-600 font-bold mb-0.5">Cidade</p>
-                                        <p className="text-xs font-medium text-gray-300 truncate">{reg.city}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-[9px] uppercase tracking-widest text-gray-600 font-bold mb-0.5">Telefone</p>
-                                        <p className="text-xs font-bold text-sky-400 font-mono">{reg.phone}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-[9px] uppercase tracking-widest text-gray-600 font-bold mb-0.5">Kit</p>
-                                        <p className="text-xs font-medium text-gray-300 truncate">{reg.kit_option.split(' - ')[0]}</p>
-                                    </div>
-                                </div>
-
-                                <div className="pt-4 border-t border-white/5 flex justify-between items-center">
-                                    <p className="text-[9px] uppercase font-bold text-gray-600 italic">{reg.assigned_angel ? `Anjo: ${reg.assigned_angel}` : 'SEM ANJO'}</p>
-                                    <div className="flex gap-3">
-                                        <button
-                                            onClick={(e) => handleDelete(reg.id, e)}
-                                            className="text-gray-600 hover:text-red-400 transition-colors"
-                                        >
-                                            <Trash2 size={16} />
-                                        </button>
-                                        <button className="text-[10px] font-black tracking-widest uppercase flex items-center gap-1 group/btn hover:text-white text-gray-400 transition-colors">
-                                            DETALHES <ChevronRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                        {pendingRegistrations.length === 0 && (
-                            <div className="p-10 text-center border border-dashed border-white/10 rounded-2xl text-gray-600 text-sm">
-                                Nenhuma inscrição pendente.
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                {/* PAID COLUMN */}
-                <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-[0.2em] px-2 flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                            Pagos ({paidRegistrations.length})
-                        </h3>
-                    </div>
-
-                    <div className="space-y-4">
-                        {paidRegistrations.map(reg => (
-                            <div key={reg.id}
-                                onClick={() => setEditingReg(reg)}
-                                className="bg-white/[0.03] backdrop-blur-md rounded-2xl p-5 border-l-4 border-l-emerald-500 hover:scale-[1.02] transition-transform cursor-pointer group shadow-lg border-y border-r border-white/5"
-                            >
-                                <div className="flex justify-between items-start mb-4">
-                                    <div>
-                                        <h4 className="font-bold text-lg text-white group-hover:text-emerald-400 transition-colors line-clamp-1">{reg.full_name}</h4>
-                                        <p className="text-xs text-gray-500 font-mono lowercase">{reg.email}</p>
-                                    </div>
-                                    <span className="text-[10px] px-2 py-1 rounded bg-emerald-500/10 text-emerald-500 font-black uppercase tracking-wider border border-emerald-500/20">PAGO</span>
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-y-3 gap-x-4 mb-5">
-                                    <div>
-                                        <p className="text-[9px] uppercase tracking-widest text-gray-600 font-bold mb-0.5">Idade</p>
-                                        <p className="text-xs font-medium text-gray-300">{calculateAge(reg.birth_date)} anos</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-[9px] uppercase tracking-widest text-gray-600 font-bold mb-0.5">Cidade</p>
-                                        <p className="text-xs font-medium text-gray-300 truncate">{reg.city}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-[9px] uppercase tracking-widest text-gray-600 font-bold mb-0.5">Telefone</p>
-                                        <p className="text-xs font-bold text-sky-400 font-mono">{reg.phone}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-[9px] uppercase tracking-widest text-gray-600 font-bold mb-0.5">Kit</p>
-                                        <p className="text-xs font-medium text-gray-300 truncate">{reg.kit_option.split(' - ')[0]}</p>
-                                    </div>
-                                </div>
-
-                                <div className="pt-4 border-t border-white/5 flex justify-between items-center">
-                                    <p className="text-[9px] uppercase font-bold text-gray-600 italic">{reg.assigned_angel ? `Anjo: ${reg.assigned_angel}` : 'SEM ANJO'}</p>
-                                    <div className="flex gap-3">
-                                        <button
-                                            onClick={(e) => handleDelete(reg.id, e)}
-                                            className="text-gray-600 hover:text-red-400 transition-colors"
-                                        >
-                                            <Trash2 size={16} />
-                                        </button>
-                                        <button className="text-[10px] font-black tracking-widest uppercase flex items-center gap-1 group/btn hover:text-white text-gray-400 transition-colors">
-                                            DETALHES <ChevronRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                        {paidRegistrations.length === 0 && (
-                            <div className="p-10 text-center border border-dashed border-white/10 rounded-2xl text-gray-600 text-sm">
-                                Nenhuma inscrição confirmada.
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </div>
-
-
-            {/* Edit Modal (Keeping existing logic but updating z-index as requested previously) */}
             <AnimatePresence>
                 {editingReg && (
                     <div className="fixed inset-0 z-[9999] bg-black/90 backdrop-blur-xl flex items-center justify-center p-4">
@@ -671,7 +607,7 @@ const RegistrationAdmin = () => {
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-bold uppercase text-gray-500 tracking-widest pl-1">Data Nascimento (Idade: {calculateAge(editingReg.birth_date)})</label>
+                                        <label className="text-[10px] font-bold uppercase text-gray-500 tracking-widest pl-1">Data Nascimento</label>
                                         <input
                                             type="date"
                                             value={editingReg.birth_date || ''}
@@ -713,12 +649,12 @@ const RegistrationAdmin = () => {
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-bold uppercase text-gray-500 tracking-widest pl-1">Telefone / WhatsApp</label>
+                                        <label className="text-[10px] font-bold uppercase text-gray-500 tracking-widest pl-1">Telefone</label>
                                         <input
                                             type="text"
                                             value={editingReg.phone || ''}
                                             onChange={e => setEditingReg({ ...editingReg, phone: e.target.value })}
-                                            className="w-full bg-white/5 border-2 border-transparent focus:border-white/20 rounded-2xl py-4 px-5 outline-none text-gray-300 font-mono text-sm transition-all"
+                                            className="w-full bg-white/5 border-2 border-transparent focus:border-white/20 rounded-2xl py-4 px-5 outline-none text-gray-300 font-mono text-sm"
                                         />
                                     </div>
                                     <div className="space-y-2">
@@ -727,109 +663,8 @@ const RegistrationAdmin = () => {
                                             type="text"
                                             value={editingReg.emergency_phone || ''}
                                             onChange={e => setEditingReg({ ...editingReg, emergency_phone: e.target.value })}
-                                            className="w-full bg-red-500/5 border-2 border-transparent focus:border-red-500/30 rounded-2xl py-4 px-5 outline-none text-red-300 font-mono text-sm transition-all"
+                                            className="w-full bg-red-500/5 border-2 border-transparent focus:border-red-500/30 rounded-2xl py-4 px-5 outline-none text-red-300 font-mono text-sm"
                                         />
-                                    </div>
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-bold uppercase text-gray-500 tracking-widest pl-1">Endereço</label>
-                                        <input
-                                            type="text"
-                                            value={editingReg.address || ''}
-                                            onChange={e => setEditingReg({ ...editingReg, address: e.target.value })}
-                                            className="w-full bg-white/5 border-2 border-transparent focus:border-white/20 rounded-2xl py-4 px-5 outline-none text-gray-300 text-sm transition-all"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-bold uppercase text-gray-500 tracking-widest pl-1">Cidade</label>
-                                        <input
-                                            type="text"
-                                            value={editingReg.city || ''}
-                                            onChange={e => setEditingReg({ ...editingReg, city: e.target.value })}
-                                            className="w-full bg-white/5 border-2 border-transparent focus:border-white/20 rounded-2xl py-4 px-5 outline-none text-gray-300 text-sm transition-all"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-bold uppercase text-gray-500 tracking-widest pl-1">Paróquia</label>
-                                        <select
-                                            value={editingReg.parish || ''}
-                                            onChange={e => setEditingReg({ ...editingReg, parish: e.target.value })}
-                                            className="w-full bg-white/5 border-2 border-transparent focus:border-white/20 rounded-2xl py-4 px-5 outline-none text-gray-300 text-sm transition-all appearance-none"
-                                        >
-                                            <option value="" disabled className="bg-gray-900">Selecione...</option>
-                                            <option value="Paróquia São José da Santíssima Trindade" className="bg-gray-900">Paróquia São José da Santíssima Trindade</option>
-                                            <option value="Paróquia Santa Clara de Assis" className="bg-gray-900">Paróquia Santa Clara de Assis</option>
-                                            <option value="Paróquia São Sebastião" className="bg-gray-900">Paróquia São Sebastião</option>
-                                            <option value="Outros" className="bg-gray-900">Outros</option>
-                                        </select>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-bold uppercase text-gray-500 tracking-widest pl-1">Sexo</label>
-                                        <select
-                                            value={editingReg.gender || ''}
-                                            onChange={e => setEditingReg({ ...editingReg, gender: e.target.value })}
-                                            className="w-full bg-white/5 border-2 border-transparent focus:border-white/20 rounded-2xl py-4 px-5 outline-none text-gray-300 text-sm transition-all appearance-none"
-                                        >
-                                            <option value="" disabled className="bg-gray-900">Selecione...</option>
-                                            <option value="Masculino" className="bg-gray-900">Masculino</option>
-                                            <option value="Feminino" className="bg-gray-900">Feminino</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div className="p-4 bg-white/5 rounded-2xl border border-white/5 flex flex-col sm:flex-row gap-4 sm:items-center">
-                                    <div className="flex-1">
-                                        <label className="text-[10px] font-bold uppercase text-gray-500 tracking-widest pl-1 block mb-2">Opção de Kit</label>
-                                        <select
-                                            value={editingReg.kit_option || ''}
-                                            onChange={e => setEditingReg({ ...editingReg, kit_option: e.target.value })}
-                                            className="w-full bg-black/20 border border-white/10 rounded-xl py-2 px-3 outline-none text-white text-sm transition-all"
-                                        >
-                                            <option value="Kit 01 - Inscrição (R$ 50,00)" className="bg-gray-900">Kit 01 (R$ 50)</option>
-                                            <option value="Kit 02 - Inscrição + Camiseta (R$ 100,00)" className="bg-gray-900">Kit 02 (R$ 100)</option>
-                                            <option value="Kit 03 - Inscrição + 2 Camisetas + Kit Radical (R$ 200,00)" className="bg-gray-900">Kit 03 (R$ 200)</option>
-                                        </select>
-                                    </div>
-                                    <div className="flex items-center gap-3 pt-4 sm:pt-0">
-                                        <input
-                                            type="checkbox"
-                                            checked={editingReg.staying_on_site || false}
-                                            onChange={e => setEditingReg({ ...editingReg, staying_on_site: e.target.checked })}
-                                            className="w-5 h-5 accent-holi-primary"
-                                            id="staying_check"
-                                        />
-                                        <label htmlFor="staying_check" className="text-sm font-bold text-white cursor-pointer select-none">
-                                            Dormir no local?
-                                        </label>
-                                    </div>
-                                </div>
-
-                                <div className="p-6 rounded-3xl bg-white/[0.03] border border-white/5 space-y-4">
-                                    <h4 className="text-xs font-black uppercase tracking-widest text-gray-400 flex items-center gap-2"><Shirt size={14} /> Preferências do Kit</h4>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="space-y-1">
-                                            <label className="text-[10px] font-bold uppercase text-gray-600">Camiseta 1</label>
-                                            <input
-                                                type="text"
-                                                value={editingReg.tshirt_size || ''}
-                                                onChange={e => setEditingReg({ ...editingReg, tshirt_size: e.target.value })}
-                                                className="w-full bg-black border border-white/10 p-3 rounded-xl text-sm outline-none focus:border-holi-primary"
-                                            />
-                                        </div>
-                                        <div className="space-y-1">
-                                            <label className="text-[10px] font-bold uppercase text-gray-600">Camiseta 2</label>
-                                            <input
-                                                type="text"
-                                                value={editingReg.tshirt_size_2 || ''}
-                                                onChange={e => setEditingReg({ ...editingReg, tshirt_size_2: e.target.value })}
-                                                className="w-full bg-black border border-white/10 p-3 rounded-xl text-sm outline-none focus:border-holi-primary"
-                                            />
-                                        </div>
                                     </div>
                                 </div>
 
@@ -846,7 +681,7 @@ const RegistrationAdmin = () => {
                                             />
                                             {editingReg.payment_receipt_url && (
                                                 <a href={editingReg.payment_receipt_url} target="_blank" rel="noopener noreferrer" className="px-6 bg-holi-primary text-white rounded-2xl flex items-center justify-center font-bold hover:scale-105 transition-all shadow-lg shadow-holi-primary/20">
-                                                    Visualizar
+                                                    Ver
                                                 </a>
                                             )}
                                         </div>
@@ -873,7 +708,7 @@ const RegistrationAdmin = () => {
                                                     <>
                                                         <Upload className="text-gray-400" size={16} />
                                                         <span className="text-xs font-bold text-gray-400">
-                                                            {editingReg.payment_receipt_url ? 'Substituir Comprovante' : 'Enviar Comprovante (Admin)'}
+                                                            {editingReg.payment_receipt_url ? 'Substituir' : 'Enviar Comprovante'}
                                                         </span>
                                                     </>
                                                 )}
@@ -884,16 +719,17 @@ const RegistrationAdmin = () => {
 
                                 <button
                                     disabled={isSaving}
+                                    type="submit"
                                     className="w-full bg-white text-black font-black py-5 rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 uppercase tracking-widest shadow-xl text-lg mt-4"
                                 >
-                                    {isSaving ? 'Salvando...' : 'Salvar Alterações'}
+                                    {isSaving ? 'Salvando...' : 'Salvar'}
                                 </button>
                             </form>
                         </motion.div>
                     </div>
                 )}
             </AnimatePresence>
-        </div >
+        </div>
     )
 }
 
