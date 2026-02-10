@@ -164,11 +164,16 @@ const RegistrationAdmin = () => {
             (reg.assigned_angel || '').toLowerCase().includes(lowerSearch)
 
         const matchesStatus = filterStatus === 'Todos' || reg.payment_status === filterStatus
-        const matchesAngel = filterAngel === 'Todos'
+
+        // Normalize both sides for comparison
+        const normalizedAssignedAngel = (reg.assigned_angel || '').trim()
+        const normalizedFilterAngel = filterAngel.trim()
+
+        const matchesAngel = normalizedFilterAngel === 'Todos'
             ? true
-            : filterAngel === 'Sem Anjo'
-                ? !reg.assigned_angel || reg.assigned_angel.trim() === ''
-                : reg.assigned_angel?.trim() === filterAngel
+            : normalizedFilterAngel === 'Sem Anjo'
+                ? normalizedAssignedAngel === ''
+                : normalizedAssignedAngel === normalizedFilterAngel
 
         return matchesSearch && matchesStatus && matchesAngel
     })
