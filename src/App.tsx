@@ -41,10 +41,10 @@ function AppContent() {
                 <Route path="/inscricao" element={<RegistrationPage />} />
                 <Route path="/admin" element={<AdminLayout />}>
                     <Route index element={<NewsAdmin />} />
+                    <Route path="inscricoes" element={<RegistrationAdmin />} />
                     <Route path="galeria" element={<GalleryAdmin />} />
                     <Route path="doacoes" element={<DonationAdmin />} />
                 </Route>
-                <Route path="/admin/inscricoes" element={<AuthGuard><RegistrationAdmin /></AuthGuard>} />
                 <Route path="/em-breve" element={<ComingSoonPage />} />
             </Routes>
 

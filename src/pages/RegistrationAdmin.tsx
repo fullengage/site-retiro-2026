@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useOutletContext } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
     Search, Download, Users, CheckCircle,
@@ -30,6 +31,8 @@ interface Registration {
 }
 
 const RegistrationAdmin = () => {
+    const { userRole } = useOutletContext<{ userRole: 'admin' | 'redator' }>()
+
     const [registrations, setRegistrations] = useState<Registration[]>([])
     const [loading, setLoading] = useState(true)
     const [searchTerm, setSearchTerm] = useState('')
@@ -268,7 +271,7 @@ const RegistrationAdmin = () => {
     const paidRegistrations = filtered.filter(r => r.payment_status === 'Pago')
 
     return (
-        <div className="min-h-screen bg-[#050208] text-white p-4 md:p-8">
+        <div className="p-4 md:p-8">
             <div className="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-6 mb-8">
                 <div>
                     <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-white italic">
