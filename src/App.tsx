@@ -9,6 +9,7 @@ import NewsPage from './pages/NewsPage'
 import NewsAdmin from './pages/NewsAdmin'
 import RegistrationPage from './pages/RegistrationPage'
 import RegistrationAdmin from './pages/RegistrationAdmin'
+import AngelPortfolioPage from './pages/AngelPortfolioPage'
 import GalleryAdmin from './pages/GalleryAdmin'
 import DonationAdmin from './pages/DonationAdmin'
 import ComingSoonPage from './pages/ComingSoonPage'
@@ -42,6 +43,7 @@ function AppContent() {
                 <Route path="/admin" element={<AdminLayout />}>
                     <Route index element={<NewsAdmin />} />
                     <Route path="inscricoes" element={<RegistrationAdmin />} />
+                    <Route path="anjos" element={<AngelPortfolioPage />} />
                     <Route path="galeria" element={<GalleryAdmin />} />
                     <Route path="doacoes" element={<DonationAdmin />} />
                 </Route>
