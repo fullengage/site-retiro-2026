@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Retiro de Carnaval 2026</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&amp;family=Permanent+Marker&amp;family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              holi: {
+                dark: "#0a050f",
+                surface: "#170a1f",
+                primary: "#d946ef",
+                secondary: "#06b6d4",
+                accent: "#facc15",
+                orange: "#f97316",
+                green: "#84cc16",
+              },
+              paper: "#fdfbf7",
+            },
+            fontFamily: {
+              display: ["Montserrat", "sans-serif"],
+              marker: ["Permanent Marker", "cursive"],
+              news: ["Playfair Display", "serif"],
+            },
+            borderRadius: {
+              DEFAULT: "0.5rem",
+              'xl': '1rem',
+              '2xl': '1.5rem',
+              '3xl': '2rem',
+            },
+            backgroundImage: {
+                'noise': "url('https://www.transparenttextures.com/patterns/stardust.png')", 
+                'paper-texture': "url('https://www.transparenttextures.com/patterns/cream-paper.png')",
+                'grunge-overlay': "url('https://www.transparenttextures.com/patterns/asfalt-dark.png')",
+            },
+            animation: {
+                'blob': 'blob 7s infinite',
+                'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                'float': 'float 6s ease-in-out infinite',
+                'spin-slow': 'spin 12s linear infinite',
+            },
+            keyframes: {
+                blob: {
+                    '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                    '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                    '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                    '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                },
+                float: {
+                    '0%, 100%': { transform: 'translateY(0)' },
+                    '50%': { transform: 'translateY(-20px)' },
+                }
+            },
+            screens: {
+                'xs': '475px',
+            }
+          },
+        },
+      };
+    </script>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style type="text/tailwindcss">
+    .text-outline { text-shadow: 2px 2px 0 #000; }
+    .neon-glow { text-shadow: 0 0 10px rgba(217, 70, 239, 0.6), 0 0 20px rgba(6, 182, 212, 0.4); }
+    ::-webkit-scrollbar { width: 10px; }
+    ::-webkit-scrollbar-track { background: #0a050f; }
+    ::-webkit-scrollbar-thumb { background: #d946ef; border-radius: 5px; }
+    .polaroid { transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), z-index 0s; box-shadow: 5px 5px 15px rgba(0,0,0,0.5); cursor: pointer; }
+    .polaroid:hover { transform: scale(1.15) rotate(0deg) !important; z-index: 100 !important; box-shadow: 0 25px 50px rgba(0,0,0,0.9); }
+    .tape { background-color: rgba(255, 255, 255, 0.4); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); backdrop-filter: blur(2px); transform: rotate(-2deg); }
+    .torn-paper-edge {
+        clip-path: polygon(0% 0%, 100% 0%, 100% 98%, 95% 100%, 90% 98%, 85% 100%, 80% 98%, 75% 100%, 70% 98%, 65% 100%, 60% 98%, 55% 100%, 50% 98%, 45% 100%, 40% 98%, 35% 100%, 30% 98%, 25% 100%, 20% 98%, 15% 100%, 10% 98%, 5% 100%, 0% 98%);
+    }
+    .newspaper-cols {
+        columns: 1;
+        column-gap: 1.5rem;
+    }
+    @media (min-width: 768px) {
+        .newspaper-cols { columns: 2; }
+    }
+    @media (min-width: 1024px) {
+        .newspaper-cols { columns: 3; }
+    }
+    .film-strip {
+        background-color: #000;
+        background-image: 
+            linear-gradient(90deg, transparent 50%, rgba(255,255,255,0.1) 50%),
+            radial-gradient(circle, transparent 30%, #000 31%),
+            radial-gradient(circle, transparent 30%, #000 31%);
+        background-size: 40px 100%, 20px 20px, 20px 20px;
+        background-position: 0 0, 10px 10px, 10px calc(100% - 10px);
+    }
+    .film-holes {
+        width: 100%;
+        height: 20px;
+        background-image: radial-gradient(white 20%, transparent 22%);
+        background-size: 30px 20px;
+    }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48; }
+    .news-modal {
+        display: none;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+    }
+    .news-modal:target {
+        display: flex;
+        opacity: 1;
+        pointer-events: auto;
+    }
+    </style>
+</head>
+<body class="bg-holi-dark text-gray-100 font-display selection:bg-holi-primary selection:text-white transition-colors duration-300 overflow-x-hidden relative">
+<div class="fixed inset-0 pointer-events-none z-0">
+<div class="absolute inset-0 bg-gradient-to-b from-holi-dark via-[#1a0b2e] to-holi-dark opacity-80"></div>
+<div class="absolute inset-0 bg-noise opacity-15"></div>
+<div class="absolute top-[10%] left-[20%] w-[800px] h-[800px] bg-holi-primary/10 rounded-full mix-blend-screen filter blur-[120px] animate-blob"></div>
+<div class="absolute bottom-[20%] right-[10%] w-[600px] h-[600px] bg-holi-secondary/10 rounded-full mix-blend-screen filter blur-[100px] animate-blob animation-delay-2000"></div>
+<div class="absolute top-[40%] right-[30%] w-[500px] h-[500px] bg-holi-accent/5 rounded-full mix-blend-screen filter blur-[80px] animate-blob animation-delay-4000"></div>
+</div>
+<nav class="fixed w-full z-50 bg-holi-dark/70 backdrop-blur-xl border-b border-white/5 supports-[backdrop-filter]:bg-holi-dark/40">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between items-center h-20">
+<div class="flex-shrink-0 flex items-center group">
+<span class="font-marker text-2xl md:text-3xl tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-holi-primary via-holi-accent to-holi-secondary group-hover:animate-pulse cursor-pointer">
+                        RETIRO DE <span class="text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.5)]">CARNAVAL</span> 2026
+                    </span>
+</div>
+<div class="hidden md:flex space-x-8 items-center">
+<a class="text-gray-300 hover:text-holi-primary transition-colors font-semibold uppercase tracking-wider text-sm" href="#sobre">Sobre</a>
+<a class="text-gray-300 hover:text-holi-secondary transition-colors font-semibold uppercase tracking-wider text-sm" href="#informacoes">Informações</a>
+<a class="text-gray-300 hover:text-holi-accent transition-colors font-semibold uppercase tracking-wider text-sm" href="#noticias">Notícias</a>
+<a class="text-gray-300 hover:text-holi-green transition-colors font-semibold uppercase tracking-wider text-sm" href="#galeria">Galeria</a>
+<a class="bg-gradient-to-r from-holi-primary to-purple-600 hover:from-purple-600 hover:to-holi-primary text-white px-6 py-2.5 rounded-full font-bold transition-all hover:scale-105 shadow-[0_0_15px_rgba(217,70,239,0.5)] uppercase tracking-wide text-sm" href="#inscricao">
+                        INSCREVA-SE
+                    </a>
+</div>
+<div class="md:hidden flex items-center">
+<button class="text-white hover:text-holi-primary focus:outline-none">
+<span class="material-icons">menu</span>
+</button>
+</div>
+</div>
+</div>
+</nav>
+<section class="pt-32 pb-20 relative overflow-hidden z-10">
+<div class="max-w-5xl mx-auto px-4 text-center relative z-10">
+<h2 class="text-4xl md:text-6xl font-black mb-16 uppercase tracking-tighter flex flex-col md:flex-row items-center justify-center gap-4 neon-glow">
+<span class="text-white">Você está pronto?</span>
+</h2>
+<div class="relative mx-auto w-full max-w-4xl transform hover:scale-[1.02] transition-transform duration-500">
+<div class="absolute -top-16 left-1/2 -translate-x-1/2 w-64 h-24 z-0 opacity-0 md:opacity-100 transition-opacity">
+<div class="absolute bottom-0 left-1/2 w-1.5 h-32 bg-gradient-to-t from-gray-700 to-gray-400 origin-bottom -rotate-[25deg] rounded-full shadow-lg">
+<div class="absolute -top-1 left-1/2 -translate-x-1/2 w-3 h-3 bg-gray-300 rounded-full shadow-[0_0_10px_white]"></div>
+</div>
+<div class="absolute bottom-0 left-1/2 w-1.5 h-32 bg-gradient-to-t from-gray-700 to-gray-400 origin-bottom rotate-[25deg] rounded-full shadow-lg">
+<div class="absolute -top-1 left-1/2 -translate-x-1/2 w-3 h-3 bg-gray-300 rounded-full shadow-[0_0_10px_white]"></div>
+</div>
+<div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-16 h-8 bg-[#252525] rounded-t-2xl"></div>
+</div>
+<div class="relative bg-[#252525] p-4 md:p-8 rounded-[2.5rem] shadow-[0_0_0_1px_rgba(255,255,255,0.1),0_25px_50px_-12px_rgba(0,0,0,0.7)] z-10">
+<div class="absolute inset-0 rounded-[2.5rem] shadow-[inset_0_2px_4px_rgba(255,255,255,0.1),inset_0_-4px_6px_rgba(0,0,0,0.5)] pointer-events-none"></div>
+<div class="bg-[#1a1a1a] p-3 md:p-5 rounded-[2rem] flex flex-col md:flex-row gap-6 shadow-[inset_0_0_20px_rgba(0,0,0,0.8)] border-b border-white/5">
+<div class="relative flex-1 bg-black rounded-[1.5rem] overflow-hidden shadow-[inset_0_0_30px_rgba(0,0,0,1)] border-[6px] border-[#222]">
+<div class="absolute inset-0 z-20 bg-gradient-to-br from-white/10 via-transparent to-transparent pointer-events-none rounded-[1.2rem]"></div>
+<div class="absolute inset-0 z-10 pointer-events-none opacity-10 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_4px,6px_100%]"></div>
+<div class="aspect-video relative group">
+<div class="absolute inset-0 bg-[url('https://media.giphy.com/media/3o7aD2saalBwwftBIY/giphy.gif')] opacity-10 pointer-events-none mix-blend-overlay"></div>
+<img alt="Video thumbnail" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500 saturate-[1.1] contrast-[1.1]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBub9KoKpI9ePtmS-i9xBiR0NvduIfo4fzCjK12GKWUclvwfUzY0Io2om6Hzr6V5gKDSPpR8pjx1vyL2mS_8RCqbYV35kgfJQhUbw7VMYZ88Jwr4LbJf1myyftQaUGydGeb2MVjvHZd6ezB9v_a0g9-x6a-UwflOKxH9XrZ-wlDRpsIudtvGm6zfc2zRoql1j_yxc6VCeQ9GVNvKMc7IGBc6fbG03pP75e0eByJEWxYvqlnGoiCC3Lr8iUAyvJ-Nad4jMnthdrD4MGm"/>
+<button class="absolute inset-0 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 z-30">
+<div class="w-20 h-20 bg-gradient-to-br from-holi-primary/90 to-purple-900/90 backdrop-blur-md rounded-full flex items-center justify-center border border-white/40 shadow-[0_0_30px_rgba(217,70,239,0.6)] group-hover:shadow-[0_0_50px_rgba(217,70,239,0.8)] transition-all">
+<span class="material-icons text-5xl text-white ml-1 drop-shadow-md">play_arrow</span>
+</div>
+</button>
+</div>
+</div>
+<div class="flex md:flex-col justify-between items-center md:w-24 bg-[#111] rounded-2xl p-4 border border-white/5 shadow-[inset_0_0_15px_rgba(0,0,0,0.8)] relative overflow-hidden">
+<div class="hidden md:block mb-4 text-center w-full border-b border-white/10 pb-2">
+<span class="font-marker text-holi-secondary text-xs tracking-wider opacity-80">HOLI TV</span>
+</div>
+<div class="flex md:flex-col gap-5 items-center justify-center">
+<div class="w-14 h-14 rounded-full bg-gradient-to-br from-[#2a2a2a] to-[#111] border-2 border-[#333] shadow-[0_4px_8px_rgba(0,0,0,0.6)] flex items-center justify-center relative group cursor-pointer hover:border-holi-primary transition-colors">
+<div class="w-1.5 h-5 bg-[#444] rounded-full absolute top-1.5 shadow-sm group-hover:bg-holi-primary/50"></div>
+<span class="text-[8px] font-bold text-gray-600 absolute bottom-1.5">VOL</span>
+</div>
+<div class="w-14 h-14 rounded-full bg-gradient-to-br from-[#2a2a2a] to-[#111] border-2 border-[#333] shadow-[0_4px_8px_rgba(0,0,0,0.6)] flex items-center justify-center relative group cursor-pointer hover:border-holi-accent transition-colors">
+<div class="w-1.5 h-5 bg-[#444] rounded-full absolute bottom-1.5 right-3 rotate-45 shadow-sm group-hover:bg-holi-accent/50"></div>
+<span class="text-[8px] font-bold text-gray-600 absolute top-1.5">CH</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="relative h-6 md:h-8 w-full max-w-[80%] mx-auto -mt-2 z-0 flex justify-between px-8">
+<div class="w-12 md:w-16 h-full bg-[#1f1f1f] transform skew-x-[15deg] rounded-b-lg border-b-4 border-[#111] shadow-lg"></div>
+<div class="w-12 md:w-16 h-full bg-[#1f1f1f] transform -skew-x-[15deg] rounded-b-lg border-b-4 border-[#111] shadow-lg"></div>
+</div>
+</div>
+</div>
+</section>
+<section class="relative py-20 overflow-visible flex items-center z-10">
+<div class="absolute top-[10%] right-[10%] w-64 h-64 bg-holi-accent/20 rounded-full blur-[80px] -z-10"></div>
+<div class="absolute bottom-[10%] left-[5%] w-80 h-80 bg-holi-primary/20 rounded-full blur-[80px] -z-10"></div>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+<div class="text-center lg:text-left space-y-6">
+<div class="inline-block px-5 py-2 rounded-full border border-holi-secondary/50 bg-holi-secondary/10 text-holi-secondary text-sm font-bold tracking-[0.2em] uppercase mb-4 animate-pulse">
+<i class="fas fa-star mr-2 text-xs"></i>Vem aí mais um retiro!!
+                    </div>
+<h1 class="text-6xl md:text-8xl font-black leading-[0.9] tracking-tighter uppercase relative">
+                        Retiro de <br/>
+<span class="text-transparent bg-clip-text bg-gradient-to-r from-holi-accent via-holi-primary to-holi-secondary neon-glow">Carnaval</span> <br/>
+<span class="text-white text-outline">2026</span>
+</h1>
+<p class="text-lg md:text-xl text-gray-300 max-w-lg mx-auto lg:mx-0 font-medium leading-relaxed">
+                        Prepare-se para viver dias inesquecíveis em um ambiente vibrante de fé e alegria. Uma explosão de cores e graça para marcar a história da sua vida.
+                    </p>
+<div class="pt-8 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+<a class="inline-flex items-center justify-center bg-white text-holi-dark font-black text-lg px-8 py-4 rounded-full shadow-[0_0_25px_rgba(255,255,255,0.4)] hover:bg-gray-100 hover:scale-105 transition-all duration-300 uppercase tracking-wide" href="#inscricao">
+<span class="material-icons mr-2 text-holi-primary">bolt</span> Inscreva-se
+                        </a>
+<a class="inline-flex items-center justify-center bg-transparent border-2 border-white/30 text-white font-bold text-lg px-8 py-4 rounded-full hover:bg-white/10 hover:border-white transition-all duration-300 uppercase tracking-wide" href="#sobre">
+                            Saiba Mais
+                        </a>
+</div>
+</div>
+<div class="relative flex justify-center lg:justify-end perspective-1000">
+<div class="absolute top-[-20px] right-[-30px] w-40 h-40 bg-holi-accent rounded-full filter blur-xl opacity-60 animate-bounce"></div>
+<div class="relative w-[320px] h-[600px] border-4 border-white/20 p-2 rounded-[3rem] shadow-2xl bg-holi-surface/80 backdrop-blur-sm transform -rotate-3 hover:rotate-0 transition-transform duration-500 z-10 group">
+<div class="absolute -top-4 -right-4 w-12 h-12 bg-holi-primary rounded-full z-30 flex items-center justify-center border-2 border-white shadow-lg">
+<i class="fas fa-heart text-white text-sm"></i>
+</div>
+<div class="absolute top-0 inset-x-0 h-8 bg-holi-dark z-20 rounded-b-2xl w-48 mx-auto border-b border-x border-white/20"></div>
+<div class="w-full h-full rounded-[2.5rem] overflow-hidden relative">
+<img alt="Jovens no retiro celebrando" class="w-full h-full object-cover opacity-90 group-hover:scale-110 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCIQl5k1_4LOwSxdj8_d5wqJD9MG5zXYQ_e_sArmByNMbiLM1kJv_CN_1PzwacGsB2Ot9h3vK2FrFZkqxgLrftVcAnJYX00T2Bwa1smCpQqIQkQxrWq3wJFmbyNGn84NKUtrgHWBFY_BIseI6V7On4wBKqnKQHoKCTC9u4ie7-xQS21xerCqrQJgkpL7KMaRdaZBjm-8Cv8WiWEjZ_zStuCccb3C1kR12x8WeZhklIgJZ50jUwu1SPyweSOBYNpa1P4OBvqUaec_F6i"/>
+<div class="absolute inset-0 bg-gradient-to-t from-holi-primary/80 via-transparent to-transparent mix-blend-overlay"></div>
+<div class="absolute bottom-0 inset-x-0 p-8 bg-gradient-to-t from-black via-black/80 to-transparent text-white z-10">
+<h3 class="font-black text-3xl uppercase text-holi-accent mb-1 drop-shadow-md">Holi Fest</h3>
+<p class="text-sm text-gray-200 font-semibold">O sobrenatural em cores!</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="py-24 relative overflow-hidden z-10">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+<h2 class="text-center text-3xl md:text-5xl font-black text-white mb-16 uppercase tracking-widest relative">
+<span class="relative z-10">O que te espera?</span>
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-20 bg-holi-primary/20 -rotate-2 blur-xl -z-0 rounded-full"></div>
+</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+<div class="bg-holi-surface/40 backdrop-blur-sm p-8 rounded-3xl border border-white/5 hover:border-holi-primary/50 transition-all duration-300 hover:-translate-y-2 group relative overflow-hidden">
+<div class="absolute -right-10 -top-10 w-32 h-32 bg-holi-primary/20 rounded-full blur-2xl group-hover:bg-holi-primary/40 transition-colors"></div>
+<div class="w-16 h-16 bg-holi-primary/20 rounded-2xl flex items-center justify-center mb-6 text-holi-primary group-hover:scale-110 transition-transform">
+<span class="material-icons text-3xl">music_note</span>
+</div>
+<h3 class="text-xl font-bold text-white mb-3">Shows ao Vivo</h3>
+<p class="text-gray-400 text-sm leading-relaxed">Bandas católicas renomadas e muito louvor para elevar sua alma aos céus.</p>
+</div>
+<div class="bg-holi-surface/40 backdrop-blur-sm p-8 rounded-3xl border border-white/5 hover:border-holi-secondary/50 transition-all duration-300 hover:-translate-y-2 group relative overflow-hidden">
+<div class="absolute -right-10 -top-10 w-32 h-32 bg-holi-secondary/20 rounded-full blur-2xl group-hover:bg-holi-secondary/40 transition-colors"></div>
+<div class="w-16 h-16 bg-holi-secondary/20 rounded-2xl flex items-center justify-center mb-6 text-holi-secondary group-hover:scale-110 transition-transform">
+<span class="material-icons text-3xl">favorite</span>
+</div>
+<h3 class="text-xl font-bold text-white mb-3">Adoração</h3>
+<p class="text-gray-400 text-sm leading-relaxed">Momentos profundos de encontro com Jesus Eucarístico e cura interior.</p>
+</div>
+<div class="bg-holi-surface/40 backdrop-blur-sm p-8 rounded-3xl border border-white/5 hover:border-holi-accent/50 transition-all duration-300 hover:-translate-y-2 group relative overflow-hidden">
+<div class="absolute -right-10 -top-10 w-32 h-32 bg-holi-accent/20 rounded-full blur-2xl group-hover:bg-holi-accent/40 transition-colors"></div>
+<div class="w-16 h-16 bg-holi-accent/20 rounded-2xl flex items-center justify-center mb-6 text-holi-accent group-hover:scale-110 transition-transform">
+<span class="material-icons text-3xl">church</span>
+</div>
+<h3 class="text-xl font-bold text-white mb-3">Santas Missas</h3>
+<p class="text-gray-400 text-sm leading-relaxed">Celebrações diárias da Eucaristia, o centro e o ápice da nossa fé cristã.</p>
+</div>
+<div class="bg-holi-surface/40 backdrop-blur-sm p-8 rounded-3xl border border-white/5 hover:border-holi-green/50 transition-all duration-300 hover:-translate-y-2 group relative overflow-hidden">
+<div class="absolute -right-10 -top-10 w-32 h-32 bg-holi-green/20 rounded-full blur-2xl group-hover:bg-holi-green/40 transition-colors"></div>
+<div class="w-16 h-16 bg-holi-green/20 rounded-2xl flex items-center justify-center mb-6 text-holi-green group-hover:scale-110 transition-transform">
+<span class="material-icons text-3xl">sports_esports</span>
+</div>
+<h3 class="text-xl font-bold text-white mb-3">Gincanas</h3>
+<p class="text-gray-400 text-sm leading-relaxed">Diversão garantida com atividades que promovem a união e a alegria santa.</p>
+</div>
+</div>
+</div>
+</section>
+<section class="relative py-24 z-10" id="sobre">
+<div class="absolute inset-0 z-0">
+<img alt="Multidão no retiro" class="w-full h-full object-cover opacity-10 grayscale mix-blend-overlay" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDO6bu2DI61ilE5yC90ozz7O79Sys4hQpfdpB21dTvHbR1DNFvUbGrRnCt639Z5c5ZAMbmwkcIEsNwQhpfLYNtNBVtgccJtQFtzAMxpsIcnQg2um6Htg6O2Y2LR5kzLIw5rdw3SkyQetr-pmF_PAeN24xenFdrgBmm0bBd7izRqjoDazWp6v45YkNP-yuwP95U6yqp9VJCb3y1DQfUilV2GyBhqLu4N6LFt8XRwAMnZ6c3ARq20uqwCVTbEqIJv5Okn4MO-Z6miN1k9"/>
+<div class="absolute inset-0 bg-gradient-to-b from-holi-dark/90 via-transparent to-holi-dark/90"></div>
+</div>
+<div class="relative z-10 max-w-4xl mx-auto px-4 text-center">
+<h2 class="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-holi-accent to-holi-orange mb-8 uppercase drop-shadow-sm">Sobre o retiro</h2>
+<div class="bg-white/5 backdrop-blur-xl p-8 md:p-14 rounded-[2.5rem] border border-white/10 shadow-2xl relative overflow-hidden group hover:bg-white/10 transition-colors">
+<div class="absolute -right-10 -top-10 w-32 h-32 bg-holi-primary rounded-full filter blur-[60px] opacity-40 group-hover:opacity-60 transition-opacity"></div>
+<div class="absolute -left-10 -bottom-10 w-32 h-32 bg-holi-secondary rounded-full filter blur-[60px] opacity-40 group-hover:opacity-60 transition-opacity"></div>
+<p class="text-lg md:text-xl text-gray-200 leading-relaxed font-medium relative z-10">
+                    Um projeto que começou em 2023, o <strong class="text-holi-primary">Retiro de Carnaval da Comunidade Voz de Deus</strong> já reuniu mais de 300 jovens no mesmo local para vivenciar uma experiênci de amor com Cristo! 
+                    <br/><br/>
+                    Em 2026 pretendemos alcançar muitas almas com um carnaval bem diferente, cheio de <span class="text-holi-secondary font-marker">cor</span>, <span class="text-holi-accent font-marker">vida</span> e <span class="text-holi-primary font-marker">propósito</span>!
+                </p>
+</div>
+</div>
+</section>
+<section class="py-24 relative overflow-hidden z-10" id="informacoes">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+<h2 class="text-center text-4xl font-black text-white mb-20 uppercase tracking-widest relative inline-block left-1/2 transform -translate-x-1/2">
+                Principais Informações
+                <span class="absolute -bottom-4 left-0 w-full h-2 bg-gradient-to-r from-holi-primary via-holi-secondary to-holi-accent rounded-full blur-[2px]"></span>
+</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+<div class="flex flex-col items-center group relative">
+<div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-4 w-48 h-48 bg-holi-primary/30 rounded-full blur-3xl group-hover:bg-holi-primary/50 transition-colors"></div>
+<div class="w-52 h-52 rounded-full overflow-hidden mb-8 border-4 border-holi-surface shadow-[0_0_20px_rgba(217,70,239,0.3)] group-hover:scale-110 transition-all relative z-10 bg-black flex items-center justify-center">
+<img alt="Datas" class="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCh4saYWyhn9PcLb7f6qzVGuQdwv3JzjAYVMKRvCUhW_YmRikCF_s9qdQYWDAspahDdX6t9KiZq_aaASahnQbDAcBlgKxJBNnO7BMH_G6946GfpANGKagdoF71C0JrjrXecv335xbH7Xz_oWoksvJ73SCWIdJ6r3vlyTc8uGpQslfn8oIe5m_ig1AA-B8Fm6Q97HbUcM62GteivxZRb5AA8LM014ogHNg-_-WW0Yq_ZX2wr_k-gl_-TDlUMrr109eAfFAq1OcNVWjo4"/>
+<div class="absolute inset-0 flex items-center justify-center">
+<i class="material-icons text-6xl text-white drop-shadow-lg">calendar_today</i>
+</div>
+</div>
+<div class="bg-holi-surface/60 backdrop-blur-md border border-white/5 p-8 rounded-3xl shadow-xl w-full text-center relative mt-0 hover:bg-white/10 transition-colors">
+<h3 class="font-bold text-2xl mb-3 text-holi-primary uppercase">Datas</h3>
+<p class="text-gray-400 font-bold text-lg">Dos dias 13 a 16 de Fevereiro</p>
+</div>
+</div>
+<div class="flex flex-col items-center group relative mt-8 md:mt-0">
+<div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-4 w-48 h-48 bg-holi-secondary/30 rounded-full blur-3xl group-hover:bg-holi-secondary/50 transition-colors"></div>
+<div class="w-52 h-52 rounded-full overflow-hidden mb-8 border-4 border-holi-surface shadow-[0_0_20px_rgba(6,182,212,0.3)] group-hover:scale-110 transition-all relative z-10 bg-black">
+<img alt="Local" class="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBAKfUU_ND3d9J4dNkL5WAB4kcl06b2fXBVfHpmk1I0dwcyXOuFr4-0titXHUtikMp98UcPjGxWogWvSCSoM_UayoQqMQ3tzstCeFbKagNeISfsVYsbfvIISGNDOqhScNHTFK7F62awEmbQeJyRDOnphLnp88tB0IYzvWaUrEyEKX2QhVeh6fVwfw0tj5oXYH9yMCsdjCyb0AIx0CGbJqZd9imhPlYr3yTqxxc6Wxszc6LRrXFgBM8lsev5keGn6pcK2h2kQn01tP0-"/>
+<div class="absolute inset-0 flex items-center justify-center">
+<i class="material-icons text-6xl text-white drop-shadow-lg">location_on</i>
+</div>
+</div>
+<div class="bg-holi-surface/60 backdrop-blur-md border border-white/5 p-8 rounded-3xl shadow-xl w-full text-center relative mt-0 hover:bg-white/10 transition-colors">
+<h3 class="font-bold text-2xl mb-3 text-holi-secondary uppercase">Local</h3>
+<p class="text-gray-400">Recinto de Rodeio de Novo Horizonte</p>
+</div>
+</div>
+<div class="flex flex-col items-center group relative">
+<div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-4 w-48 h-48 bg-holi-accent/30 rounded-full blur-3xl group-hover:bg-holi-accent/50 transition-colors"></div>
+<div class="w-52 h-52 rounded-full overflow-hidden mb-8 border-4 border-holi-surface shadow-[0_0_20px_rgba(250,204,21,0.3)] group-hover:scale-110 transition-all relative z-10 bg-black">
+<img alt="Organização" class="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDk1-oSjrF0xQvlChsBcsXLdU8bdXFJ8RSsazWEYACC6NmhoZoYSI2TbrGOB26yAIfNiA2zmlFQRreVMjfFxHNHUz7bNydk7shMUrDV0mvKm0AUWJrtrS6vD7__QSezFSkUk6MRNMbDCKhaZksX6NoXaLrTqgmmX2wqBx74dqspG1B0CIGSw6rL2Al2fh5sNPLB4mZfugTNemXFvnDh7To-RttGa-fhsSU517rXLgtKxjYchgRkifpgmAI3q0rQqU3Ja6GTdoBW6wYG"/>
+<div class="absolute inset-0 flex items-center justify-center">
+<i class="material-icons text-6xl text-white drop-shadow-lg">groups</i>
+</div>
+</div>
+<div class="bg-holi-surface/60 backdrop-blur-md border border-white/5 p-8 rounded-3xl shadow-xl w-full text-center relative mt-0 hover:bg-white/10 transition-colors">
+<h3 class="font-bold text-2xl mb-3 text-holi-accent uppercase">Organização</h3>
+<p class="text-gray-400">Comunidade Voz de Deus</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="py-32 relative overflow-hidden z-10" id="noticias">
+<div class="absolute inset-0 bg-noise opacity-20 z-0"></div>
+<div class="absolute top-10 right-10 w-96 h-96 bg-white/5 rounded-full blur-[100px] z-0"></div>
+<div class="max-w-7xl mx-auto px-4 relative z-10">
+<div class="text-center mb-16 relative">
+<span class="font-marker text-holi-primary text-xl rotate-[-5deg] inline-block absolute -top-8 left-1/2 -translate-x-20">Extra! Extra!</span>
+<h2 class="text-5xl md:text-6xl font-black text-white uppercase tracking-tighter inline-block border-b-4 border-white pb-2">
+                    Últimas Notícias
+                </h2>
+</div>
+<div class="newspaper-cols space-y-8 gap-8 perspective-1000">
+<a class="block break-inside-avoid bg-[#fdfbf7] text-gray-900 p-6 shadow-2xl torn-paper-edge transform -rotate-1 hover:rotate-0 transition-transform duration-300 relative group cursor-pointer" href="#news-modal-1">
+<div class="border-b-2 border-black mb-4 pb-2 flex justify-between items-end">
+<span class="font-news font-bold italic text-lg">O Diário do Peregrino</span>
+<span class="font-mono text-xs">NOVIDADE</span>
+</div>
+<h3 class="font-news font-black text-4xl leading-[0.9] mb-4 uppercase">Vai ter camping no Carnaval 2026</h3>
+<p class="font-news text-sm text-justify leading-snug mb-4">
+<span class="float-left text-4xl font-black mr-2 mt-[-5px] font-display">A</span> grande novidade deste ano é a liberação da área de camping oficial. Os participantes poderão trazer suas barracas e vivenciar a experiência completa de fraternidade no recinto.
+                    </p>
+<div class="w-full h-1 bg-black mb-1"></div>
+<div class="w-full h-0.5 bg-black"></div>
+<div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+<span class="bg-black text-white px-3 py-1 font-mono text-xs uppercase transform -rotate-3">Ler mais</span>
+</div>
+</a>
+<a class="block break-inside-avoid bg-[#f0f0e8] text-gray-800 p-6 shadow-xl torn-paper-edge transform rotate-2 hover:rotate-0 transition-transform duration-300 relative mt-4 cursor-pointer" href="#news-modal-2">
+<div class="border-b-2 border-gray-400 mb-4 pb-2">
+<span class="font-news font-bold italic text-sm">NOTAS DA EDIÇÃO</span>
+</div>
+<h4 class="font-news font-bold text-3xl mb-4 leading-tight uppercase">Mudanças do Carnaval 2026</h4>
+<p class="font-news text-sm text-justify leading-snug mb-4">
+                        A edição de 2026 traz atualizações importantes no cronograma e na estrutura das gincanas. Novos palcos e áreas de convivência foram projetados para garantir mais conforto e dinamismo para os jovens.
+                    </p>
+<div class="absolute bottom-2 right-2 text-holi-secondary font-marker text-lg rotate-[-5deg]">Atualizado</div>
+</a>
+<a class="block break-inside-avoid bg-[#fdfbf7] text-gray-900 p-6 shadow-2xl torn-paper-edge transform rotate-1 hover:rotate-0 transition-transform duration-300 relative group cursor-pointer" href="#news-modal-3">
+<div class="border-b-2 border-black mb-4 pb-2 flex justify-between items-end">
+<span class="font-news font-bold italic text-lg">O Diário do Peregrino</span>
+<span class="font-mono text-xs">VOL. III</span>
+</div>
+<h3 class="font-news font-black text-4xl leading-[0.9] mb-4 uppercase">Preparativos a Todo Vapor!</h3>
+<p class="font-news text-sm text-justify leading-snug mb-4">
+<span class="float-left text-4xl font-black mr-2 mt-[-5px] font-display">A</span> contagem regressiva começou. Nossa equipe está trabalhando dia e noite para transformar o recinto em um pedaço do céu. "Será algo nunca visto antes", afirma a organização.
+                    </p>
+<div class="w-full h-1 bg-black mb-1"></div>
+<div class="w-full h-0.5 bg-black"></div>
+<div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+<span class="bg-black text-white px-3 py-1 font-mono text-xs uppercase transform -rotate-3">Ler mais</span>
+</div>
+</a>
+<a class="block break-inside-avoid bg-white p-3 pb-8 shadow-xl transform -rotate-2 hover:rotate-0 transition-transform duration-300 relative z-10 mt-12 cursor-pointer" href="#news-modal-4">
+<div class="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-6 tape rotate-2"></div>
+<div class="aspect-video overflow-hidden grayscale contrast-125 mb-2 border border-gray-200">
+<img alt="Team working" class="w-full h-full object-cover hover:scale-110 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA7iott_51W07tA39SX2XTEJCaBYQliamHd7zFoqNtgnNL5MioTADsPi5HtU-491tWPwICCIIpUwXvW28w0kzLK9Fd0VMCVbXyW8Sgs2uwnhkoqeWaqGDFZfXi_ZwRfhWxUWFEItT7XzXN7wp-G9DLItzAHIxNFAam3UG74qlsmEvUZR2CZkNpeh1mvOInHrgkj58rkLkEQxDXMXbIjfL1jl9-eZm_7sDTNXOHlQmb9Xg4DQfuiDH1YYh2ph9y3QpGBaoXDfF9lEmq9"/>
+</div>
+<p class="font-mono text-[10px] text-gray-500 uppercase tracking-widest text-center">Fig. 1: Equipe em ação</p>
+<div class="absolute bottom-2 right-2 text-red-600 font-marker text-lg rotate-[-10deg]">Bastidores</div>
+</a>
+<a class="block break-inside-avoid bg-red-600 text-white p-6 shadow-lg transform rotate-2 hover:rotate-0 transition-transform duration-300 relative border-4 border-double border-white/20 cursor-pointer" href="#news-modal-5">
+<div class="absolute -top-3 -right-3 w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center text-red-900 font-bold text-xs animate-bounce shadow-md">HOT</div>
+<h4 class="font-black font-display text-2xl uppercase mb-2">Camisetas Esgotando!</h4>
+<p class="font-display text-sm opacity-90 leading-tight">Os novos modelos de 2026 estão voando das prateleiras. Garanta a sua no stand oficial assim que chegar!</p>
+</a>
+<a class="block break-inside-avoid bg-gray-900 text-gray-200 p-8 shadow-2xl transform -rotate-1 hover:rotate-0 transition-transform duration-300 border border-white/10 relative cursor-pointer" href="#news-modal-6">
+<i class="fas fa-quote-left text-4xl text-holi-primary absolute top-4 left-4 opacity-20"></i>
+<p class="font-news italic text-xl text-center leading-relaxed relative z-10">
+                        "A alegria do Senhor é a nossa força. Preparem seus corações para o transbordar da graça."
+                    </p>
+<div class="mt-4 text-center font-mono text-xs text-holi-secondary uppercase tracking-widest">- Neemias 8:10</div>
+</a>
+<a class="block break-inside-avoid bg-[#f0f0e8] text-gray-800 p-6 shadow-xl torn-paper-edge transform rotate-3 hover:rotate-0 transition-transform duration-300 relative mt-8 cursor-pointer" href="#news-modal-7">
+<h4 class="font-marker text-2xl mb-4 border-b border-gray-400 pb-2">Checklist do Peregrino</h4>
+<ul class="font-news text-sm space-y-2 list-disc list-inside">
+<li>Bíblia e Terço</li>
+<li>Garrafa de água</li>
+<li>Muita disposição</li>
+<li>Coração aberto</li>
+<li class="line-through decoration-red-500">Tristeza</li>
+</ul>
+</a>
+<a class="block break-inside-avoid bg-blue-100 p-4 shadow-lg transform -rotate-2 hover:rotate-0 transition-transform duration-300 relative w-3/4 mx-auto cursor-pointer" href="#news-modal-8">
+<div class="border-2 border-blue-300 p-3 text-center">
+<span class="block font-bold text-blue-900 uppercase text-xs mb-1">Previsão do Tempo</span>
+<div class="flex justify-center items-center gap-2 mb-1">
+<i class="fas fa-sun text-yellow-500 text-3xl animate-spin-slow"></i>
+<span class="text-4xl font-black text-blue-900">30°C</span>
+</div>
+<span class="block font-news italic text-blue-800 text-sm">Chuva de Graça Confirmada</span>
+</div>
+</a>
+<a class="block break-inside-avoid bg-yellow-300 text-black p-4 shadow-md transform rotate-6 hover:rotate-0 transition-transform duration-300 relative w-2/3 ml-auto mt-4 cursor-pointer" href="#news-modal-9">
+<div class="border-dashed border-2 border-black p-2 text-center">
+<h5 class="font-black text-xl uppercase">Procura-se</h5>
+<p class="font-mono text-xs leading-tight mt-1">Jovens dispostos a mudar de vida radicalmente.</p>
+</div>
+</a>
+<a class="block break-inside-avoid bg-white border-2 border-black p-2 shadow-xl transform -rotate-1 hover:rotate-0 transition-transform duration-300 cursor-pointer" href="#news-modal-10">
+<div class="grid grid-cols-2 gap-2">
+<div class="aspect-square bg-gray-100 border border-black flex items-center justify-center overflow-hidden"><img class="w-full h-full object-cover opacity-50 grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBub9KoKpI9ePtmS-i9xBiR0NvduIfo4fzCjK12GKWUclvwfUzY0Io2om6Hzr6V5gKDSPpR8pjx1vyL2mS_8RCqbYV35kgfJQhUbw7VMYZ88Jwr4LbJf1myyftQaUGydGeb2MVjvHZd6ezB9v_a0g9-x6a-UwflOKxH9XrZ-wlDRpsIudtvGm6zfc2zRoql1j_yxc6VCeQ9GVNvKMc7IGBc6fbG03pP75e0eByJEWxYvqlnGoiCC3Lr8iUAyvJ-Nad4jMnthdrD4MGm"/></div>
+<div class="aspect-square bg-gray-100 border border-black flex items-center justify-center overflow-hidden"><img class="w-full h-full object-cover opacity-50 grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCIQl5k1_4LOwSxdj8_d5wqJD9MG5zXYQ_e_sArmByNMbiLM1kJv_CN_1PzwacGsB2Ot9h3vK2FrFZkqxgLrftVcAnJYX00T2Bwa1smCpQqIQkQxrWq3wJFmbyNGn84NKUtrgHWBFY_BIseI6V7On4wBKqnKQHoKCTC9u4ie7-xQS21xerCqrQJgkpL7KMaRdaZBjm-8Cv8WiWEjZ_zStuCccb3C1kR12x8WeZhklIgJZ50jUwu1SPyweSOBYNpa1P4OBvqUaec_F6i"/></div>
+</div>
+<div class="bg-black text-white font-bold text-center text-xs uppercase py-1 mt-2">Momentos Épicos</div>
+</a>
+<a class="block break-inside-avoid bg-white p-5 shadow-2xl transform rotate-1 hover:rotate-0 transition-transform duration-300 relative mt-6 torn-paper-edge cursor-pointer" href="#news-modal-11">
+<h4 class="font-news font-bold text-xl mb-2 text-black">Um convite especial</h4>
+<p class="font-news text-xs text-gray-900 text-justify leading-relaxed">
+                        Não deixe para a última hora. As vagas estão acabando e você não vai querer ficar de fora dessa festa. Traga seus amigos, sua família e venha viver o extraordinário. Deus tem pressa em te amar.
+                    </p>
+</a>
+<a class="block break-inside-avoid p-4 transform -rotate-3 hover:rotate-0 transition-transform duration-300 cursor-pointer" href="#news-modal-12">
+<div class="bg-holi-primary text-white p-6 rounded-tl-3xl rounded-br-3xl shadow-lg text-center border-2 border-white/50">
+<span class="block text-5xl font-black">300+</span>
+<span class="uppercase tracking-widest text-xs font-bold">Confirmados</span>
+</div>
+</a>
+</div>
+</div>
+</section>
+<div class="fixed inset-0 z-[100] items-center justify-center p-4 md:p-10 bg-black/80 backdrop-blur-md news-modal" id="news-modal-1">
+<div class="relative w-full max-w-2xl bg-[#fdfbf7] text-gray-900 p-8 md:p-12 shadow-2xl torn-paper-edge transform transition-all">
+<a class="absolute top-4 right-4 text-black hover:text-red-600 transition-colors" href="#noticias">
+<span class="material-icons text-3xl">close</span>
+</a>
+<div class="border-b-2 border-black mb-6 pb-2">
+<span class="font-news font-bold italic text-xl">O Diário do Peregrino - Edição Especial</span>
+</div>
+<div class="space-y-6">
+<h2 class="font-news font-black text-5xl leading-tight uppercase">Camping no Carnaval 2026</h2>
+<div class="aspect-video w-full bg-gray-200 mb-6 overflow-hidden border border-black/10">
+<img alt="News feature" class="w-full h-full object-cover grayscale opacity-70" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA7iott_51W07tA39SX2XTEJCaBYQliamHd7zFoqNtgnNL5MioTADsPi5HtU-491tWPwICCIIpUwXvW28w0kzLK9Fd0VMCVbXyW8Sgs2uwnhkoqeWaqGDFZfXi_ZwRfhWxUWFEItT7XzXN7wp-G9DLItzAHIxNFAam3UG74qlsmEvUZR2CZkNpeh1mvOInHrgkj58rkLkEQxDXMXbIjfL1jl9-eZm_7sDTNXOHlQmb9Xg4DQfuiDH1YYh2ph9y3QpGBaoXDfF9lEmq9"/>
+</div>
+<p class="font-news text-lg text-justify leading-relaxed">
+                    Este é o detalhamento completo sobre a nossa área de camping. Pela primeira vez em nossa história, os peregrinos terão um espaço dedicado dentro do recinto para acampar. Teremos segurança 24h, banheiros exclusivos e uma área de convivência noturna para partilhas ao redor da luz do luar. Garanta sua vaga no camping no momento da inscrição!
+                </p>
+<div class="pt-6 border-t border-black/20 flex justify-between items-center">
+<span class="font-marker text-holi-primary">Comunidade Voz de Deus</span>
+<span class="font-mono text-sm uppercase">2026 Edition</span>
+</div>
+</div>
+</div>
+</div>
+<div class="fixed inset-0 z-[100] items-center justify-center p-4 md:p-10 bg-black/80 backdrop-blur-md news-modal" id="news-modal-2">
+<div class="relative w-full max-w-2xl bg-[#f0f0e8] text-gray-800 p-8 md:p-12 shadow-2xl torn-paper-edge transform transition-all">
+<a class="absolute top-4 right-4 text-black hover:text-red-600 transition-colors" href="#noticias">
+<span class="material-icons text-3xl">close</span>
+</a>
+<div class="border-b-2 border-gray-400 mb-6 pb-2">
+<span class="font-news font-bold italic text-xl">NOTAS DA EDIÇÃO - Mudanças Importantes</span>
+</div>
+<div class="space-y-6">
+<h2 class="font-news font-black text-5xl leading-tight uppercase">Novidades na Estrutura</h2>
+<p class="font-news text-lg text-justify leading-relaxed">
+                    Para 2026, decidimos ampliar a praça de alimentação e dobrar o tamanho do palco principal. Além disso, as gincanas agora contarão com um sistema de pontuação digital via aplicativo, permitindo que todos acompanhem em tempo real quem está liderando a jornada da alegria.
+                </p>
+<div class="pt-6 border-t border-gray-400/20 flex justify-between items-center">
+<span class="font-marker text-holi-secondary">Equipe Organizadora</span>
+<span class="font-mono text-sm uppercase">Fevereiro 2026</span>
+</div>
+</div>
+</div>
+</div>
+<div class="fixed inset-0 z-[100] items-center justify-center p-4 md:p-10 bg-black/80 backdrop-blur-md news-modal" id="news-modal-3">
+<div class="relative w-full max-w-2xl bg-white p-12 shadow-2xl torn-paper-edge">
+<a class="absolute top-4 right-4 text-black" href="#noticias"><span class="material-icons">close</span></a>
+<h2 class="font-news font-black text-4xl uppercase mb-6">Preparativos a Todo Vapor!</h2>
+<p class="font-news text-lg leading-relaxed text-justify">A equipe de logística já iniciou as demarcações no Recinto de Rodeio. Estamos preparando surpresas visuais com tintas neon e iluminação de última geração para as noites de louvor. Cada detalhe está sendo pensado para proporcionar uma experiência espiritual e artística imersiva para todos os participantes.</p>
+</div>
+</div>
+<div class="fixed inset-0 z-[100] items-center justify-center p-4 md:p-10 bg-black/80 backdrop-blur-md news-modal" id="news-modal-4">
+<div class="relative w-full max-w-2xl bg-white p-12 shadow-2xl torn-paper-edge">
+<a class="absolute top-4 right-4 text-black" href="#noticias"><span class="material-icons">close</span></a>
+<h2 class="font-news font-black text-4xl uppercase mb-6">Bastidores</h2>
+<img class="w-full h-auto mb-4 border-2 border-black" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA7iott_51W07tA39SX2XTEJCaBYQliamHd7zFoqNtgnNL5MioTADsPi5HtU-491tWPwICCIIpUwXvW28w0kzLK9Fd0VMCVbXyW8Sgs2uwnhkoqeWaqGDFZfXi_ZwRfhWxUWFEItT7XzXN7wp-G9DLItzAHIxNFAam3UG74qlsmEvUZR2CZkNpeh1mvOInHrgkj58rkLkEQxDXMXbIjfL1jl9-eZm_7sDTNXOHlQmb9Xg4DQfuiDH1YYh2ph9y3QpGBaoXDfF9lEmq9"/>
+<p class="font-news text-lg">Nossa equipe trabalhando duro para garantir que cada detalhe seja perfeito. Dos ensaios das bandas até a montagem da estrutura de iluminação.</p>
+</div>
+</div>
+<div class="fixed inset-0 z-[100] items-center justify-center p-4 md:p-10 bg-black/80 backdrop-blur-md news-modal" id="news-modal-5">
+<div class="relative w-full max-w-2xl bg-red-600 text-white p-12 shadow-2xl border-4 border-double border-white/20">
+<a class="absolute top-4 right-4 text-white" href="#noticias"><span class="material-icons">close</span></a>
+<h2 class="font-display font-black text-4xl uppercase mb-6">Últimas Unidades!</h2>
+<p class="font-display text-xl leading-relaxed">As camisetas oficiais da edição Holi 2026 estão quase esgotadas. Garanta o seu kit através da loja virtual antes do início do evento! Os novos modelos trazem estampas artísticas inspiradas na identidade visual vibrante deste ano.</p>
+</div>
+</div>
+<div class="fixed inset-0 z-[100] items-center justify-center p-4 md:p-10 bg-black/80 backdrop-blur-md news-modal" id="news-modal-6">
+<div class="relative w-full max-w-2xl bg-gray-900 text-gray-100 p-12 shadow-2xl border border-white/10">
+<a class="absolute top-4 right-4 text-white" href="#noticias"><span class="material-icons">close</span></a>
+<i class="fas fa-quote-left text-5xl text-holi-primary mb-6"></i>
+<p class="font-news italic text-3xl text-center leading-relaxed">"A alegria do Senhor é a nossa força. Preparem seus corações para o transbordar da graça."</p>
+<div class="mt-8 text-center font-mono text-xl">- Neemias 8:10</div>
+</div>
+</div>
+<div class="fixed inset-0 z-[100] items-center justify-center p-4 md:p-10 bg-black/80 backdrop-blur-md news-modal" id="news-modal-7">
+<div class="relative w-full max-w-2xl bg-[#f0f0e8] text-gray-900 p-12 shadow-2xl torn-paper-edge">
+<a class="absolute top-4 right-4 text-black" href="#noticias"><span class="material-icons">close</span></a>
+<h2 class="font-marker text-4xl mb-6">Checklist do Peregrino</h2>
+<ul class="font-news text-xl space-y-4 list-disc list-inside">
+<li>Bíblia e Terço</li>
+<li>Colchão e cobertor</li>
+<li>Produtos de higiene</li>
+<li>Roupas leves (brancas de preferência)</li>
+<li>Coração transbordando expectativa</li>
+</ul>
+</div>
+</div>
+<div class="fixed inset-0 z-[100] items-center justify-center p-4 md:p-10 bg-black/80 backdrop-blur-md news-modal" id="news-modal-8">
+<div class="relative w-full max-w-lg bg-blue-100 p-12 shadow-2xl border-2 border-blue-300">
+<a class="absolute top-4 right-4 text-blue-900" href="#noticias"><span class="material-icons">close</span></a>
+<div class="text-center">
+<h2 class="font-bold text-blue-900 uppercase text-2xl mb-6">Previsão do Tempo</h2>
+<i class="fas fa-sun text-yellow-500 text-8xl mb-6 animate-spin-slow"></i>
+<p class="text-5xl font-black text-blue-900 mb-4">30°C</p>
+<p class="font-news italic text-blue-800 text-xl">Dias ensolarados e noites frescas para nossa celebração. Traga seu protetor solar!</p>
+</div>
+</div>
+</div>
+<div class="fixed inset-0 z-[100] items-center justify-center p-4 md:p-10 bg-black/80 backdrop-blur-md news-modal" id="news-modal-9">
+<div class="relative w-full max-w-md bg-yellow-300 p-12 shadow-2xl border-dashed border-4 border-black">
+<a class="absolute top-4 right-4 text-black" href="#noticias"><span class="material-icons">close</span></a>
+<h2 class="font-black text-5xl uppercase mb-6 text-center">Procura-se</h2>
+<p class="font-news text-2xl leading-tight text-center">Você! Que busca um sentido maior e uma alegria que não passa na quarta-feira de cinzas.</p>
+</div>
+</div>
+<div class="fixed inset-0 z-[100] items-center justify-center p-4 md:p-10 bg-black/80 backdrop-blur-md news-modal" id="news-modal-10">
+<div class="relative w-full max-w-3xl bg-white p-8 shadow-2xl border-4 border-black">
+<a class="absolute top-4 right-4 text-black" href="#noticias"><span class="material-icons">close</span></a>
+<h2 class="font-black text-3xl uppercase mb-8 text-center">Momentos Épicos</h2>
+<div class="grid grid-cols-2 gap-4">
+<img class="w-full h-auto grayscale border border-black" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBub9KoKpI9ePtmS-i9xBiR0NvduIfo4fzCjK12GKWUclvwfUzY0Io2om6Hzr6V5gKDSPpR8pjx1vyL2mS_8RCqbYV35kgfJQhUbw7VMYZ88Jwr4LbJf1myyftQaUGydGeb2MVjvHZd6ezB9v_a0g9-x6a-UwflOKxH9XrZ-wlDRpsIudtvGm6zfc2zRoql1j_yxc6VCeQ9GVNvKMc7IGBc6fbG03pP75e0eByJEWxYvqlnGoiCC3Lr8iUAyvJ-Nad4jMnthdrD4MGm"/>
+<img class="w-full h-auto grayscale border border-black" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCIQl5k1_4LOwSxdj8_d5wqJD9MG5zXYQ_e_sArmByNMbiLM1kJv_CN_1PzwacGsB2Ot9h3vK2FrFZkqxgLrftVcAnJYX00T2Bwa1smCpQqIQkQxrWq3wJFmbyNGn84NKUtrgHWBFY_BIseI6V7On4wBKqnKQHoKCTC9u4ie7-xQS21xerCqrQJgkpL7KMaRdaZBjm-8Cv8WiWEjZ_zStuCccb3C1kR12x8WeZhklIgJZ50jUwu1SPyweSOBYNpa1P4OBvqUaec_F6i"/>
+</div>
+<p class="mt-4 font-news text-center">Lembranças que duram para sempre em nossos corações.</p>
+</div>
+</div>
+<div class="fixed inset-0 z-[100] items-center justify-center p-4 md:p-10 bg-black/80 backdrop-blur-md news-modal" id="news-modal-11">
+<div class="relative w-full max-w-2xl bg-white p-12 shadow-2xl torn-paper-edge">
+<a class="absolute top-4 right-4 text-black" href="#noticias"><span class="material-icons">close</span></a>
+<h2 class="font-news font-bold text-3xl mb-6">Um convite especial</h2>
+<p class="font-news text-xl leading-relaxed text-justify">Não perca a oportunidade de fazer parte desta história. Este não é apenas um evento, é um divisor de águas. O Espírito Santo está soprando ventos de renovação sobre a juventude de Novo Horizonte e região. Junte-se a nós nesta jornada de cor e fé.</p>
+</div>
+</div>
+<div class="fixed inset-0 z-[100] items-center justify-center p-4 md:p-10 bg-black/80 backdrop-blur-md news-modal" id="news-modal-12">
+<div class="relative w-full max-w-md bg-holi-primary text-white p-12 shadow-2xl rounded-3xl border-4 border-white">
+<a class="absolute top-4 right-4 text-white" href="#noticias"><span class="material-icons">close</span></a>
+<div class="text-center">
+<span class="text-8xl font-black block mb-4">300+</span>
+<h2 class="text-3xl font-bold uppercase tracking-widest">Inscritos Confirmados!</h2>
+<p class="mt-6 text-lg opacity-90">A família Voz de Deus só cresce. Venha ser um conosco! Não fique de fora dessa contagem.</p>
+</div>
+</div>
+</div>
+<section class="relative py-24 border-t border-white/5" id="calendario">
+<div class="absolute top-0 w-full h-32 bg-gradient-to-b from-[#0a050f] to-transparent z-0 pointer-events-none"></div>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+<div class="relative min-h-[400px] flex items-center justify-center">
+<div class="absolute w-full h-full bg-gradient-to-tr from-holi-primary to-purple-900 rounded-[3rem] transform -rotate-6 opacity-30 blur-xl"></div>
+<div class="relative w-80 h-96 bg-gradient-to-b from-gray-900 to-black rounded-3xl overflow-hidden shadow-2xl border border-white/20">
+<div class="absolute top-[-20%] left-[-20%] w-60 h-60 bg-holi-secondary rounded-full mix-blend-screen filter blur-[50px] opacity-40"></div>
+<div class="absolute bottom-[-10%] right-[-10%] w-60 h-60 bg-holi-primary rounded-full mix-blend-screen filter blur-[50px] opacity-40"></div>
+<div class="absolute inset-0 flex items-center justify-center flex-col text-center p-8">
+<span class="font-marker text-8xl text-white/10 select-none">13</span>
+<span class="font-bold text-2xl text-white uppercase tracking-widest mt-2">Fevereiro</span>
+</div>
+<div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-holi-primary via-holi-accent to-holi-secondary"></div>
+</div>
+</div>
+<div class="bg-white/5 backdrop-blur-md p-8 md:p-12 rounded-[2rem] shadow-xl border border-white/10 relative">
+<h2 class="text-4xl font-black text-white mb-8 uppercase text-center md:text-left flex items-center gap-3">
+<i class="far fa-calendar-alt text-holi-accent"></i> Calendário
+                    </h2>
+<ul class="space-y-6 mb-10">
+<li class="flex items-center justify-between border-b border-white/10 pb-4">
+<div>
+<span class="text-xl font-bold text-gray-500 block">PRIMEIRO LOTE</span>
+<span class="text-xs text-gray-600 font-mono">10 JAN - 25 JAN</span>
+</div>
+<span class="text-gray-500 font-bold text-sm bg-white/5 px-3 py-1 rounded-lg">EM BREVE</span>
+</li>
+<li class="flex items-center justify-between border-b border-white/10 pb-4">
+<div>
+<span class="text-xl font-bold text-gray-500 block">SEGUNDO LOTE</span>
+<span class="text-xs text-gray-600 font-mono">25 JAN - 07 FEV</span>
+</div>
+<span class="text-gray-500 font-bold text-sm bg-white/5 px-3 py-1 rounded-lg">EM BREVE</span>
+</li>
+<li class="flex items-center justify-between pb-4">
+<div>
+<span class="text-xl font-bold text-gray-500 block">TERCEIRO LOTE</span>
+<span class="text-xs text-gray-600 font-mono">07 FEV - 10 FEV</span>
+</div>
+<span class="text-gray-500 font-bold text-sm bg-white/5 px-3 py-1 rounded-lg">EM BREVE</span>
+</li>
+</ul>
+<div class="text-center md:text-left">
+<a class="inline-block bg-holi-primary hover:bg-fuchsia-600 text-white font-bold px-8 py-3 rounded-full transition-all uppercase shadow-lg hover:shadow-fuchsia-500/30" href="#inscricao">
+                            Garantir vaga
+                        </a>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="relative bg-[#050208] overflow-hidden z-10 min-h-[1400px] py-32" id="galeria">
+<div class="absolute top-0 left-0 w-full h-40 bg-gradient-to-b from-holi-dark to-transparent z-20 pointer-events-none"></div>
+<div class="relative z-30 text-center mb-20 pointer-events-none">
+<h2 class="font-marker text-[15vw] md:text-[10vw] leading-none text-white/10 select-none absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 whitespace-nowrap">GALERIA</h2>
+<div class="relative inline-block">
+<div class="bg-white text-black px-12 py-6 shadow-[15px_15px_0px_#d946ef] transform -rotate-2 font-marker text-5xl md:text-7xl uppercase border-4 border-black relative">
+                    Galeria
+                    <div class="absolute -top-4 -right-4 w-6 h-6 bg-holi-accent rounded-full border-2 border-black"></div>
+<div class="absolute -bottom-4 -left-4 w-6 h-6 bg-holi-secondary rounded-full border-2 border-black"></div>
+</div>
+</div>
+<p class="text-gray-400 mt-8 font-mono text-sm uppercase tracking-[0.3em]">Clique para ampliar</p>
+</div>
+<div class="max-w-[1600px] mx-auto relative h-[1000px] z-10 w-full">
+<div class="polaroid absolute top-[5%] left-[5%] md:left-[15%] w-64 bg-white p-3 pb-10 transform -rotate-12 z-10">
+<div class="aspect-[4/5] bg-gray-200 overflow-hidden"><img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDO6bu2DI61ilE5yC90ozz7O79Sys4hQpfdpB21dTvHbR1DNFvUbGrRnCt639Z5c5ZAMbmwkcIEsNwQhpfLYNtNBVtgccJtQFtzAMxpsIcnQg2um6Htg6O2Y2LR5kzLIw5rdw3SkyQetr-pmF_PAeN24xenFdrgBmm0bBd7izRqjoDazWp6v45YkNP-yuwP95U6yqp9VJCb3y1DQfUilV2GyBhqLu4N6LFt8XRwAMnZ6c3ARq20uqwCVTbEqIJv5Okn4MO-Z6miN1k9"/></div>
+</div>
+<div class="polaroid absolute top-[15%] right-[10%] md:right-[20%] w-72 bg-white p-3 pb-12 transform rotate-6 z-10">
+<div class="absolute -top-4 right-1/2 w-32 h-8 tape"></div>
+<div class="aspect-video bg-gray-200 overflow-hidden"><img class="w-full h-full object-cover grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDO6bu2DI61ilE5yC90ozz7O79Sys4hQpfdpB21dTvHbR1DNFvUbGrRnCt639Z5c5ZAMbmwkcIEsNwQhpfLYNtNBVtgccJtQFtzAMxpsIcnQg2um6Htg6O2Y2LR5kzLIw5rdw3SkyQetr-pmF_PAeN24xenFdrgBmm0bBd7izRqjoDazWp6v45YkNP-yuwP95U6yqp9VJCb3y1DQfUilV2GyBhqLu4N6LFt8XRwAMnZ6c3ARq20uqwCVTbEqIJv5Okn4MO-Z6miN1k9"/></div>
+<div class="font-marker text-center mt-2 text-xl text-gray-800">Energia!</div>
+</div>
+<div class="polaroid absolute top-[30%] left-[20%] md:left-[35%] w-56 bg-white p-2 pb-8 transform rotate-3 z-20">
+<div class="aspect-square bg-gray-200 overflow-hidden"><img class="w-full h-full object-cover sepia" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA7kecJtdvsWN6SRX-2yIEq81JyH9-DtwvgZkw1alxj3kS6suiRIi_T4n7j94k0WOdOuQEX3SXcXsbmAoV_T3bd-aEQlwZb7vrmM90-YAat0bUvUJqggG9bXFD6Y_DnZYJWjvKaguFsbPIC4wlvutveK4kp0zd4SNOBcOHJZhQR2RWWRPxe4joSm65s8pkPHF6oC3LtEq4m4fRvmKeQsYb8yreUm0YvadL0LfTFTLl92VGRYAFhTDcD024SoaPcKfnbPPlJk5I-GXfD"/></div>
+</div>
+<div class="polaroid absolute top-[40%] left-[50%] transform -translate-x-1/2 w-80 md:w-96 bg-white p-4 pb-16 rotate-[-2deg] z-30 shadow-2xl">
+<div class="absolute -top-6 left-10 w-40 h-10 tape rotate-1"></div>
+<div class="aspect-[4/3] bg-gray-200 overflow-hidden border-2 border-gray-100"><img class="w-full h-full object-cover saturate-150" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDAEb_kd0POMnxQUGU64l5JSfNBm6uzMs2wZcXh8GmIM5Drrt5nFddehB6uBiyPDTt0l5yuEOKC2Kd94wX6BFjXBQ4b8v0HMMxJ6wXQ4gcRDYIrZvjjL0W5b1J05asto3UfJfQr89WFqgGSU-Tuo83AdM74V8kzml0YT7Ph05sAhU4-2Jc8wIWT76DhD_ZZKITE3wyF4HKgkwUNJFa26jzOUozpVnlNTkcg9JBGfHvYA1TTe_wMN47hgcXL40skdiKZBK0HdvrILd81"/></div>
+<div class="font-marker text-center mt-4 text-3xl text-holi-primary">Inesquecível</div>
+</div>
+</div>
+</section>
+<footer class="relative bg-[#050208] text-white pt-24 pb-12 overflow-hidden border-t-4 border-holi-primary z-20">
+<div class="absolute inset-0 z-0">
+<div class="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-holi-primary/20 rounded-full blur-[100px]"></div>
+<div class="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-holi-secondary/20 rounded-full blur-[100px]"></div>
+</div>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20">
+<div class="flex flex-col md:flex-row justify-between items-start gap-12">
+<div class="space-y-8">
+<h2 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400 uppercase tracking-tight">Fale conosco</h2>
+<div class="space-y-4 text-gray-400">
+<div class="flex items-center gap-4 group">
+<span class="w-10 h-10 rounded-full bg-holi-surface flex items-center justify-center text-holi-primary group-hover:bg-holi-primary group-hover:text-white transition-colors"><i class="fas fa-user"></i></span>
+<div>
+<span class="font-bold text-white block">WAGNER</span>
+<span class="text-sm">(11) 95550-1090</span>
+</div>
+</div>
+<div class="flex items-center gap-4 group">
+<span class="w-10 h-10 rounded-full bg-holi-surface flex items-center justify-center text-holi-secondary group-hover:bg-holi-secondary group-hover:text-black transition-colors"><i class="fas fa-user"></i></span>
+<div>
+<span class="font-bold text-white block">JULIA</span>
+<span class="text-sm">(11) 94343-6970</span>
+</div>
+</div>
+</div>
+</div>
+<div class="flex-1 w-full md:w-auto max-w-md bg-gradient-to-br from-[#111] to-[#222] p-1 rounded-3xl shadow-2xl transform rotate-1 hover:rotate-0 transition-transform duration-300" id="inscricao">
+<div class="bg-black rounded-[1.3rem] p-8 h-full border border-white/10 flex flex-col items-center text-center relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-purple-600 to-pink-600 opacity-20 blur-2xl rounded-full"></div>
+<div class="w-16 h-16 bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+<i class="fab fa-instagram text-3xl text-white"></i>
+</div>
+<h3 class="text-2xl font-bold mb-2 text-white">Conheça nosso Instagram</h3>
+<p class="text-sm text-gray-400 mb-8">Fique por dentro de todos os bastidores, novidades e a cobertura completa do retiro.</p>
+<a class="w-full bg-white text-black font-bold py-4 rounded-xl transition-all shadow-[0_4px_14px_0_rgba(255,255,255,0.2)] hover:shadow-[0_6px_20px_rgba(255,255,255,0.3)] hover:-translate-y-1 uppercase tracking-wide flex items-center justify-center gap-2" href="#">
+<span>Seguir Agora</span>
+<i class="fas fa-arrow-right text-xs"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="border-t border-gray-800 mt-20 pt-8 text-center text-sm text-gray-600 flex flex-col md:flex-row justify-between items-center gap-4">
+<p>© 2026 Retiro de Carnaval. Todos os direitos reservados.</p>
+<div class="flex gap-4 text-xs font-bold uppercase tracking-wider">
+<a class="hover:text-white transition-colors" href="#">Privacidade</a>
+<a class="hover:text-white transition-colors" href="#">Termos</a>
+</div>
+</div>
+</div>
+</footer>
+
+</body></html>
