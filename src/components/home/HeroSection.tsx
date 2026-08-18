@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 export const HeroSection: React.FC = () => {
     return (
@@ -33,9 +34,9 @@ export const HeroSection: React.FC = () => {
                 <a href="#ingressos" className="btn-sziget-primary">
                     🎟️ GARANTA SEU INGRESSO
                 </a>
-                <a href="#experiencia" className="btn-sziget-secondary">
-                    DESCUBRA
-                </a>
+                <Link to="/galeria" className="btn-sziget-secondary">
+                    📸 VER GALERIA
+                </Link>
             </div>
         </section>
     )

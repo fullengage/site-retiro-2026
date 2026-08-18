@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import Navbar from './components/Navbar'
 import Background from './components/Background'
 import HomePage from './pages/HomePage'
+import GalleryPage from './pages/GalleryPage'
 import DonationPage from './pages/DonationPage'
 import SchedulePage from './pages/SchedulePage'
 import NewsPage from './pages/NewsPage'
@@ -37,8 +38,10 @@ function AppContent() {
 
             <Routes>
                 <Route path="/" element={<HomePage />} />
+                <Route path="/galeria" element={<GalleryPage />} />
                 <Route path="/doacoes" element={<DonationPage />} />
                 <Route path="/cronograma" element={<SchedulePage />} />
+                <Route path="/noticias" element={<NewsPage />} />
                 <Route path="/inscricao" element={<RegistrationPage />} />
                 <Route path="/admin" element={<AdminLayout />}>
                     <Route index element={<NewsAdmin />} />
@@ -56,12 +59,12 @@ function AppContent() {
                         <div className="font-marker text-2xl mb-8">RETIROS • COMUNIDADE VOZ DE DEUS</div>
 
                         <div className="flex flex-wrap justify-center gap-8 mb-8 font-mono text-sm uppercase tracking-widest text-gray-400">
-                            <Link to="/doacoes" className="hover:text-holi-primary transition-colors">Doações</Link>
-                            <Link to="/noticias" className="hover:text-holi-secondary transition-colors">Notícias</Link>
-                            <Link to="/em-breve" className="hover:text-holi-accent transition-colors">Cronograma</Link>
+                            <Link to="/galeria" className="hover:text-holi-primary transition-colors">Galeria</Link>
+                            <Link to="/doacoes" className="hover:text-holi-secondary transition-colors">Doações</Link>
+                            <Link to="/noticias" className="hover:text-holi-accent transition-colors">Notícias</Link>
+                            <Link to="/cronograma" className="hover:text-white transition-colors">Cronograma</Link>
                             <a href="/#sobre" className="hover:text-white transition-colors">Sobre Nós</a>
                         </div>
-
 
                         <p className="text-gray-500 text-sm">© 2026 Comunidade Voz de Deus. NH/SP.</p>
                     </div>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
-import { X, ChevronLeft, ChevronRight, Maximize2 } from 'lucide-react'
+import { X, ChevronLeft, ChevronRight, Maximize2, ArrowRight, Sparkles } from 'lucide-react'
 
 interface GalleryItem {
     id?: string
@@ -61,6 +62,7 @@ const FALLBACK_IMAGES: GalleryItem[] = [
 
 export const GalleryGridSection: React.FC = () => {
     const [images, setImages] = useState<GalleryItem[]>(FALLBACK_IMAGES)
+    const [totalCount, setTotalCount] = useState<number>(FALLBACK_IMAGES.length)
     const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
 
     useEffect(() => {
@@ -78,6 +80,7 @@ export const GalleryGridSection: React.FC = () => {
                         alt: item.label || `Foto ${idx + 1} do Festival Adonai`
                     }))
                     setImages(mapped)
+                    setTotalCount(data.length)
                 }
             } catch (e) {
                 console.warn('Usando fotos padrão na grade:', e)
@@ -112,16 +115,27 @@ export const GalleryGridSection: React.FC = () => {
                 MOMENTOS QUE GUARDAMOS NA MEMÓRIA
             </span>
 
-            <h2
-                style={{
-                    fontSize: 'clamp(2.2rem, 5vw, 3.8rem)',
-                    fontWeight: 900,
-                    margin: '10px auto 50px auto',
-                    textTransform: 'uppercase',
-                }}
-            >
-                REGISTROS DA NOSSA GALERA
-            </h2>
+            <div className="flex flex-col md:flex-row md:items-end justify-between max-w-[1440px] mx-auto gap-4 mb-10">
+                <h2
+                    style={{
+                        fontSize: 'clamp(2.2rem, 5vw, 3.8rem)',
+                        fontWeight: 900,
+                        margin: 0,
+                        textTransform: 'uppercase',
+                    }}
+                >
+                    REGISTROS DA NOSSA GALERA
+                </h2>
+
+                <Link
+                    to="/galeria"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-[#fff53c] text-black font-black uppercase text-xs tracking-wider rounded-full shadow-[4px_4px_0px_#000] hover:shadow-[1px_1px_0px_#000] hover:translate-x-0.5 hover:translate-y-0.5 transition-all border-2 border-black w-fit"
+                >
+                    <Sparkles size={16} />
+                    <span>Ver Galeria Completa ({totalCount} fotos)</span>
+                    <ArrowRight size={16} />
+                </Link>
+            </div>
 
             <div className="adonai-gallery-grid">
                 {images.slice(0, 12).map((img, idx) => (
@@ -138,6 +152,17 @@ export const GalleryGridSection: React.FC = () => {
                         </div>
                     </div>
                 ))}
+            </div>
+
+            {/* Banner CTA para Galeria Completa */}
+            <div className="max-w-[1440px] mx-auto mt-12 text-center">
+                <Link
+                    to="/galeria"
+                    className="inline-flex items-center gap-3 px-8 py-4 bg-white text-black font-black uppercase text-sm tracking-wider rounded-full shadow-[6px_6px_0px_#d946ef] hover:shadow-[2px_2px_0px_#d946ef] hover:translate-x-1 hover:translate-y-1 transition-all border-2 border-black"
+                >
+                    <span>Explorar Mural & Fotos em Alta Resolução</span>
+                    <ArrowRight size={18} />
+                </Link>
             </div>
 
             {/* Modal Lightbox */}
@@ -185,11 +210,19 @@ export const GalleryGridSection: React.FC = () => {
                             alt={images[selectedIndex].alt}
                             className="max-h-[75vh] max-w-full object-contain"
                         />
-                        {images[selectedIndex].alt && (
-                            <p className="text-white text-sm mt-2 font-medium tracking-wide text-center px-4">
-                                {images[selectedIndex].alt} ({selectedIndex + 1}/{images.length})
-                            </p>
-                        )}
+                        <div className="flex items-center justify-between w-full mt-2 px-2">
+                            {images[selectedIndex].alt && (
+                                <p className="text-white text-sm font-medium tracking-wide text-left truncate">
+                                    {images[selectedIndex].alt} ({selectedIndex + 1}/{images.length})
+                                </p>
+                            )}
+                            <Link
+                                to="/galeria"
+                                className="text-xs text-[#fff53c] hover:underline font-bold uppercase shrink-0 ml-4"
+                            >
+                                Ver Todas ↗
+                            </Link>
+                        </div>
                     </div>
                 </div>
             )}

@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 export const EucharistSection: React.FC = () => {
     return (
@@ -23,14 +24,24 @@ export const EucharistSection: React.FC = () => {
                         </p>
                     </div>
 
-                    {/* FOTO DESTACADA */}
-                    <div className="eucaristia-img-wrap">
+                    {/* FOTO DESTACADA COM LINK PARA GALERIA */}
+                    <Link
+                        to="/galeria"
+                        className="eucaristia-img-wrap block group relative"
+                        aria-label="Ver fotos na galeria"
+                    >
                         <img
                             src="https://www.festivaladonai.com.br/wp-content/uploads/2026/08/484791295_1064252372408472_3823837486130695994_n.jpg"
                             alt="Momento de fé e adoração no Retiro Adonai"
                             loading="lazy"
+                            className="transition-transform duration-500 group-hover:scale-105"
                         />
-                    </div>
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <span className="bg-[#fff53c] text-black font-black text-xs px-4 py-1.5 rounded-full uppercase tracking-wider shadow-md">
+                                Ver Mais na Galeria ↗
+                            </span>
+                        </div>
+                    </Link>
                 </div>
             </div>
         </section>

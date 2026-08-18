@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 export const EditorialSection: React.FC = () => {
     return (
@@ -259,28 +260,43 @@ export const EditorialSection: React.FC = () => {
 
                         {/* GALERIA EXPANSIVA (3 FOTOS) */}
                         <div className="ato-gallery-grid">
-                            <div className="ato-gallery-img-wrap" style={{ height: '260px' }}>
+                            <Link to="/galeria" className="ato-gallery-img-wrap block group relative" style={{ height: '260px' }}>
                                 <img
                                     src="https://www.festivaladonai.com.br/wp-content/uploads/2026/08/482244875_1064251082408601_6342010604447305819_n.jpg"
                                     alt="Jovens no Festival Adonai"
-                                    className="ato-gallery-img"
+                                    className="ato-gallery-img transition-transform duration-500 group-hover:scale-105"
                                 />
-                            </div>
+                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <span className="bg-[#fff53c] text-black font-black text-[11px] px-3 py-1 rounded-full uppercase tracking-wider shadow-md">
+                                        Ver Galeria ↗
+                                    </span>
+                                </div>
+                            </Link>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', height: '260px' }}>
-                                <div className="ato-gallery-img-wrap" style={{ height: 'calc(50% - 7px)' }}>
+                                <Link to="/galeria" className="ato-gallery-img-wrap block group relative" style={{ height: 'calc(50% - 7px)' }}>
                                     <img
                                         src="https://www.festivaladonai.com.br/wp-content/uploads/2026/08/482248896_1064251052408604_144387337051636653_n.jpg"
                                         alt="Convivência no Adonai"
-                                        className="ato-gallery-img"
+                                        className="ato-gallery-img transition-transform duration-500 group-hover:scale-105"
                                     />
-                                </div>
-                                <div className="ato-gallery-img-wrap" style={{ height: 'calc(50% - 7px)' }}>
+                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                        <span className="bg-[#fff53c] text-black font-black text-[10px] px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow-md">
+                                            Galeria ↗
+                                        </span>
+                                    </div>
+                                </Link>
+                                <Link to="/galeria" className="ato-gallery-img-wrap block group relative" style={{ height: 'calc(50% - 7px)' }}>
                                     <img
                                         src="https://www.festivaladonai.com.br/wp-content/uploads/2026/08/IMG_7873.jpg"
                                         alt="Momento de fé no Adonai"
-                                        className="ato-gallery-img"
+                                        className="ato-gallery-img transition-transform duration-500 group-hover:scale-105"
                                     />
-                                </div>
+                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                        <span className="bg-[#fff53c] text-black font-black text-[10px] px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow-md">
+                                            Galeria ↗
+                                        </span>
+                                    </div>
+                                </Link>
                             </div>
                         </div>
 
