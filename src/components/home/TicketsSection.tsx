@@ -25,15 +25,38 @@ export const TicketsSection: React.FC = () => {
             <div>
                 {/* CARD 1: ADONAI ESSENCIAL - PRÉ-CONVITE */}
                 <div className="sziget-pass-card">
-                    <span className="pass-badge">
-                        🎟️ PRÉ-CONVITE
-                    </span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '6px' }}>
+                        <span className="pass-badge">
+                            🎟️ PRÉ-CONVITE
+                        </span>
+                        <span style={{ fontSize: '0.75rem', fontWeight: 900, color: '#b91c1c', background: '#fee2e2', border: '1.5px solid #ef4444', padding: '3px 8px', borderRadius: '3px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                            ⏰ Válido só até 31/08
+                        </span>
+                    </div>
 
                     <h3>ADONAI ESSENCIAL</h3>
 
                     <p style={{ fontSize: '1rem', marginBottom: '12px', minHeight: '44px' }}>
                         Para quem não quer apenas participar. Quer viver tudo.
                     </p>
+
+                    <div
+                        style={{
+                            background: '#fef2f2',
+                            border: '1.5px solid #ef4444',
+                            borderRadius: '4px',
+                            padding: '8px 10px',
+                            marginBottom: '10px',
+                            color: '#b91c1c',
+                            fontSize: '0.82rem',
+                            fontWeight: 900,
+                            lineHeight: 1.35,
+                            fontFamily: "'Space Grotesk', sans-serif",
+                            textAlign: 'center',
+                        }}
+                    >
+                        🚨 Este PRÉ-CONVITE é válido só até dia 31/08
+                    </div>
 
                     <div
                         style={{

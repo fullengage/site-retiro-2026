@@ -797,8 +797,13 @@ const RegistrationPage = () => {
                                             />
                                             <div>
                                                 <span className="text-white font-bold block text-sm">{kit.name}</span>
+                                                {kit.price === 50 && (
+                                                    <span className="inline-block bg-red-500/20 text-red-300 text-[11px] font-bold px-2 py-0.5 rounded border border-red-500/30 mt-1">
+                                                        ⏰ Pré-convite válido só até 31/08 • 50% OFF para quem já participou do Carnaval!
+                                                    </span>
+                                                )}
                                                 {kit.includesTshirt && (
-                                                    <span className="text-xs text-gray-400 flex items-center gap-1 mt-0.5">
+                                                    <span className="text-xs text-gray-400 flex items-center gap-1 mt-1">
                                                         <Shirt size={12} className="text-holi-secondary" />
                                                         Inclui {kit.tshirtCount || 1} camiseta oficial do retiro
                                                     </span>

@@ -35,7 +35,7 @@ export const DEFAULT_EVENTS: EventItem[] = [
         kit_options: [
             {
                 id: 'adonai_essencial_50',
-                name: 'ADONAI ESSENCIAL — PRÉ-CONVITE (R$ 50,00)',
+                name: 'ADONAI ESSENCIAL — PRÉ-CONVITE (Válido até 31/08) (R$ 50,00)',
                 price: 50,
                 includesTshirt: true,
                 tshirtCount: 1,
