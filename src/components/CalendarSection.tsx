@@ -19,27 +19,28 @@ const CalendarSection = () => {
                             <div className="absolute top-[-20%] left-[-20%] w-60 h-60 bg-holi-secondary rounded-full mix-blend-screen filter blur-[50px] opacity-40"></div>
                             <div className="absolute bottom-[-10%] right-[-10%] w-60 h-60 bg-holi-primary rounded-full mix-blend-screen filter blur-[50px] opacity-40"></div>
                             <div className="absolute inset-0 flex items-center justify-center flex-col text-center p-8">
-                                <span className="font-marker text-8xl text-white/10 select-none">14</span>
-                                <span className="font-bold text-2xl text-white uppercase tracking-widest mt-2">Fevereiro</span>
+                                <span className="font-marker text-8xl text-white/10 select-none">25</span>
+                                <span className="font-bold text-2xl text-white uppercase tracking-widest mt-2">Setembro</span>
+                                <span className="text-xs font-mono text-holi-secondary tracking-widest uppercase mt-1">25 a 27 de Setembro</span>
                             </div>
                             <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-holi-primary via-holi-accent to-holi-secondary"></div>
                         </motion.div>
-                        <Link to="/em-breve" className="mt-8 inline-flex items-center gap-2 text-holi-secondary hover:text-white font-bold uppercase tracking-widest transition-colors relative group">
+                        <Link to="/cronograma" className="mt-8 inline-flex items-center gap-2 text-holi-secondary hover:text-white font-bold uppercase tracking-widest transition-colors relative group">
                             <CalendarIcon size={16} />
-                            <span>Cronograma do evento</span>
+                            <span>Ver Cronograma Completo</span>
                             <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-holi-secondary transition-all group-hover:w-full"></span>
                         </Link>
                     </div>
 
                     <div className="bg-white/5 backdrop-blur-md p-8 md:p-12 rounded-[2rem] shadow-xl border border-white/10 relative">
                         <h2 className="text-4xl font-black text-white mb-8 uppercase text-center md:text-left flex items-center gap-3">
-                            <CalendarIcon className="text-holi-accent" /> Calendário
+                            <CalendarIcon className="text-holi-accent" /> Calendário & Lotes
                         </h2>
                         <ul className="space-y-6 mb-10">
                             {[
-                                { batch: "PRIMEIRO LOTE", dates: "10 JAN - 25 JAN", status: "Encerrado" },
-                                { batch: "SEGUNDO LOTE", dates: "25 JAN - 07 FEV", status: "Liberado" },
-                                { batch: "TERCEIRO LOTE", dates: "07 FEV - 10 FEV", status: "EM BREVE" }
+                                { batch: "PRIMEIRO LOTE", dates: "01 JUL - 31 JUL", status: "Encerrado" },
+                                { batch: "SEGUNDO LOTE", dates: "01 AGO - 31 AGO", status: "Liberado" },
+                                { batch: "TERCEIRO LOTE", dates: "01 SET - 20 SET", status: "EM BREVE" }
                             ].map((item, idx) => (
                                 <li key={idx} className={`flex items-center justify-between ${idx !== 2 ? 'border-b border-white/10 pb-4' : 'pb-4'}`}>
                                     <div>
@@ -52,9 +53,12 @@ const CalendarSection = () => {
                                 </li>
                             ))}
                         </ul>
-                        <div className="text-center md:text-left">
+                        <div className="flex flex-wrap gap-4 text-center md:text-left">
                             <Link to="/inscricao" className="inline-block bg-holi-primary hover:bg-fuchsia-600 text-white font-bold px-8 py-3 rounded-full transition-all uppercase shadow-lg hover:shadow-fuchsia-500/30">
                                 Garantir vaga
+                            </Link>
+                            <Link to="/cronograma" className="inline-block bg-white/10 hover:bg-white/20 text-white font-bold px-6 py-3 rounded-full transition-all uppercase border border-white/15">
+                                Programação
                             </Link>
                         </div>
                     </div>
