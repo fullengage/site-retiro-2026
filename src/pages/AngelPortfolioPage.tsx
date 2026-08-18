@@ -3,7 +3,8 @@ import { useOutletContext } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
     Users, Phone, Mail, CheckCircle, Clock, XCircle,
-    ChevronDown, ChevronUp, DollarSign, Package, Shirt, TrendingUp, Sparkles, Loader2
+    ChevronDown, ChevronUp, DollarSign, Package, Shirt, TrendingUp,
+    Sparkles, Loader2, Download, FileSpreadsheet
 } from 'lucide-react'
 import { fetchEvents } from '../services/eventService'
 import { fetchAllDetailedRegistrations } from '../services/registrationService'
@@ -22,7 +23,7 @@ interface AngelPortfolio {
 const AngelPortfolioPage = () => {
     const { userRole } = useOutletContext<{ userRole: 'admin' | 'redator' }>()
     const [events, setEvents] = useState<EventItem[]>([])
-    const [selectedEventSlug, setSelectedEventSlug] = useState<string>('adonai-2026')
+    const [selectedEventSlug, setSelectedEventSlug] = useState<string>('all')
     const [registrations, setRegistrations] = useState<RegistrationDetailed[]>([])
     const [loading, setLoading] = useState(true)
     const [expandedAngel, setExpandedAngel] = useState<string | null>(null)
@@ -32,8 +33,8 @@ const AngelPortfolioPage = () => {
         const loadEvts = async () => {
             const evts = await fetchEvents()
             setEvents(evts)
-            const active = evts.find(e => e.status === 'active')
-            if (active) setSelectedEventSlug(active.slug)
+            // Se tiver eventos, default para 'all' ou o ativo
+            setSelectedEventSlug('all')
         }
         loadEvts()
     }, [])
@@ -55,7 +56,7 @@ const AngelPortfolioPage = () => {
                     .select('*')
                     .order('created_at', { ascending: false })
 
-                if (legacyData) {
+                if (legacyData && legacyData.length > 0) {
                     const converted: RegistrationDetailed[] = legacyData.map(leg => ({
                         id: leg.id,
                         created_at: leg.created_at,
@@ -101,7 +102,8 @@ const AngelPortfolioPage = () => {
                     if (selectedEventSlug === 'all' || selectedEventSlug === 'carnaval-2026') {
                         setRegistrations(converted)
                     } else {
-                        setRegistrations([])
+                        // Se o evento novo ainda não tiver inscrições, exibe todas para facilitar o gerenciamento dos anjos
+                        setRegistrations(converted)
                     }
                 } else {
                     setRegistrations([])
@@ -124,6 +126,93 @@ const AngelPortfolioPage = () => {
             age--
         }
         return isNaN(age) ? 'N/A' : age
+    }
+
+    // Exportação para Planilha CSV compatível com Excel (BOM UTF-8 e delimitador ;)
+    const handleExportSpreadsheet = () => {
+        if (!registrations || registrations.length === 0) {
+            alert('Nenhuma inscrição encontrada para exportar.')
+            return
+        }
+
+        const headers = [
+            'Anjo Responsável',
+            'Nome Completo',
+            'WhatsApp / Telefone',
+            'Email',
+            'Data de Nascimento',
+            'Idade',
+            'Gênero',
+            'Cidade',
+            'Paróquia',
+            'Contato Emergência',
+            'Pernoite (Camping)',
+            'Kit / Inscrição',
+            'Tamanho Camiseta 1',
+            'Tamanho Camiseta 2',
+            'Status Pagamento',
+            'Valor (R$)',
+            'Data de Inscrição'
+        ]
+
+        const escapeCsv = (val: any) => {
+            if (val === null || val === undefined) return '""'
+            const str = String(val).replace(/"/g, '""')
+            return `"${str}"`
+        }
+
+        const rows = [headers.map(escapeCsv).join(';')]
+
+        // Ordenar por anjo e nome do participante
+        const sorted = [...registrations].sort((a, b) => {
+            const angelA = (a.assigned_angel || '').trim() || 'Sem Anjo'
+            const angelB = (b.assigned_angel || '').trim() || 'Sem Anjo'
+            if (angelA === angelB) {
+                return (a.participant.full_name || '').localeCompare(b.participant.full_name || '')
+            }
+            if (angelA === 'Sem Anjo') return 1
+            if (angelB === 'Sem Anjo') return -1
+            return angelA.localeCompare(angelB)
+        })
+
+        sorted.forEach(r => {
+            const age = calculateAge(r.participant.birth_date)
+            const createdAtFormatted = r.created_at ? new Date(r.created_at).toLocaleString('pt-BR') : ''
+            const row = [
+                (r.assigned_angel || '').trim() || 'Sem Anjo',
+                r.participant.full_name || '',
+                r.participant.phone || '',
+                r.participant.email || '',
+                r.participant.birth_date || '',
+                age,
+                r.participant.gender || '',
+                r.participant.city || '',
+                r.participant.parish || '',
+                r.participant.emergency_phone || '',
+                r.staying_on_site ? 'Sim' : 'Não',
+                r.kit_option || '',
+                r.tshirt_size || '',
+                r.tshirt_size_2 || '',
+                r.payment?.status || r.status || 'Pendente',
+                r.payment?.amount ? String(r.payment.amount) : '0',
+                createdAtFormatted
+            ]
+            rows.push(row.map(escapeCsv).join(';'))
+        })
+
+        // Adiciona UTF-8 BOM (\uFEFF) para abrir perfeitamente com acentos no Excel
+        const bom = '\uFEFF'
+        const csvContent = bom + rows.join('\r\n')
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+        const url = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        const filename = `relatorio_carteira_de_anjos_${selectedEventSlug}_${new Date().toISOString().slice(0, 10)}.csv`
+        link.setAttribute('href', url)
+        link.setAttribute('download', filename)
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        URL.revokeObjectURL(url)
     }
 
     // Agrupar por anjo
@@ -179,7 +268,7 @@ const AngelPortfolioPage = () => {
 
     return (
         <div className="space-y-8">
-            {/* CABEÇALHO & SELETOR DE EVENTO */}
+            {/* CABEÇALHO & SELETOR DE EVENTO & BOTÃO DOWNLOAD */}
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-holi-surface/80 border border-white/10 p-6 rounded-3xl backdrop-blur-md">
                 <div>
                     <div className="flex items-center gap-3 mb-1">
@@ -195,32 +284,46 @@ const AngelPortfolioPage = () => {
                     </p>
                 </div>
 
-                {/* SELETOR DE RETIRO */}
-                <div className="flex items-center gap-2 bg-black/40 p-1.5 rounded-2xl border border-white/10 overflow-x-auto">
-                    {events.map(evt => (
+                <div className="flex flex-wrap items-center gap-3">
+                    {/* BOTÃO BAIXAR PLANILHA */}
+                    <button
+                        onClick={handleExportSpreadsheet}
+                        disabled={loading || registrations.length === 0}
+                        className="inline-flex items-center gap-2 px-5 py-3 bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white font-black rounded-2xl transition-all shadow-lg shadow-emerald-500/20 text-xs uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed"
+                        title="Baixar lista completa em formato de planilha Excel / CSV"
+                    >
+                        <FileSpreadsheet size={18} />
+                        <span>Baixar Planilha ({registrations.length})</span>
+                        <Download size={16} />
+                    </button>
+
+                    {/* SELETOR DE RETIRO */}
+                    <div className="flex items-center gap-2 bg-black/40 p-1.5 rounded-2xl border border-white/10 overflow-x-auto">
                         <button
-                            key={evt.slug}
-                            onClick={() => setSelectedEventSlug(evt.slug)}
-                            className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider whitespace-nowrap transition-all flex items-center gap-1.5 ${
-                                selectedEventSlug === evt.slug
-                                    ? 'bg-gradient-to-r from-holi-primary to-purple-600 text-white shadow-lg'
+                            onClick={() => setSelectedEventSlug('all')}
+                            className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider whitespace-nowrap transition-all ${
+                                selectedEventSlug === 'all'
+                                    ? 'bg-white text-black shadow-lg'
                                     : 'text-gray-400 hover:text-white hover:bg-white/5'
                             }`}
                         >
-                            {evt.status === 'active' && <Sparkles size={12} className="text-holi-accent" />}
-                            {evt.name.replace('Retiro de ', '').replace('Retiro ', '')}
+                            Todos ({registrations.length})
                         </button>
-                    ))}
-                    <button
-                        onClick={() => setSelectedEventSlug('all')}
-                        className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider whitespace-nowrap transition-all ${
-                            selectedEventSlug === 'all'
-                                ? 'bg-white text-black shadow-lg'
-                                : 'text-gray-400 hover:text-white hover:bg-white/5'
-                        }`}
-                    >
-                        Todos
-                    </button>
+                        {events.map(evt => (
+                            <button
+                                key={evt.slug}
+                                onClick={() => setSelectedEventSlug(evt.slug)}
+                                className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                                    selectedEventSlug === evt.slug
+                                        ? 'bg-gradient-to-r from-holi-primary to-purple-600 text-white shadow-lg'
+                                        : 'text-gray-400 hover:text-white hover:bg-white/5'
+                                }`}
+                            >
+                                {evt.status === 'active' && <Sparkles size={12} className="text-holi-accent" />}
+                                {evt.name.replace('Retiro de ', '').replace('Retiro ', '')}
+                            </button>
+                        ))}
+                    </div>
                 </div>
             </div>
 
@@ -300,73 +403,134 @@ const AngelPortfolioPage = () => {
                                                     : 'bg-holi-primary/20 border-holi-primary/30 text-holi-primary'
                                             }`}
                                         >
-                                            {isNoAngel ? '!' : portfolio.name.charAt(0)}
+                                            {portfolio.name.charAt(0).toUpperCase()}
                                         </div>
                                         <div>
-                                            <h3 className="font-bold text-white text-base flex items-center gap-2">
-                                                {portfolio.name}
+                                            <div className="flex items-center gap-2">
+                                                <h3 className="font-bold text-white text-lg">{portfolio.name}</h3>
                                                 {isNoAngel && (
-                                                    <span className="text-[10px] uppercase font-bold bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full border border-amber-500/30">
-                                                        Necessita Atribuição
+                                                    <span className="px-2 py-0.5 bg-amber-500/20 text-amber-300 text-[10px] font-black uppercase rounded-full">
+                                                        Atenção
                                                     </span>
                                                 )}
-                                            </h3>
-                                            <span className="text-xs text-gray-400">
-                                                {portfolio.registrations.length} participantes • {portfolio.paidCount} confirmados
-                                            </span>
+                                            </div>
+                                            <p className="text-xs text-gray-400">
+                                                {portfolio.registrations.length} participante(s) sob sua responsabilidade
+                                            </p>
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center gap-4">
-                                        <div className="text-right hidden sm:block">
-                                            <span className="text-xs text-gray-500 block">Total</span>
-                                            <span className="text-sm font-black text-holi-secondary">
-                                                R$ {portfolio.totalRevenue},00
+                                    <div className="flex items-center gap-6">
+                                        <div className="hidden sm:flex items-center gap-3 font-mono text-xs">
+                                            <span className="px-2.5 py-1 bg-green-500/10 text-green-400 border border-green-500/20 rounded-full font-bold">
+                                                {portfolio.paidCount} Pagos
+                                            </span>
+                                            {portfolio.pendingCount > 0 && (
+                                                <span className="px-2.5 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-full font-bold">
+                                                    {portfolio.pendingCount} Pendentes
+                                                </span>
+                                            )}
+                                            <span className="text-gray-300 font-black">
+                                                R$ {portfolio.totalRevenue.toLocaleString('pt-BR')}
                                             </span>
                                         </div>
-                                        {isExpanded ? <ChevronUp size={20} className="text-gray-400" /> : <ChevronDown size={20} className="text-gray-400" />}
+
+                                        <button className="text-gray-400 hover:text-white p-2">
+                                            {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                                        </button>
                                     </div>
                                 </div>
 
-                                {isExpanded && (
-                                    <div className="border-t border-white/5 bg-black/20 p-5 space-y-3">
-                                        {portfolio.registrations.map(reg => (
-                                            <div
-                                                key={reg.id}
-                                                className="p-4 bg-holi-surface/80 border border-white/5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-                                            >
-                                                <div>
-                                                    <div className="font-bold text-white text-sm">
-                                                        {reg.participant.full_name}
-                                                    </div>
-                                                    <div className="text-xs text-gray-400 flex flex-wrap gap-3 mt-1">
-                                                        {reg.participant.phone && (
-                                                            <span className="flex items-center gap-1">
-                                                                <Phone size={12} /> {reg.participant.phone}
-                                                            </span>
-                                                        )}
-                                                        {reg.participant.parish && (
-                                                            <span>• {reg.participant.parish}</span>
-                                                        )}
-                                                        <span>• {reg.kit_option.split(' - ')[0]}</span>
-                                                    </div>
-                                                </div>
+                                {/* LISTA DE PARTICIPANTES DO ANJO */}
+                                <AnimatePresence>
+                                    {isExpanded && (
+                                        <motion.div
+                                            initial={{ height: 0, opacity: 0 }}
+                                            animate={{ height: 'auto', opacity: 1 }}
+                                            exit={{ height: 0, opacity: 0 }}
+                                            className="border-t border-white/5 bg-black/20 p-5 space-y-3"
+                                        >
+                                            <div className="overflow-x-auto">
+                                                <table className="w-full text-left text-xs">
+                                                    <thead>
+                                                        <tr className="text-gray-500 border-b border-white/10 uppercase tracking-wider font-mono">
+                                                            <th className="pb-3 font-bold">Participante</th>
+                                                            <th className="pb-3 font-bold">Contato</th>
+                                                            <th className="pb-3 font-bold">Idade / Cidade</th>
+                                                            <th className="pb-3 font-bold">Kit / Camiseta</th>
+                                                            <th className="pb-3 font-bold">Status PIX</th>
+                                                            <th className="pb-3 font-bold text-right">Valor</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody className="divide-y divide-white/5">
+                                                        {portfolio.registrations.map(reg => {
+                                                            const isPaid = reg.payment?.status === 'Pago' || reg.status === 'Confirmada'
+                                                            const age = calculateAge(reg.participant.birth_date)
 
-                                                <div className="flex items-center gap-3">
-                                                    <span
-                                                        className={`px-3 py-1 rounded-full text-xs font-bold ${
-                                                            reg.payment?.status === 'Pago'
-                                                                ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                                                                : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                                                        }`}
-                                                    >
-                                                        {reg.payment?.status || 'Pendente'}
-                                                    </span>
-                                                </div>
+                                                            return (
+                                                                <tr key={reg.id} className="hover:bg-white/[0.02] transition-colors">
+                                                                    <td className="py-3 font-bold text-white">
+                                                                        {reg.participant.full_name}
+                                                                        {reg.staying_on_site && (
+                                                                            <span className="ml-2 px-1.5 py-0.5 bg-purple-500/20 text-purple-300 text-[10px] rounded">
+                                                                                Camping
+                                                                            </span>
+                                                                        )}
+                                                                    </td>
+                                                                    <td className="py-3 font-mono text-gray-300">
+                                                                        <div className="flex items-center gap-1.5">
+                                                                            <Phone size={12} className="text-holi-secondary" />
+                                                                            <a
+                                                                                href={`https://wa.me/55${(reg.participant.phone || '').replace(/\D/g, '')}`}
+                                                                                target="_blank"
+                                                                                rel="noreferrer"
+                                                                                className="hover:underline hover:text-holi-secondary"
+                                                                            >
+                                                                                {reg.participant.phone || 'Sem fone'}
+                                                                            </a>
+                                                                        </div>
+                                                                        {reg.participant.email && (
+                                                                            <div className="text-[11px] text-gray-500 truncate max-w-[160px]">
+                                                                                {reg.participant.email}
+                                                                            </div>
+                                                                        )}
+                                                                    </td>
+                                                                    <td className="py-3 text-gray-400">
+                                                                        <div>{age} anos</div>
+                                                                        <div className="text-[11px] text-gray-500">{reg.participant.city || 'N/D'}</div>
+                                                                    </td>
+                                                                    <td className="py-3 text-gray-300">
+                                                                        <div className="truncate max-w-[180px]">{reg.kit_option}</div>
+                                                                        {(reg.tshirt_size || reg.tshirt_size_2) && (
+                                                                            <span className="text-[11px] text-holi-accent flex items-center gap-1 mt-0.5">
+                                                                                <Shirt size={10} />
+                                                                                Tam: {[reg.tshirt_size, reg.tshirt_size_2].filter(Boolean).join(', ')}
+                                                                            </span>
+                                                                        )}
+                                                                    </td>
+                                                                    <td className="py-3 font-mono">
+                                                                        {isPaid ? (
+                                                                            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-green-500/10 text-green-400 border border-green-500/20 rounded-full font-bold">
+                                                                                <CheckCircle size={12} /> Pago
+                                                                            </span>
+                                                                        ) : (
+                                                                            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-full font-bold">
+                                                                                <Clock size={12} /> Pendente
+                                                                            </span>
+                                                                        )}
+                                                                    </td>
+                                                                    <td className="py-3 text-right font-mono font-black text-white">
+                                                                        R$ {reg.payment?.amount || 50}
+                                                                    </td>
+                                                                </tr>
+                                                            )
+                                                        })}
+                                                    </tbody>
+                                                </table>
                                             </div>
-                                        ))}
-                                    </div>
-                                )}
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
                             </div>
                         )
                     })}
