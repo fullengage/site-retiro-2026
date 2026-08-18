@@ -1,11 +1,14 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
+import { supabase } from '../../lib/supabase'
+import { X, ChevronLeft, ChevronRight, Maximize2 } from 'lucide-react'
 
-interface GalleryImage {
+interface GalleryItem {
+    id?: string
     src: string
     alt: string
 }
 
-const GALLERY_IMAGES: GalleryImage[] = [
+const FALLBACK_IMAGES: GalleryItem[] = [
     {
         src: 'https://www.festivaladonai.com.br/wp-content/uploads/2026/08/482249267_1064251255741917_8368824039255334219_n.jpg',
         alt: 'Jovens cantando e celebrando no Festival Adonai',
@@ -57,8 +60,46 @@ const GALLERY_IMAGES: GalleryImage[] = [
 ]
 
 export const GalleryGridSection: React.FC = () => {
+    const [images, setImages] = useState<GalleryItem[]>(FALLBACK_IMAGES)
+    const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
+
+    useEffect(() => {
+        const fetchGallery = async () => {
+            try {
+                const { data, error } = await supabase
+                    .from('gallery_images')
+                    .select('id, url, label')
+                    .order('created_at', { ascending: false })
+
+                if (!error && data && data.length > 0) {
+                    const mapped = data.map((item, idx) => ({
+                        id: item.id,
+                        src: item.url,
+                        alt: item.label || `Foto ${idx + 1} do Festival Adonai`
+                    }))
+                    setImages(mapped)
+                }
+            } catch (e) {
+                console.warn('Usando fotos padrão na grade:', e)
+            }
+        }
+
+        fetchGallery()
+    }, [])
+
+    useEffect(() => {
+        const handleKey = (e: KeyboardEvent) => {
+            if (selectedIndex === null) return
+            if (e.key === 'Escape') setSelectedIndex(null)
+            if (e.key === 'ArrowRight') setSelectedIndex(prev => (prev !== null && prev < images.length - 1 ? prev + 1 : 0))
+            if (e.key === 'ArrowLeft') setSelectedIndex(prev => (prev !== null && prev > 0 ? prev - 1 : images.length - 1))
+        }
+        window.addEventListener('keydown', handleKey)
+        return () => window.removeEventListener('keydown', handleKey)
+    }, [selectedIndex, images.length])
+
     return (
-        <section className="adonai-gallery" aria-label="Galeria de Fotos do Adonai">
+        <section className="adonai-gallery" id="galeria" aria-label="Galeria de Fotos do Adonai">
             <span
                 style={{
                     color: 'var(--sziget-pink)',
@@ -83,12 +124,75 @@ export const GalleryGridSection: React.FC = () => {
             </h2>
 
             <div className="adonai-gallery-grid">
-                {GALLERY_IMAGES.map((img, idx) => (
-                    <div key={idx}>
-                        <img src={img.src} alt={img.alt} loading="lazy" />
+                {images.slice(0, 12).map((img, idx) => (
+                    <div
+                        key={img.id || idx}
+                        onClick={() => setSelectedIndex(idx)}
+                        className="cursor-pointer group relative overflow-hidden"
+                    >
+                        <img src={img.src} alt={img.alt} loading="lazy" className="transition-transform duration-500 group-hover:scale-105" />
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <div className="p-2 bg-white text-black rounded-full shadow-md transform scale-90 group-hover:scale-100 transition-transform">
+                                <Maximize2 size={16} />
+                            </div>
+                        </div>
                     </div>
                 ))}
             </div>
+
+            {/* Modal Lightbox */}
+            {selectedIndex !== null && images[selectedIndex] && (
+                <div
+                    onClick={() => setSelectedIndex(null)}
+                    className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4"
+                >
+                    <button
+                        onClick={(e) => { e.stopPropagation(); setSelectedIndex(null); }}
+                        className="absolute top-6 right-6 p-2 text-white/80 hover:text-white bg-white/10 rounded-full transition-colors"
+                        aria-label="Fechar"
+                    >
+                        <X size={24} />
+                    </button>
+
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            setSelectedIndex(prev => (prev !== null && prev > 0 ? prev - 1 : images.length - 1))
+                        }}
+                        className="absolute left-4 top-1/2 -translate-y-1/2 p-3 text-white/80 hover:text-white bg-white/10 rounded-full transition-colors"
+                        aria-label="Anterior"
+                    >
+                        <ChevronLeft size={28} />
+                    </button>
+
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            setSelectedIndex(prev => (prev !== null && prev < images.length - 1 ? prev + 1 : 0))
+                        }}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 p-3 text-white/80 hover:text-white bg-white/10 rounded-full transition-colors"
+                        aria-label="Próximo"
+                    >
+                        <ChevronRight size={28} />
+                    </button>
+
+                    <div
+                        onClick={(e) => e.stopPropagation()}
+                        className="max-w-4xl max-h-[85vh] flex flex-col items-center p-2 bg-black border-2 border-white/20 shadow-2xl"
+                    >
+                        <img
+                            src={images[selectedIndex].src}
+                            alt={images[selectedIndex].alt}
+                            className="max-h-[75vh] max-w-full object-contain"
+                        />
+                        {images[selectedIndex].alt && (
+                            <p className="text-white text-sm mt-2 font-medium tracking-wide text-center px-4">
+                                {images[selectedIndex].alt} ({selectedIndex + 1}/{images.length})
+                            </p>
+                        )}
+                    </div>
+                </div>
+            )}
         </section>
     )
 }
