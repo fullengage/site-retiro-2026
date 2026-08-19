@@ -37,7 +37,7 @@ export const EucharistSection: React.FC = () => {
                             className="transition-transform duration-500 group-hover:scale-105"
                         />
                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <span className="bg-[#fff53c] text-black font-black text-xs px-4 py-1.5 rounded-full uppercase tracking-wider shadow-md">
+                            <span className="bg-adonai-orange text-adonai-charcoal font-black text-xs px-4 py-2 rounded-sm uppercase tracking-wider shadow-md">
                                 Ver Mais na Galeria ↗
                             </span>
                         </div>

@@ -48,6 +48,8 @@ export default {
                 }
             },
             fontFamily: {
+                sans: ["Inter", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
+                body: ["Inter", "sans-serif"],
                 display: ["Montserrat", "sans-serif"],
                 marker: ["Permanent Marker", "cursive"],
                 news: ["Playfair Display", "serif"],

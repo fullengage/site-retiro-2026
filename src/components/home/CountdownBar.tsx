@@ -40,21 +40,37 @@ export const CountdownBar: React.FC = () => {
     }, [])
 
     return (
-        <div className="sziget-countdown-bar" role="timer" aria-label="Contagem regressiva para abertura dos portões">
-            <span>⚡ ABERTURA DOS PORTÕES 25 SETEMBRO 2026:</span>
-            <div className="sziget-timer-box">
-                <div className="sziget-timer-unit">
-                    <strong>{timeLeft.days.toString().padStart(2, '0')}</strong> DIAS
+        <div className="sziget-countdown-bar rack-console-bar" role="timer" aria-label="Contagem regressiva para abertura dos portões">
+            <div className="rack-status-indicator">
+                <span className="rack-led-pulse" />
+                <span className="rack-label">MASTER TIMER • STAGE READY</span>
+                <span className="rack-freq">FREQ: 25.09.2026</span>
+            </div>
+
+            <div className="sziget-timer-box rack-digital-display">
+                <div className="sziget-timer-unit rack-unit">
+                    <span className="rack-led-num">{timeLeft.days.toString().padStart(2, '0')}</span>
+                    <span className="rack-unit-label">DIAS</span>
                 </div>
-                <div className="sziget-timer-unit">
-                    <strong>{timeLeft.hours.toString().padStart(2, '0')}</strong> HRS
+                <div className="sziget-timer-unit rack-unit">
+                    <span className="rack-led-num">{timeLeft.hours.toString().padStart(2, '0')}</span>
+                    <span className="rack-unit-label">HRS</span>
                 </div>
-                <div className="sziget-timer-unit">
-                    <strong>{timeLeft.minutes.toString().padStart(2, '0')}</strong> MINS
+                <div className="sziget-timer-unit rack-unit">
+                    <span className="rack-led-num">{timeLeft.minutes.toString().padStart(2, '0')}</span>
+                    <span className="rack-unit-label">MIN</span>
                 </div>
-                <div className="sziget-timer-unit">
-                    <strong>{timeLeft.seconds.toString().padStart(2, '0')}</strong> SECS
+                <div className="sziget-timer-unit rack-unit">
+                    <span className="rack-led-num">{timeLeft.seconds.toString().padStart(2, '0')}</span>
+                    <span className="rack-unit-label">SEG</span>
                 </div>
+            </div>
+
+            <div className="rack-vu-meter" aria-hidden="true">
+                <span className="vu-bar vu-green" />
+                <span className="vu-bar vu-green" />
+                <span className="vu-bar vu-yellow" />
+                <span className="vu-bar vu-red" />
             </div>
         </div>
     )

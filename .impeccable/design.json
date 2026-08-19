@@ -1,0 +1,154 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-19T00:11:00.000Z",
+  "title": "Design System: Adonai Festival 2026",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Adonai Solar Orange",
+        "canonical": "#F7942D",
+        "tonalRamp": ["#422103", "#743a05", "#a65408", "#d96f0a", "#F7942D", "#f9aa57", "#fbc082", "#fed7ad"]
+      },
+      "secondary": {
+        "role": "secondary",
+        "displayName": "Adonai Terracotta Flame",
+        "canonical": "#C94C22",
+        "tonalRamp": ["#361206", "#61210b", "#8d3011", "#b93f16", "#C94C22", "#d76f4e", "#e49379", "#f1b8a5"]
+      },
+      "sand-bg": {
+        "role": "neutral",
+        "displayName": "Adonai Sand Canvas",
+        "canonical": "#F5D29C",
+        "tonalRamp": ["#423219", "#74582c", "#a67e3f", "#d8a452", "#F5D29C", "#f7dcaf", "#fae5c3", "#fcf0d7"]
+      },
+      "charcoal": {
+        "role": "neutral",
+        "displayName": "Adonai Deep Charcoal",
+        "canonical": "#202020",
+        "tonalRamp": ["#000000", "#101010", "#202020", "#3a3a3a", "#545454", "#707070", "#909090", "#b4b4b4"]
+      },
+      "cream": {
+        "role": "neutral",
+        "displayName": "Adonai Vintage Cream",
+        "canonical": "#F1E6C8",
+        "tonalRamp": ["#3e392a", "#6e654b", "#9e916c", "#cebd8d", "#F1E6C8", "#f4ebd3", "#f7f1df", "#fbf7eb"]
+      },
+      "brown": {
+        "role": "tertiary",
+        "displayName": "Adonai Rich Umber",
+        "canonical": "#56382A",
+        "tonalRamp": ["#160e0a", "#2b1c15", "#412a1f", "#56382A", "#784f3b", "#9b664c", "#bd7f61", "#d3a088"]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display (Montserrat Black)",
+        "purpose": "Monumental festival titles and hero headers"
+      },
+      "headline": {
+        "displayName": "Headline (Space Grotesk)",
+        "purpose": "Section titles, stage banners, and badges"
+      },
+      "body": {
+        "displayName": "Body (Montserrat)",
+        "purpose": "Event information and body copy"
+      }
+    },
+    "shadows": [
+      {
+        "name": "card-pop",
+        "value": "6px 6px 0 #202020",
+        "purpose": "Solid offset shadow on cards and containers."
+      },
+      {
+        "name": "accent-pop",
+        "value": "7px 7px 0 #C94C22",
+        "purpose": "Solid offset shadow on primary CTA and floating bars."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-tactile",
+        "value": "cubic-bezier(0.2, 0, 0, 1)",
+        "purpose": "Crisp lift and press interactions on buttons."
+      }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Ticket CTA",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Primary conversion button for ticket purchases and registration.",
+      "html": "<button class=\"ds-btn-primary\">🎟️ GARANTA SEU INGRESSO</button>",
+      "css": ".ds-btn-primary { background: #F7942D; color: #202020; padding: 14px 28px; font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.08em; border: 3px solid #202020; border-radius: 2px; box-shadow: 5px 5px 0 #202020; cursor: pointer; transition: transform 0.15s ease, background 0.15s ease; } .ds-btn-primary:hover { background: #C94C22; color: #fff; transform: translate(-2px, -2px); box-shadow: 7px 7px 0 #202020; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Secondary action button for gallery and navigation.",
+      "html": "<button class=\"ds-btn-secondary\">📸 VER GALERIA</button>",
+      "css": ".ds-btn-secondary { background: #202020; color: #F1E6C8; padding: 14px 28px; font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.08em; border: 3px solid #202020; border-radius: 2px; box-shadow: 5px 5px 0 #F7942D; cursor: pointer; transition: transform 0.15s ease, border-color 0.15s ease; } .ds-btn-secondary:hover { transform: translate(-2px, -2px); border-color: #F7942D; }"
+    },
+    {
+      "name": "Festival Badge",
+      "kind": "chip",
+      "refersTo": "badge-festival",
+      "description": "Tag indicator for dates, locations, and urgency badges.",
+      "html": "<span class=\"ds-badge\">📍 NOVO HORIZONTE — SP</span>",
+      "css": ".ds-badge { display: inline-block; background: #202020; color: #F7942D; border: 2px solid #F7942D; padding: 6px 14px; font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; border-radius: 2px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Electric Revival",
+    "overview": "O sistema visual do Adonai Festival combina a energia crua de grandes festivais globais de música com a autenticidade e profundidade do streetwear contemporâneo e da juventude católica.",
+    "keyCharacteristics": [
+      "Estética streetwear/festival: bordas retas (radius 2px) e sombras sólidas deslocadas.",
+      "Paleta solar e terrosa de alto contraste: laranja vibrante, terracota, carvão e areia.",
+      "Tipografia de impacto: Montserrat Black e Space Grotesk em caixa alta.",
+      "Elementos táteis de festival: ingressos flutuantes, badges adesivos e blocos densos de pôster."
+    ],
+    "rules": [
+      {
+        "name": "The Solid Contrast Rule",
+        "body": "O contraste nunca depende de transparências sutis; elementos usam cores sólidas e bordas nítidas de 2px a 4px.",
+        "section": "colors"
+      },
+      {
+        "name": "The Hard Shadow Doctrine",
+        "body": "As sombras de elevação não usam blur gaussiano suave; são deslocamentos sólidos e angulares.",
+        "section": "elevation"
+      },
+      {
+        "name": "The All-Caps Accent Rule",
+        "body": "Toda tag, badge de credencial e botão de ação primária é renderizado estritamente em caixa alta.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tactile Lift Rule",
+        "body": "Elementos clicáveis devem mover-se fisicamente no espaço no sentido oposto à sua sombra sólida.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do manter as sombras duras e deslocadas sem desfoque para reforçar a identidade física de cartaz/festival.",
+      "Do utilizar textos de botões, tags e badges sempre em caixa alta com peso bold/black.",
+      "Do preservar o fundo aquecido em areia/creme com textura sutil de retícula.",
+      "Do garantir contraste AAA entre fundos e tipografia em todos os formulários."
+    ],
+    "donts": [
+      "Don't utilizar sombras difusas e suaves de estilo Tailwind padrão sem customização.",
+      "Don't aplicar cantos arredondados excessivos (rounded-2xl) em botões principais.",
+      "Don't diluir a personalidade visual com degradês translúcidos roxo/azul genéricos.",
+      "Don't sobrecarregar o usuário com animações lentas; transições devem ser rápidas e táteis."
+    ]
+  }
+}

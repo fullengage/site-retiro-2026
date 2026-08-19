@@ -1,4 +1,4 @@
-/* ADONAI FESTIVAL 2026 — RETRO STREETWEAR & FESTIVAL DESIGN SYSTEM */
+/* ADONAI FESTIVAL 2026 — RETRO STREETWEAR & FESTIVAL SOUNDBOARD DESIGN SYSTEM */
 
 :root {
     --adonai-orange: #F7942D;
@@ -20,7 +20,8 @@
 .adonai-home-wrapper {
     background-color: var(--sziget-bg);
     color: var(--sziget-text);
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     position: relative;
     overflow-x: hidden;
     width: 100%;
@@ -38,7 +39,82 @@
     mix-blend-mode: multiply;
 }
 
-/* Sziget Floating Rock in Rio Hybrid Ticket Bar */
+/* Section Shared Badges */
+.adonai-section-badge {
+    display: inline-block;
+    background: var(--adonai-charcoal);
+    color: var(--adonai-orange);
+    border: 2px solid var(--adonai-orange);
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 800;
+    font-size: 0.78rem;
+    letter-spacing: 2px;
+    padding: 6px 14px;
+    border-radius: 2px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    box-shadow: 4px 4px 0 var(--adonai-terracotta);
+}
+
+.text-adonai-orange {
+    color: var(--adonai-orange);
+}
+
+/* Pilot LEDs & Console Indicators */
+.pilot-led-green, .pilot-led-amber, .pilot-led-orange {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    border: 1px solid #000;
+}
+
+.pilot-led-green {
+    background: #22c55e;
+    box-shadow: 0 0 6px #22c55e;
+}
+
+.pilot-led-amber {
+    background: #eab308;
+    box-shadow: 0 0 6px #eab308;
+}
+
+.pilot-led-orange {
+    background: var(--adonai-orange);
+    box-shadow: 0 0 8px var(--adonai-orange);
+}
+
+.active-pulse {
+    animation: led-pulse 1.8s infinite;
+}
+
+@keyframes led-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.9); }
+}
+
+/* Rack Corner Screws */
+.rack-accent-box {
+    position: relative;
+}
+
+.rack-corner-screw {
+    position: absolute;
+    font-family: monospace;
+    font-size: 0.8rem;
+    font-weight: 900;
+    color: var(--adonai-charcoal);
+    opacity: 0.6;
+    line-height: 1;
+    pointer-events: none;
+}
+
+.rack-corner-screw.top-left { top: 4px; left: 6px; }
+.rack-corner-screw.top-right { top: 4px; right: 6px; }
+.rack-corner-screw.bottom-left { bottom: 4px; left: 6px; }
+.rack-corner-screw.bottom-right { bottom: 4px; right: 6px; }
+
+/* Floating Quick Bar */
 .sziget-floating-bar {
     position: fixed;
     right: 20px;
@@ -97,17 +173,12 @@
     box-shadow: none;
 }
 
-/* Sziget Countdown Ticker Bar */
-.sziget-countdown-bar {
+/* Soundboard Countdown Ticker Bar */
+.rack-console-bar {
     background: var(--adonai-charcoal);
     color: var(--adonai-cream);
     border-bottom: 4px solid var(--adonai-orange);
-    padding: 13px clamp(18px, 4vw, 70px);
-    font-family: 'Space Grotesk', sans-serif;
-    font-weight: 900;
-    font-size: 0.95rem;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
+    padding: 12px clamp(18px, 4vw, 70px);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -117,36 +188,103 @@
     z-index: 30;
 }
 
-.sziget-timer-box {
+.rack-status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 900;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+}
+
+.rack-led-pulse {
+    width: 10px;
+    height: 10px;
+    background: #22c55e;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #22c55e;
+    animation: led-pulse 1.5s infinite;
+}
+
+.rack-label {
+    color: var(--adonai-orange);
+}
+
+.rack-freq {
+    color: var(--adonai-cream);
+    opacity: 0.75;
+    font-size: 0.72rem;
+    border-left: 1px solid rgba(255,255,255,0.2);
+    padding-left: 10px;
+}
+
+.rack-digital-display {
     display: flex;
     gap: 0;
     align-items: center;
-    border-left: 2px solid var(--adonai-orange);
+    border: 2px solid var(--adonai-orange);
+    background: #111111;
+    border-radius: 2px;
 }
 
-.sziget-timer-unit {
-    background: transparent;
-    border-radius: 0;
-    padding: 3px 12px;
-    border-right: 2px solid var(--adonai-orange);
-    color: var(--adonai-cream);
-    font-size: 1.1rem;
+.rack-unit {
+    padding: 6px 14px;
+    border-right: 1px solid rgba(247, 148, 45, 0.4);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
-.sziget-timer-unit strong {
+.rack-unit:last-child {
+    border-right: none;
+}
+
+.rack-led-num {
+    font-family: 'Space Grotesk', monospace;
     color: var(--adonai-orange);
-    font-size: 1.35rem;
+    font-size: 1.5rem;
+    font-weight: 900;
+    line-height: 1;
+    text-shadow: 0 0 8px rgba(247, 148, 45, 0.5);
 }
 
-/* Sziget Hero Video/Image Cover */
-.sziget-hero {
-    min-height: 760px;
-    padding: 105px clamp(24px, 6vw, 90px) 90px;
+.rack-unit-label {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.62rem;
+    color: var(--adonai-cream);
+    font-weight: 800;
+    letter-spacing: 1px;
+    margin-top: 2px;
+}
+
+.rack-vu-meter {
+    display: flex;
+    gap: 4px;
+    align-items: flex-end;
+    height: 20px;
+}
+
+.vu-bar {
+    width: 6px;
+    height: 100%;
+    border-radius: 1px;
+}
+
+.vu-bar.vu-green { background: #22c55e; height: 60%; }
+.vu-bar.vu-yellow { background: #eab308; height: 80%; }
+.vu-bar.vu-red { background: var(--adonai-terracotta); height: 100%; }
+
+/* Soundboard Hero Section */
+.soundboard-hero {
+    min-height: 780px;
+    padding: 95px clamp(24px, 6vw, 90px) 90px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     justify-content: center;
-    gap: 0;
     text-align: left;
     background: var(--adonai-orange);
     position: relative;
@@ -154,7 +292,7 @@
     overflow: hidden;
 }
 
-.sziget-hero::before {
+.soundboard-hero::before {
     content: '';
     display: block;
     position: absolute;
@@ -170,7 +308,7 @@
     pointer-events: none;
 }
 
-.sziget-hero::after {
+.soundboard-hero::after {
     content: '';
     position: absolute;
     z-index: 1;
@@ -187,72 +325,63 @@
     pointer-events: none;
 }
 
-.sziget-hero>* {
+.soundboard-hero>* {
     position: relative;
     z-index: 2;
     width: min(100%, 650px);
     max-width: 650px;
 }
 
-.sziget-hero>.adonai-hero-shape {
-    display: block;
-    position: absolute;
-    max-width: none;
-    height: auto;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    box-shadow: none;
-    pointer-events: none;
-    z-index: 0;
+.hero-console-status {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
 }
 
-.sziget-hero>.adonai-hero-shape-bottom {
-    right: -2%;
-    bottom: 1%;
-    width: min(55vw, 780px);
-    height: 250px;
-    background: var(--adonai-cream);
-    clip-path: polygon(0 55%, 20% 30%, 12% 0, 42% 24%, 58% 5%, 70% 34%, 100% 16%, 89% 67%, 100% 100%, 55% 80%, 25% 100%);
-    transform: rotate(2deg);
-    opacity: .96;
+.live-on-air-pill {
+    background: #b91c1c;
+    color: #ffffff;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 900;
+    font-size: 0.75rem;
+    letter-spacing: 1.5px;
+    padding: 6px 12px;
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 3px 3px 0 var(--adonai-charcoal);
 }
 
-.sziget-hero>.adonai-hero-shape-accent {
-    right: 35%;
-    bottom: 4%;
-    width: min(18vw, 240px);
-    height: 150px;
-    background: var(--adonai-terracotta);
-    clip-path: polygon(0 48%, 72% 0, 52% 43%, 100% 72%, 42% 64%, 18% 100%);
-    transform: rotate(-6deg);
-    opacity: 1;
+.live-dot {
+    width: 8px;
+    height: 8px;
+    background: #ffffff;
+    border-radius: 50%;
+    animation: led-pulse 1s infinite;
 }
 
-.sziget-hero-badge {
+.console-meta-tag {
     background: var(--adonai-charcoal);
     color: var(--adonai-cream);
     font-family: 'Space Grotesk', sans-serif;
-    font-weight: 900;
-    font-size: 0.85rem;
-    letter-spacing: 2px;
-    padding: 9px 14px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    padding: 6px 10px;
     border-radius: 2px;
-    text-transform: uppercase;
-    margin-bottom: 20px;
-    box-shadow: 5px 5px 0 var(--adonai-terracotta);
-    width: fit-content;
 }
 
 .sziget-hero-title {
+    font-family: 'Montserrat', sans-serif;
     font-size: clamp(4rem, 10vw, 8.5rem);
     font-weight: 900;
-    font-style: italic;
-    letter-spacing: -.07em;
+    letter-spacing: -.05em;
     color: var(--adonai-charcoal);
-    text-shadow: none;
-    margin: 18px 0 14px;
-    line-height: .82;
+    margin: 14px 0;
+    line-height: .88;
     text-transform: uppercase;
 }
 
@@ -269,211 +398,313 @@
     border: 3px solid var(--adonai-charcoal);
     border-radius: 2px;
     box-shadow: 6px 6px 0 var(--adonai-charcoal);
-    padding: 12px 18px;
+    padding: 12px 20px;
     font-family: 'Space Grotesk', sans-serif;
-    font-weight: 800;
-    font-size: 1.25rem;
+    font-weight: 900;
+    font-size: 1.2rem;
     letter-spacing: 2px;
-    margin: 20px 0 30px 0;
+    margin: 16px 0 26px 0;
     text-transform: uppercase;
     width: fit-content;
 }
 
-.sziget-hero p {
+.hero-console-lead {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     color: var(--adonai-charcoal);
     max-width: 560px;
-    font-size: 1.25rem;
-    line-height: 1.6;
-    font-weight: 600;
+    font-size: 1.125rem;
+    line-height: 1.68;
+    font-weight: 500;
     margin: 0 0 28px;
 }
 
-.sziget-hero-tags {
+.console-tag-deck {
     display: flex;
-    gap: 15px;
+    gap: 12px;
     flex-wrap: wrap;
     margin-bottom: 35px;
     width: 100%;
-    max-width: 760px;
 }
 
-.sziget-hero-tags span {
-    background: var(--adonai-sand);
-    color: var(--adonai-charcoal);
+.console-data-pill {
+    background: var(--adonai-cream);
     border: 2px solid var(--adonai-charcoal);
-    border-radius: 2px;
-    padding: 10px 20px;
-    font-weight: 800;
+    color: var(--adonai-charcoal);
     font-family: 'Space Grotesk', sans-serif;
-    font-size: 0.95rem;
+    font-weight: 800;
+    font-size: 0.82rem;
+    letter-spacing: 1px;
+    padding: 7px 12px;
+    border-radius: 2px;
+    text-transform: uppercase;
+    box-shadow: 4px 4px 0 var(--adonai-charcoal);
+}
+
+.console-data-pill.highlight {
+    background: var(--adonai-charcoal);
+    color: var(--adonai-orange);
+    border-color: var(--adonai-orange);
+    box-shadow: 4px 4px 0 var(--adonai-terracotta);
 }
 
 .sziget-hero-cta {
     display: flex;
-    gap: 20px;
+    gap: 16px;
     flex-wrap: wrap;
-    width: 100%;
-    max-width: 760px;
 }
 
-/* Sziget Style Buttons */
+/* Stompbox Buttons */
 .btn-sziget-primary {
-    background: var(--adonai-cream) !important;
-    color: var(--adonai-charcoal) !important;
+    background: var(--adonai-charcoal) !important;
+    color: var(--adonai-orange) !important;
     font-family: 'Space Grotesk', sans-serif !important;
     font-weight: 900 !important;
-    font-size: 1.15rem !important;
+    font-size: 1.05rem !important;
     letter-spacing: 1.5px !important;
     text-transform: uppercase !important;
-    padding: 16px 32px !important;
-    border-radius: 2px !important;
+    padding: 16px 34px !important;
     border: 3px solid var(--adonai-charcoal) !important;
-    box-shadow: 6px 6px 0 var(--adonai-charcoal) !important;
+    border-radius: 2px !important;
+    box-shadow: 6px 6px 0 var(--adonai-terracotta) !important;
     text-decoration: none !important;
     display: inline-block !important;
-    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease !important;
     cursor: pointer;
 }
 
 .btn-sziget-primary:hover {
-    transform: translate(3px, 3px) !important;
-    box-shadow: 2px 2px 0 var(--adonai-charcoal) !important;
+    transform: translate(-3px, -3px) !important;
+    box-shadow: 9px 9px 0 var(--adonai-terracotta) !important;
+    background: var(--adonai-terracotta) !important;
+    color: var(--adonai-cream) !important;
 }
 
 .btn-sziget-secondary {
-    background: transparent !important;
+    background: var(--adonai-cream) !important;
     color: var(--adonai-charcoal) !important;
     border: 3px solid var(--adonai-charcoal) !important;
     font-family: 'Space Grotesk', sans-serif !important;
-    font-weight: 800 !important;
-    font-size: 1.1rem !important;
+    font-weight: 900 !important;
+    font-size: 1.05rem !important;
     letter-spacing: 1.5px !important;
     text-transform: uppercase !important;
-    padding: 16px 32px !important;
+    padding: 16px 30px !important;
     border-radius: 2px !important;
     box-shadow: 6px 6px 0 var(--adonai-charcoal) !important;
     text-decoration: none !important;
     display: inline-block !important;
-    transition: all 0.2s ease !important;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease !important;
     cursor: pointer;
 }
 
 .btn-sziget-secondary:hover {
-    transform: translate(3px, 3px) !important;
-    box-shadow: 2px 2px 0 var(--adonai-charcoal) !important;
-    background: var(--adonai-cream) !important;
+    transform: translate(-3px, -3px) !important;
+    box-shadow: 9px 9px 0 var(--adonai-charcoal) !important;
+    background: #ffffff !important;
 }
 
-.btn-adonai-start {
-    background: #fff53c !important;
-    color: #e30053 !important;
-    padding: 16px 42px !important;
-    font-family: 'Space Grotesk', sans-serif !important;
-    font-weight: 900 !important;
-    font-size: 1.1rem !important;
-    border: 3px solid #e30053 !important;
-    box-shadow: 5px 5px 0 #e30053 !important;
-    text-decoration: none !important;
-    text-transform: uppercase !important;
-    display: inline-block !important;
-    border-radius: 999px !important;
-    letter-spacing: 0.8px !important;
-    transition: all 0.25s ease !important;
-    cursor: pointer;
-}
-
-.btn-adonai-start:hover {
-    transform: translate(3px, 3px) scale(1.02) !important;
-    box-shadow: 2px 2px 0 #e30053 !important;
-    color: #e30053 !important;
-}
-
-/* Editorial Section (O que é o Adonai) */
+/* Editorial Section */
 .adonai-editorial-section {
-    background-color: #b56c4f;
-    padding: clamp(60px, 7vw, 100px) 24px;
-    color: #fff;
+    background-color: var(--adonai-brown);
+    padding: clamp(70px, 8vw, 110px) 24px;
+    color: var(--adonai-cream);
     position: relative;
     overflow: hidden;
-    font-family: 'Space Grotesk', sans-serif;
     width: 100%;
     box-sizing: border-box;
 }
 
 .adonai-editorial-container {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    max-width: 1480px;
+    max-width: 1280px;
     margin: 0 auto;
 }
 
-.adonai-editorial-grid {
-    display: grid;
-    grid-template-columns: 1.15fr 0.85fr;
-    gap: clamp(32px, 4.5vw, 64px);
-    align-items: start;
-    width: 100%;
+.adonai-editorial-header {
+    text-align: center;
+    margin-bottom: 50px;
 }
 
-.ato-timeline {
+.adonai-editorial-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: clamp(2.5rem, 5.5vw, 4.2rem);
+    font-weight: 900;
+    color: #ffffff;
+    text-transform: uppercase;
+    letter-spacing: -1px;
+    line-height: 1.05;
+    margin: 10px 0 18px 0;
+}
+
+.adonai-editorial-lead {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(1.05rem, 2vw, 1.25rem);
+    color: var(--adonai-cream);
+    max-width: 800px;
+    margin: 0 auto;
+    line-height: 1.7;
+    font-weight: 400;
+}
+
+.adonai-pillars-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-bottom: 50px;
+}
+
+.adonai-pillar-card {
+    background: var(--adonai-charcoal);
+    border: 3px solid var(--adonai-cream);
+    padding: 32px 26px;
+    border-radius: 2px;
+    box-shadow: 8px 8px 0 var(--adonai-terracotta);
     display: flex;
     flex-direction: column;
-    gap: 0;
-    margin-top: 14px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.ato-step-item {
-    position: relative;
-    padding-left: 34px;
-    border-left: 3px solid rgba(255, 245, 60, 0.35);
-    padding-bottom: 32px;
+.adonai-pillar-card.active {
+    background: var(--adonai-terracotta);
+    border-color: var(--adonai-orange);
+    box-shadow: 8px 8px 0 var(--adonai-charcoal);
 }
 
-.ato-step-item:last-child {
-    padding-bottom: 0;
-    border-left: 3px solid transparent;
+.adonai-pillar-card:hover {
+    transform: translateY(-4px);
 }
 
-.ato-step-dot {
-    position: absolute;
-    left: -11px;
-    top: 2px;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: #fff53c;
-    box-shadow: 0 0 18px rgba(255, 245, 60, 0.95);
-    border: 3px solid #104a30;
+.adonai-pillar-num {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 900;
+    color: var(--adonai-orange);
+    letter-spacing: 2px;
+    margin-bottom: 10px;
 }
 
-.ato-gallery-grid {
+.adonai-pillar-card.active .adonai-pillar-num {
+    color: var(--adonai-cream);
+}
+
+.adonai-pillar-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.45rem;
+    font-weight: 900;
+    color: #ffffff;
+    margin: 0 0 14px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.adonai-pillar-desc {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.98rem;
+    line-height: 1.68;
+    color: var(--adonai-cream);
+    margin: 0 0 20px 0;
+    flex-grow: 1;
+}
+
+.adonai-pillar-tag {
+    display: inline-block;
+    background: rgba(0, 0, 0, 0.35);
+    color: var(--adonai-orange);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    padding: 5px 10px;
+    border-radius: 2px;
+    width: fit-content;
+}
+
+.adonai-pillar-card.active .adonai-pillar-tag {
+    background: var(--adonai-charcoal);
+    color: var(--adonai-cream);
+}
+
+.adonai-editorial-bottom {
     display: grid;
-    grid-template-columns: 1.25fr 1fr;
-    gap: 16px;
-    margin: 22px 0;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 32px;
+    align-items: center;
 }
 
-.ato-gallery-img-wrap {
-    border-radius: 22px;
+.adonai-quote-box {
+    background: var(--adonai-charcoal);
+    border: 3px solid var(--adonai-orange);
+    padding: 36px 32px;
+    border-radius: 2px;
+    box-shadow: 8px 8px 0 var(--adonai-terracotta);
+}
+
+.adonai-quote-scripture {
+    font-family: 'Montserrat', serif;
+    font-size: clamp(1.15rem, 2vw, 1.45rem);
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.5;
+    margin: 0 0 10px 0;
+}
+
+.adonai-quote-ref {
+    display: block;
+    color: var(--adonai-orange);
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 800;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    margin-bottom: 24px;
+}
+
+.adonai-quote-cta {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.adonai-editorial-photos {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.adonai-photo-item {
+    position: relative;
+    height: 220px;
+    border: 3px solid var(--adonai-charcoal);
+    border-radius: 2px;
     overflow: hidden;
-    box-shadow: 0 14px 35px rgba(0, 0, 0, 0.4);
-    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 5px 5px 0 var(--adonai-terracotta);
+    display: block;
 }
 
-.ato-gallery-img {
+.adonai-photo-item img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    display: block;
-    transition: transform 0.45s ease;
+    transition: transform 0.3s ease;
 }
 
-.ato-gallery-img:hover {
-    transform: scale(1.05);
+.adonai-photo-item:hover img {
+    transform: scale(1.08);
 }
 
-/* Sziget Program & Stage Cards */
+.adonai-photo-badge {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    background: var(--adonai-charcoal);
+    color: var(--adonai-cream);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 900;
+    letter-spacing: 1px;
+    padding: 3px 8px;
+    border-radius: 2px;
+}
+
+/* Experience Section Cards */
 #experiencia {
     background: var(--adonai-sand);
     color: var(--adonai-charcoal);
@@ -489,241 +720,322 @@
     margin: 0 auto;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0;
+    gap: 20px;
 }
 
 .sziget-stage-card {
     border: 3px solid var(--adonai-charcoal);
-    border-radius: 0;
+    border-radius: 2px;
     background: var(--adonai-cream);
     box-shadow: 8px 8px 0 var(--adonai-charcoal);
     min-height: 280px;
-    padding: 35px 25px;
-    text-align: left;
-    transition: all 0.35s ease;
+    padding: 40px 32px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
     position: relative;
-    overflow: hidden;
+    box-sizing: border-box;
+    transition: transform 0.2s ease;
+}
+
+.sziget-stage-card:hover {
+    transform: translateY(-4px);
+}
+
+.sziget-stage-card:nth-child(1) {
+    background: var(--adonai-cream);
 }
 
 .sziget-stage-card:nth-child(2) {
     background: var(--adonai-orange);
-    transform: rotate(1.3deg);
 }
 
 .sziget-stage-card:nth-child(3) {
     background: var(--adonai-charcoal);
     color: var(--adonai-cream);
-    transform: rotate(-1deg);
 }
 
 .sziget-stage-card:nth-child(4) {
     background: var(--adonai-terracotta);
     color: #ffffff;
-    transform: rotate(1deg);
 }
 
-.sziget-stage-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 8px;
-    background: var(--adonai-terracotta);
+.sziget-stage-card h3 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+    margin: 5px 0 12px 0;
 }
 
-.sziget-stage-card h3,
-.sziget-stage-card p,
+.sziget-stage-card p {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    line-height: 1.65;
+    font-weight: 500;
+}
+
 .sziget-stage-card span {
-    color: inherit;
+    font-family: 'Space Grotesk', sans-serif;
 }
 
-/* Holi Banner */
+/* Holi Section */
 #holi {
     background: var(--adonai-orange);
     color: var(--adonai-charcoal);
-    min-height: auto;
-    text-align: left;
-    padding: clamp(60px, 8vw, 120px) clamp(20px, 4vw, 64px);
+    padding: clamp(60px, 8vw, 110px) clamp(20px, 4vw, 64px);
     width: 100%;
     box-sizing: border-box;
     overflow: hidden;
 }
 
 .holi-container {
-    max-width: 1440px;
+    max-width: 1280px;
     margin: 0 auto;
     display: grid;
-    grid-template-columns: 1.15fr 0.85fr;
+    grid-template-columns: 1.1fr 0.9fr;
     gap: clamp(32px, 5vw, 64px);
     align-items: center;
-    width: 100%;
 }
 
 #holi h2 {
+    font-family: 'Montserrat', sans-serif;
     color: var(--adonai-charcoal);
-    font-size: clamp(3.2rem, 7vw, 6.2rem);
-    letter-spacing: -.07em;
-    line-height: .88;
+    font-size: clamp(3rem, 6.5vw, 5.5rem);
+    letter-spacing: -.05em;
+    line-height: .9;
     margin: 12px 0 24px 0;
-    max-width: 650px;
     font-weight: 900;
 }
 
 #holi p {
+    font-family: 'Inter', sans-serif;
     color: var(--adonai-charcoal);
-    font-size: clamp(1.1rem, 1.8vw, 1.35rem);
-    line-height: 1.65;
-    font-weight: 600;
-    max-width: 580px;
+    font-size: clamp(1.05rem, 1.8vw, 1.25rem);
+    line-height: 1.7;
+    font-weight: 500;
 }
 
-.holi-card {
-    background: var(--adonai-cream);
-    border: 3px solid var(--adonai-charcoal);
-    border-radius: 2px;
-    box-shadow: 8px 8px 0 var(--adonai-charcoal);
-    padding: clamp(24px, 3.5vw, 36px);
+/* Soundboard Preaching Section */
+.soundboard-preaching-section {
+    background: var(--adonai-charcoal);
+    color: var(--adonai-cream);
+    padding: clamp(80px, 8vw, 120px) 24px;
     width: 100%;
     box-sizing: border-box;
 }
 
-.holi-card h3 {
-    color: var(--adonai-terracotta);
-    font-size: clamp(1.4rem, 2vw, 1.8rem);
+.adonai-preaching-container {
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+.adonai-preaching-header {
+    text-align: center;
+    max-width: 900px;
+    margin: 0 auto 50px auto;
+}
+
+.adonai-preaching-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: clamp(2.4rem, 5.5vw, 4.2rem);
     font-weight: 900;
-    margin: 0 0 16px 0;
+    color: #ffffff;
     text-transform: uppercase;
+    letter-spacing: -1px;
+    line-height: 1.05;
+    margin: 12px 0 6px 0;
+}
+
+.adonai-preaching-subtitle {
+    font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+    font-weight: 800;
+    color: var(--adonai-orange);
     font-family: 'Space Grotesk', sans-serif;
+    margin: 0 0 18px 0;
 }
 
-@media (max-width: 980px) {
-    .holi-container {
-        grid-template-columns: 1fr;
-        gap: 36px;
-    }
+.adonai-preaching-lead {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.125rem;
+    color: var(--adonai-cream);
+    line-height: 1.68;
+    font-weight: 400;
 }
 
-/* Pregações */
-#pregacoes {
-    background: var(--adonai-cream);
-    color: var(--adonai-charcoal);
-    text-align: left;
+.adonai-preaching-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.rack-fx-card {
+    background: #252525;
+    border: 3px solid var(--adonai-terracotta);
+    padding: 24px 20px;
+    border-radius: 2px;
+    box-shadow: 6px 6px 0 var(--adonai-terracotta);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.rack-fx-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--adonai-orange);
+    box-shadow: 8px 8px 0 var(--adonai-orange);
+}
+
+.rack-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 6px;
+}
+
+.rack-preset-id {
+    font-family: 'Space Grotesk', monospace;
+    font-size: 0.7rem;
+    font-weight: 900;
+    color: var(--adonai-orange);
+    letter-spacing: 1px;
+}
+
+.preaching-card-icon {
+    font-size: 2.2rem;
+    margin-bottom: 10px;
+}
+
+.preaching-card-badge {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.68rem;
+    font-weight: 900;
+    color: var(--adonai-cream);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    opacity: 0.8;
+}
+
+.preaching-card-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: #ffffff;
+    margin: 0 0 10px 0;
+    text-transform: uppercase;
+    line-height: 1.2;
+}
+
+.preaching-card-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.92rem;
+    color: var(--adonai-cream);
+    line-height: 1.62;
+    margin: 0 0 16px 0;
+    flex-grow: 1;
+}
+
+.fx-vu-mini {
+    display: flex;
+    gap: 4px;
+    margin-top: auto;
+    padding-top: 10px;
+    border-top: 1px dashed rgba(255,255,255,0.15);
+}
+
+.vu-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 1px;
+    background: #444;
+}
+
+.vu-dot.on {
+    background: var(--adonai-orange);
+    box-shadow: 0 0 4px var(--adonai-orange);
+}
+
+/* Eucharist Section */
+#eucaristia {
+    background: var(--adonai-sand);
     padding: 100px 20px;
     width: 100%;
     box-sizing: border-box;
-    overflow: hidden;
-}
-
-#pregacoes>div {
-    max-width: 1100px;
-    margin: 0 auto;
-}
-
-#pregacoes h2 {
-    color: var(--adonai-charcoal);
-    font-size: clamp(3rem, 7vw, 6rem);
-    line-height: .85;
-    letter-spacing: -.06em;
-    max-width: 850px;
-}
-
-#pregacoes h3 {
-    color: var(--adonai-terracotta);
-    max-width: 800px;
-}
-
-#pregacoes .pregacao-tag {
-    background: var(--adonai-orange);
-    color: var(--adonai-charcoal);
-    border: 3px solid var(--adonai-charcoal);
-    border-radius: 2px;
-    box-shadow: 4px 4px 0 var(--adonai-charcoal);
-    padding: 14px 28px;
-    font-weight: 800;
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 1.05rem;
-}
-
-/* Eucaristia */
-#eucaristia {
-    background: linear-gradient(180deg, rgba(32, 32, 32, .88), rgba(32, 32, 32, .97)), url('https://www.festivaladonai.com.br/wp-content/uploads/2026/08/adonai_adoration_eucharist.jpg') center/cover no-repeat;
-    padding: clamp(80px, 10vw, 130px) clamp(20px, 4vw, 64px);
-    width: 100%;
-    box-sizing: border-box;
-    overflow: hidden;
 }
 
 .eucaristia-wrapper {
-    max-width: 1240px;
+    max-width: 1280px;
     margin: 0 auto;
-    text-align: center;
 }
 
 .eucaristia-badge {
-    color: var(--sziget-yellow);
+    display: inline-block;
+    background: var(--adonai-charcoal);
+    color: var(--adonai-orange);
+    border: 2px solid var(--adonai-orange);
     font-family: 'Space Grotesk', sans-serif;
     font-weight: 900;
-    letter-spacing: 3px;
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    padding: 6px 14px;
+    border-radius: 2px;
     text-transform: uppercase;
-    display: block;
-    font-size: 0.95rem;
+    margin-bottom: 14px;
+    box-shadow: 4px 4px 0 var(--adonai-terracotta);
 }
 
 .eucaristia-title {
-    color: var(--adonai-cream);
-    font-size: clamp(2.8rem, 6.5vw, 5.5rem);
-    line-height: .88;
-    letter-spacing: -.07em;
+    font-family: 'Montserrat', sans-serif;
+    color: var(--adonai-charcoal);
+    font-size: clamp(2.8rem, 6vw, 5rem);
     font-weight: 900;
-    margin: 15px 0 45px 0;
+    letter-spacing: -.05em;
+    line-height: .95;
+    margin: 10px 0 40px 0;
+    text-transform: uppercase;
 }
 
 .eucaristia-content-grid {
     display: grid;
     grid-template-columns: 1.1fr 0.9fr;
-    gap: clamp(24px, 4vw, 48px);
+    gap: 32px;
     align-items: center;
-    max-width: 1100px;
-    margin: 0 auto;
 }
 
 .eucaristia-quote-card {
-    background: var(--adonai-cream);
-    border-left: 8px solid var(--adonai-orange);
-    border-radius: 0;
-    box-shadow: 10px 10px 0 var(--adonai-terracotta);
-    padding: clamp(28px, 4vw, 42px);
-    text-align: left;
+    background: var(--adonai-charcoal);
+    border: 4px solid var(--adonai-terracotta);
+    box-shadow: 10px 10px 0 var(--adonai-charcoal);
+    padding: 44px 36px;
+    border-radius: 2px;
 }
 
 .eucaristia-quote-text {
-    color: var(--adonai-charcoal);
-    font-size: clamp(1.15rem, 1.8vw, 1.35rem);
-    line-height: 1.8;
-    font-weight: 500;
-    margin: 0;
-    font-style: italic;
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(1.2rem, 2.2vw, 1.6rem);
+    font-weight: 600;
+    color: var(--adonai-cream);
+    line-height: 1.55;
+    margin: 0 0 16px 0;
 }
 
 .eucaristia-author {
-    color: var(--adonai-terracotta);
-    font-size: 1.05rem;
-    margin-top: 20px;
-    margin-bottom: 0;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 2px;
+    color: var(--adonai-orange);
     font-family: 'Space Grotesk', sans-serif;
+    font-weight: 800;
+    font-size: 0.95rem;
+    letter-spacing: 1px;
+    margin: 0;
 }
 
 .eucaristia-img-wrap {
-    height: 300px;
-    border: 4px solid var(--adonai-orange);
+    border: 4px solid var(--adonai-charcoal);
     box-shadow: 10px 10px 0 var(--adonai-terracotta);
-    overflow: hidden;
     border-radius: 2px;
-    background: #000;
+    overflow: hidden;
+    max-height: 380px;
 }
 
 .eucaristia-img-wrap img {
@@ -731,247 +1043,360 @@
     height: 100%;
     object-fit: cover;
     display: block;
-    transition: transform 0.4s ease;
 }
 
-.eucaristia-img-wrap:hover img {
-    transform: scale(1.04);
-}
-
-@media (max-width: 860px) {
-    .eucaristia-content-grid {
-        grid-template-columns: 1fr;
-        gap: 32px;
-    }
-
-    .eucaristia-img-wrap {
-        height: 260px;
-    }
-}
-
-/* Gallery Grid */
+/* Gallery Grid Section */
 .adonai-gallery {
     width: 100%;
-    max-width: none;
-    margin: 0;
     padding: 100px clamp(20px, 3vw, 56px);
     box-sizing: border-box;
     text-align: left;
     background: var(--adonai-sand);
 }
 
-.adonai-gallery>span,
-.adonai-gallery>h2 {
-    display: block;
-    width: 100%;
-    max-width: 1440px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
 .adonai-gallery-grid {
     width: 100%;
-    max-width: 1440px;
+    max-width: 1280px;
     margin: 0 auto;
     display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    grid-template-rows: repeat(8, 185px);
-    grid-auto-rows: 185px;
-    gap: clamp(16px, 1.3vw, 24px);
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: 240px;
+    gap: 18px;
 }
 
 .adonai-gallery-grid>div {
-    width: 100%;
-    height: 100%;
-    min-height: 0;
-    box-sizing: border-box;
     overflow: hidden;
     border: 3px solid var(--adonai-charcoal);
     border-radius: 2px;
-    box-shadow: 8px 8px 0 var(--adonai-charcoal);
-    transition: transform 0.3s ease;
+    box-shadow: 6px 6px 0 var(--adonai-charcoal);
+    transition: transform 0.25s ease;
 }
 
 .adonai-gallery-grid>div:hover {
-    transform: scale(1.02);
-}
-
-.adonai-gallery-grid>div:nth-child(1) {
-    grid-column: 1 / 8;
-    grid-row: 1 / 3;
-}
-
-.adonai-gallery-grid>div:nth-child(2) {
-    grid-column: 8 / 13;
-    grid-row: 1 / 2;
-}
-
-.adonai-gallery-grid>div:nth-child(3) {
-    grid-column: 8 / 13;
-    grid-row: 2 / 4;
-}
-
-.adonai-gallery-grid>div:nth-child(4) {
-    grid-column: 1 / 8;
-    grid-row: 3 / 4;
-}
-
-.adonai-gallery-grid>div:nth-child(5) {
-    grid-column: 1 / 6;
-    grid-row: 4 / 6;
-}
-
-.adonai-gallery-grid>div:nth-child(6) {
-    grid-column: 6 / 13;
-    grid-row: 4 / 5;
-}
-
-.adonai-gallery-grid>div:nth-child(7) {
-    grid-column: 6 / 13;
-    grid-row: 5 / 6;
-}
-
-.adonai-gallery-grid>div:nth-child(8) {
-    grid-column: 1 / 8;
-    grid-row: 6 / 8;
-}
-
-.adonai-gallery-grid>div:nth-child(9) {
-    grid-column: 8 / 13;
-    grid-row: 6 / 7;
-}
-
-.adonai-gallery-grid>div:nth-child(10) {
-    grid-column: 8 / 13;
-    grid-row: 7 / 8;
-}
-
-.adonai-gallery-grid>div:nth-child(11) {
-    grid-column: 1 / 6;
-    grid-row: 8 / 9;
-}
-
-.adonai-gallery-grid>div:nth-child(12) {
-    grid-column: 6 / 13;
-    grid-row: 8 / 9;
+    transform: scale(1.03);
 }
 
 .adonai-gallery-grid img {
-    display: block;
     width: 100%;
     height: 100%;
-    min-height: 100%;
     object-fit: cover;
+    display: block;
 }
 
-/* Sziget Tickets Passes Section */
-#ingressos {
+/* Soundboard Tickets Section */
+.soundboard-tickets-section {
     width: 100%;
     box-sizing: border-box;
     background: var(--adonai-sand);
     color: var(--adonai-charcoal);
-    text-align: left;
-    padding: 110px clamp(20px, 4vw, 64px);
-    overflow: hidden;
+    padding: 100px clamp(20px, 4vw, 64px);
 }
 
-#ingressos>h2 {
+.adonai-tickets-header {
+    text-align: center;
+    max-width: 900px;
+    margin: 0 auto 36px auto;
+}
+
+.adonai-tickets-title {
+    font-family: 'Montserrat', sans-serif;
     color: var(--adonai-charcoal);
-    font-size: clamp(3rem, 7vw, 6rem);
-    line-height: .85;
-    letter-spacing: -.06em;
-    max-width: 1440px;
-    margin-left: auto;
-    margin-right: auto;
+    font-size: clamp(2.8rem, 6vw, 5rem);
+    line-height: .92;
+    letter-spacing: -.05em;
+    font-weight: 900;
+    margin: 10px 0 14px 0;
+    text-transform: uppercase;
 }
 
-#ingressos>p,
-#ingressos>span {
+.adonai-tickets-lead {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.15rem;
     color: var(--adonai-brown);
-    max-width: 1440px;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
+    margin: 0;
+    line-height: 1.65;
 }
 
-#ingressos>div:has(.sziget-pass-card) {
-    width: 100%;
-    max-width: 1440px;
-    margin: 40px auto 0 auto;
+.rack-master-bus {
+    max-width: 1280px;
+    margin: 0 auto 40px auto;
+    background: var(--adonai-charcoal);
+    border: 3px solid var(--adonai-orange);
+    padding: 20px 24px;
+    border-radius: 2px;
+    box-shadow: 6px 6px 0 var(--adonai-terracotta);
+    color: var(--adonai-cream);
+}
+
+.adonai-inclusions-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    border-bottom: 1px solid rgba(247, 148, 45, 0.3);
+    padding-bottom: 8px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.master-bus-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 900;
+    color: var(--adonai-orange);
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+}
+
+.master-bus-code {
+    font-family: 'Space Grotesk', monospace;
+    font-size: 0.72rem;
+    color: var(--adonai-cream);
+    opacity: 0.8;
+}
+
+.adonai-inclusions-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(320px, 1fr));
-    align-items: stretch;
-    gap: clamp(16px, 2.2vw, 28px);
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px 18px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.92rem;
+    font-weight: 600;
 }
 
-.sziget-pass-card {
+.soundboard-rack-grid {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    align-items: stretch;
+}
+
+.rack-channel-card {
     background: var(--adonai-cream);
-    border: 3px dashed var(--adonai-charcoal);
-    border-radius: 0;
-    box-shadow: 9px 9px 0 var(--adonai-charcoal);
-    text-align: left;
-    padding: 36px 30px;
+    border: 3px solid var(--adonai-charcoal);
+    border-radius: 2px;
+    box-shadow: 8px 8px 0 var(--adonai-charcoal);
+    padding: 28px 24px 34px;
     display: flex;
     flex-direction: column;
     position: relative;
+    transition: transform 0.2s ease;
 }
 
-.sziget-pass-card:nth-child(2) {
+.rack-channel-card.featured {
     background: var(--adonai-orange);
-    transform: translateY(-14px);
-    border-color: var(--adonai-terracotta);
+    border-color: var(--adonai-charcoal);
+    transform: translateY(-8px);
+    box-shadow: 10px 10px 0 var(--adonai-charcoal);
 }
 
-.sziget-pass-card:nth-child(3) {
-    background: var(--adonai-cream);
+.rack-channel-card:hover {
+    transform: translateY(-6px);
 }
 
-.sziget-pass-card span.pass-badge {
+.rack-channel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+    padding-bottom: 6px;
+    margin-bottom: 14px;
+}
+
+.channel-id {
+    font-family: 'Space Grotesk', monospace;
+    font-size: 0.72rem;
+    font-weight: 900;
+    color: var(--adonai-charcoal);
+    letter-spacing: 1px;
+}
+
+.pass-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    gap: 8px;
+}
+
+.pass-badge {
     background: var(--adonai-charcoal);
     color: var(--adonai-cream);
     font-family: 'Space Grotesk', sans-serif;
     font-weight: 900;
-    font-size: 0.75rem;
-    padding: 6px 16px;
+    font-size: 0.72rem;
+    padding: 5px 10px;
     border-radius: 2px;
     text-transform: uppercase;
-    letter-spacing: 2px;
-    width: fit-content;
+    letter-spacing: 1px;
 }
 
-.sziget-pass-card h3 {
-    font-size: clamp(1.55rem, 1.8vw, 2rem);
-    line-height: 1.05;
+.pass-badge.highlight {
+    background: var(--adonai-terracotta);
+    color: #ffffff;
+}
+
+.pass-badge.duo {
+    background: var(--adonai-charcoal);
+    color: var(--adonai-orange);
+}
+
+.pass-urgency-tag, .pass-stock-tag, .pass-save-tag {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 900;
+    padding: 4px 8px;
+    border-radius: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.pass-urgency-tag {
+    background: #fee2e2;
+    color: #b91c1c;
+    border: 1.5px solid #ef4444;
+}
+
+.pass-stock-tag {
+    background: var(--adonai-cream);
+    color: var(--adonai-charcoal);
+    border: 1.5px solid var(--adonai-charcoal);
+}
+
+.pass-save-tag {
+    background: var(--adonai-charcoal);
+    color: var(--adonai-cream);
+    border: 1.5px solid var(--adonai-charcoal);
+}
+
+.pass-card-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.65rem;
     font-weight: 900;
     color: var(--adonai-charcoal);
-    margin: 20px 0 10px 0;
+    margin: 0 0 10px 0;
+    line-height: 1.1;
+    text-transform: uppercase;
 }
 
-.sziget-pass-card p,
-.sziget-pass-card li,
-.sziget-pass-card div {
+.pass-card-subtitle {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.94rem;
+    line-height: 1.55;
+    color: var(--adonai-brown);
+    margin: 0 0 18px 0;
+    min-height: 42px;
+}
+
+.pass-highlight-box {
+    padding: 10px 12px;
+    border-radius: 2px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    font-family: 'Space Grotesk', sans-serif;
+}
+
+.pass-highlight-box.veteran-box {
+    background: rgba(201, 76, 34, 0.12);
+    border: 1.5px solid var(--adonai-terracotta);
+    color: var(--adonai-terracotta);
+}
+
+.pass-highlight-box.single-box {
+    background: rgba(32, 32, 32, 0.08);
+    border: 1.5px solid var(--adonai-charcoal);
     color: var(--adonai-charcoal);
 }
 
-.sziget-pass-card .btn-sziget-primary {
+.pass-highlight-box.duo-box {
+    background: var(--adonai-cream);
+    border: 2px solid var(--adonai-charcoal);
+    color: var(--adonai-charcoal);
+}
+
+.rack-price-box {
+    margin-bottom: 20px;
+}
+
+.pass-price-val {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 3rem;
+    font-weight: 900;
+    color: var(--adonai-charcoal);
+    line-height: 1;
+}
+
+.pass-price-label {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--adonai-charcoal);
+    margin-top: 4px;
+}
+
+.pass-features-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 26px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--adonai-charcoal);
+}
+
+.stompbox-btn {
     width: 100%;
     margin-top: auto;
     text-align: center;
+    box-sizing: border-box;
 }
 
 .turma-adonai-box {
-    max-width: 900px;
-    margin: 60px auto 0 auto;
-    padding: 25px;
+    max-width: 1000px;
+    margin: 50px auto 0 auto;
+    padding: 28px 32px;
     background: var(--adonai-charcoal);
     border: 3px solid var(--adonai-orange);
-    border-radius: 0;
+    border-radius: 2px;
     color: var(--adonai-cream);
     box-shadow: 7px 7px 0 var(--adonai-terracotta);
+    text-align: center;
 }
 
-.turma-adonai-box * {
+.turma-adonai-badge {
+    display: inline-block;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 900;
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    color: var(--adonai-orange);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.turma-adonai-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: #ffffff;
+    margin: 0 0 10px 0;
+}
+
+.turma-adonai-desc {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    line-height: 1.65;
     color: var(--adonai-cream);
+    margin: 0;
 }
 
 /* FAQ Section */
@@ -986,12 +1411,15 @@
 }
 
 #duvidas h2 {
+    font-family: 'Montserrat', sans-serif;
     color: var(--adonai-cream);
-    font-size: clamp(3rem, 7vw, 6rem);
-    line-height: .85;
-    letter-spacing: -.06em;
+    font-size: clamp(2.8rem, 6vw, 5rem);
+    line-height: .9;
+    letter-spacing: -.05em;
     max-width: 960px;
     margin: 0 auto 40px auto;
+    text-transform: uppercase;
+    font-weight: 900;
 }
 
 #duvidas>div {
@@ -1026,140 +1454,105 @@
 
 #duvidas details p {
     margin: 14px 0 0;
+    font-family: 'Inter', sans-serif;
     color: var(--adonai-cream);
     font-size: 1.05rem;
-    line-height: 1.6;
+    line-height: 1.65;
 }
 
-/* Responsive Overrides */
+/* Responsive Rules */
 @media (max-width: 1100px) {
-    #ingressos>div:has(.sziget-pass-card) {
+    .adonai-pillars-grid {
         grid-template-columns: 1fr;
-        max-width: 620px;
     }
 
-    #ingressos .sziget-pass-card:nth-child(2) {
+    .adonai-preaching-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .soundboard-rack-grid {
+        grid-template-columns: 1fr;
+        max-width: 580px;
+    }
+
+    .rack-channel-card.featured {
         transform: none;
+    }
+
+    .adonai-inclusions-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
 @media (max-width: 980px) {
-    .adonai-editorial-grid {
+    .adonai-editorial-bottom {
         grid-template-columns: 1fr;
-        gap: 48px;
+    }
+
+    .eucaristia-content-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .holi-container {
+        grid-template-columns: 1fr;
     }
 
     .adonai-gallery-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        grid-template-rows: none;
-        grid-auto-rows: 280px;
-    }
-
-    .adonai-gallery-grid>div:nth-child(n) {
-        grid-column: auto;
-        grid-row: auto;
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
 @media (max-width: 768px) {
     .sziget-floating-bar {
         top: auto;
-        bottom: 15px;
+        bottom: 12px;
         right: 50%;
         transform: translateX(50%);
         flex-direction: row;
-        padding: 10px 14px;
+        padding: 8px 12px;
         border-radius: 2px;
-        width: calc(100% - 28px);
+        width: calc(100% - 24px);
         max-width: 440px;
         justify-content: space-around;
-        box-shadow: 5px 5px 0 var(--adonai-terracotta);
+        box-shadow: 4px 4px 0 var(--adonai-terracotta);
     }
 
-    .sziget-countdown-bar {
+    .rack-console-bar {
         justify-content: center;
         text-align: center;
     }
 
-    .sziget-hero {
-        min-height: 980px;
-        display: flex;
-        align-items: flex-start;
-        text-align: left;
-        padding: 70px 24px 90px;
+    .rack-status-indicator {
+        width: 100%;
+        justify-content: center;
     }
 
-    .sziget-hero::before {
-        top: auto;
-        right: 0;
-        bottom: 3%;
-        width: 88vw;
-        height: 500px;
-    }
-
-    .sziget-hero::after {
-        width: 75vw;
-        height: 420px;
-        top: auto;
-        bottom: 7%;
-        right: 7%;
-    }
-
-    .sziget-hero>.adonai-hero-shape-bottom {
-        right: -12%;
-        bottom: 1%;
-        width: 105vw;
-        height: 190px;
-    }
-
-    .sziget-hero>.adonai-hero-shape-accent {
-        right: 58%;
-        bottom: 5%;
-        width: 34vw;
-        height: 110px;
+    .soundboard-hero {
+        min-height: 720px;
+        padding: 60px 20px 80px;
     }
 
     .sziget-hero-title {
-        font-size: clamp(3.8rem, 16vw, 6.5rem);
+        font-size: clamp(3.2rem, 14vw, 5.5rem);
     }
 
     #experiencia>div {
         grid-template-columns: 1fr;
     }
 
-    .sziget-stage-card:nth-child(2),
-    .sziget-stage-card:nth-child(3),
-    .sziget-stage-card:nth-child(4) {
-        transform: none;
-    }
-
-    #holi {
-        padding: 60px 20px;
-    }
-}
-
-@media (max-width: 560px) {
-    .ato-gallery-grid {
+    .adonai-preaching-grid {
         grid-template-columns: 1fr;
     }
 
-    .ato-step-item {
-        padding-left: 24px;
-        padding-bottom: 26px;
-    }
-
-    .adonai-gallery {
-        padding: 72px 18px;
-    }
-
-    .adonai-gallery-grid {
+    .adonai-inclusions-grid {
         grid-template-columns: 1fr;
-        gap: 18px;
     }
 
-    .adonai-gallery-grid>div:nth-child(n) {
-        grid-column: auto;
-        grid-row: auto;
-        height: 240px;
+    .adonai-editorial-photos {
+        grid-template-columns: 1fr;
+    }
+
+    .adonai-photo-item {
+        height: 180px;
     }
 }

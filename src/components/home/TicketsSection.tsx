@@ -3,299 +3,164 @@ import { Link } from 'react-router-dom'
 
 export const TicketsSection: React.FC = () => {
     return (
-        <section id="ingressos" aria-label="Ingressos e Passaportes Adonai">
-            <span
-                style={{
-                    color: 'var(--sziget-brown)',
-                    fontFamily: "'Space Grotesk', sans-serif",
-                    fontWeight: 900,
-                    letterSpacing: '3px',
-                    textTransform: 'uppercase',
-                }}
-            >
-                ESCOLHA SUA EXPERIÊNCIA
-            </span>
+        <section id="ingressos" aria-label="Ingressos e Passaportes Adonai" className="adonai-tickets-section soundboard-tickets-section">
+            <div className="adonai-tickets-header">
+                <span className="adonai-section-badge">
+                    🎛️ SELETOR DE CANAIS & PASSAPORTES
+                </span>
+                <h2 className="adonai-tickets-title">
+                    GARANTA SEU PASSAPORTE ADONAI
+                </h2>
+                <p className="adonai-tickets-lead">
+                    Selecione o seu canal de acesso ao festival. Três experiências configuradas para você viver o maior retiro da sua vida.
+                </p>
+            </div>
 
-            <h2>GARANTA SEU PASSAPORTE ADONAI</h2>
+            {/* BARRA UNIFICADA: MASTER BUS INCLUSIONS */}
+            <div className="adonai-inclusions-bar rack-master-bus">
+                <div className="adonai-inclusions-header">
+                    <div className="master-bus-title">
+                        <span className="pilot-led-green" />
+                        <span>MASTER INCLUSIONS • INCLUSO EM TODOS OS PASSAPORTES</span>
+                    </div>
+                    <span className="master-bus-code">SIGNAL: 100% COVERED</span>
+                </div>
+                <div className="adonai-inclusions-grid">
+                    <span>⛺ 3 Dias de Festival</span>
+                    <span>🍽️ Alimentação Completa</span>
+                    <span>🎨 1 Kit Holi (Festa das Cores)</span>
+                    <span>👕 Camiseta Oficial 2026</span>
+                    <span>🏷️ Crachá de Acesso</span>
+                    <span>🎸 Todos os Shows & Pregações</span>
+                    <span>📸 Álbum de Fotos Oficial</span>
+                    <span>🎁 Benefício Surpresa no Evento</span>
+                </div>
+            </div>
 
-            <p style={{ fontSize: '1.15rem', lineHeight: 1.6, margin: '15px auto 40px auto' }}>
-                Três formas de viver o ADONAI. Escolha a sua e venha fazer parte dessa experiência transformadora.
-            </p>
-
-            <div>
-                {/* CARD 1: ADONAI ESSENCIAL - PRÉ-CONVITE */}
-                <div className="sziget-pass-card">
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '6px' }}>
-                        <span className="pass-badge">
-                            🎟️ PRÉ-CONVITE
-                        </span>
-                        <span style={{ fontSize: '0.75rem', fontWeight: 900, color: '#b91c1c', background: '#fee2e2', border: '1.5px solid #ef4444', padding: '3px 8px', borderRadius: '3px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                            ⏰ Válido só até 31/08
-                        </span>
+            {/* RACK DE 3 CANAIS DE PASSAPORTE */}
+            <div className="adonai-tickets-grid soundboard-rack-grid">
+                {/* CANAL 01: ADONAI ESSENCIAL (VETERANOS) */}
+                <div className="sziget-pass-card rack-channel-card">
+                    <div className="rack-channel-header">
+                        <div className="channel-id">CH-01 • VETERAN GAIN</div>
+                        <span className="pilot-led-amber" title="Lote exclusivo" />
                     </div>
 
-                    <h3>ADONAI ESSENCIAL</h3>
+                    <div className="pass-card-header">
+                        <span className="pass-badge">🎟️ PRÉ-CONVITE</span>
+                        <span className="pass-urgency-tag">⏰ ATÉ 31/08</span>
+                    </div>
 
-                    <p style={{ fontSize: '1rem', marginBottom: '12px', minHeight: '44px' }}>
-                        Para quem não quer apenas participar. Quer viver tudo.
+                    <h3 className="pass-card-title">ADONAI ESSENCIAL</h3>
+                    <p className="pass-card-subtitle">
+                        Exclusivo para quem participou do Retiro de Carnaval e quer garantir a vaga com benefício antecipado.
                     </p>
 
-                    <div
-                        style={{
-                            background: '#fef2f2',
-                            border: '1.5px solid #ef4444',
-                            borderRadius: '4px',
-                            padding: '8px 10px',
-                            marginBottom: '10px',
-                            color: '#b91c1c',
-                            fontSize: '0.82rem',
-                            fontWeight: 900,
-                            lineHeight: 1.35,
-                            fontFamily: "'Space Grotesk', sans-serif",
-                            textAlign: 'center',
-                        }}
-                    >
-                        🚨 Este PRÉ-CONVITE é válido só até dia 31/08
+                    <div className="pass-highlight-box veteran-box">
+                        ⚡ <strong>50% OFF</strong> para quem esteve no Retiro de Carnaval!
                     </div>
 
-                    <div
-                        style={{
-                            background: 'rgba(201, 76, 34, 0.12)',
-                            border: '1.5px solid var(--adonai-terracotta)',
-                            borderRadius: '2px',
-                            padding: '8px 10px',
-                            marginBottom: '16px',
-                            color: 'var(--adonai-terracotta)',
-                            fontSize: '0.82rem',
-                            fontWeight: 800,
-                            lineHeight: 1.35,
-                            fontFamily: "'Space Grotesk', sans-serif",
-                        }}
-                    >
-                        ⚡ Participou do Retiro de Carnaval? Sua inscrição está perfeita: confirme seus dados e pague metade!
+                    <div className="pass-price-box rack-price-box">
+                        <div className="pass-price-val">R$ 50</div>
+                        <div className="pass-price-label">PRE-ORDER GAIN (50% OFF)</div>
                     </div>
 
-                    <div style={{ marginBottom: '20px' }}>
-                        <div
-                            style={{
-                                color: 'var(--adonai-terracotta)',
-                                fontSize: '2.8rem',
-                                fontWeight: 900,
-                                fontFamily: "'Space Grotesk', sans-serif",
-                                lineHeight: 1,
-                            }}
-                        >
-                            R$ 50
-                        </div>
-                        <span style={{ fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--adonai-charcoal)' }}>
-                            CONVITE ESPECIAL (50% OFF)
-                        </span>
+                    <div className="pass-features-summary">
+                        <div className="pass-summary-item">✅ Vaga individual garantida</div>
+                        <div className="pass-summary-item">✅ 1 Kit Holi + Camiseta Oficial</div>
+                        <div className="pass-summary-item">✅ Desconto exclusivo de veterano</div>
                     </div>
 
-                    <ul
-                        style={{
-                            listStyle: 'none',
-                            padding: 0,
-                            margin: '0 0 30px 0',
-                            fontSize: '0.98rem',
-                            lineHeight: 1.9,
-                        }}
-                    >
-                        <li>✅ Acesso aos 3 dias do ADONAI</li>
-                        <li>✅ Alimentação durante os 3 dias</li>
-                        <li>✅ 1 Kit Holi</li>
-                        <li>✅ Todas as pregações</li>
-                        <li>✅ Todos os eventos</li>
-                        <li>✅ Praça de alimentação e estandes</li>
-                        <li>✅ Camiseta Oficial ADONAI</li>
-                        <li>✅ Crachá Especial ADONAI</li>
-                        <li>✅ Acesso ao Álbum de fotos</li>
-                        <li>✅ Foto Experience especial</li>
-                        <li>
-                            🎁 <strong>Benefício surpresa durante o ADONAI</strong>
-                        </li>
-                    </ul>
-
-                    <Link to="/inscricao?pacote=essencial" className="btn-sziget-primary">
+                    <Link to="/inscricao?pacote=essencial" className="btn-sziget-primary stompbox-btn">
                         CONFIRMAR MINHA VAGA
                     </Link>
                 </div>
 
-                {/* CARD 2: ADONAI EXPERIENCE */}
-                <div className="sziget-pass-card">
-                    <span className="pass-badge" style={{ background: 'var(--adonai-charcoal)', color: '#fff' }}>
-                        🔥 PRIMEIRA VEZ SOZINHO
-                    </span>
+                {/* CANAL 02: ADONAI EXPERIENCE (INDIVIDUAL) */}
+                <div className="sziget-pass-card rack-channel-card">
+                    <div className="rack-channel-header">
+                        <div className="channel-id">CH-02 • SOLO EXPERIENCE</div>
+                        <span className="pilot-led-green active" title="Lote Aberto" />
+                    </div>
 
-                    <h3>ADONAI EXPERIENCE</h3>
+                    <div className="pass-card-header">
+                        <span className="pass-badge highlight">🔥 INDIVIDUAL</span>
+                        <span className="pass-stock-tag">1º LOTE</span>
+                    </div>
 
-                    <p style={{ fontSize: '1rem', marginBottom: '12px', minHeight: '44px' }}>
-                        Para quem não quer apenas participar. Quer viver tudo.
+                    <h3 className="pass-card-title">ADONAI EXPERIENCE</h3>
+                    <p className="pass-card-subtitle">
+                        Para quem vai viver a experiência pela primeira vez ou participar de forma independente.
                     </p>
 
-                    <div
-                        style={{
-                            background: 'rgba(32, 32, 32, 0.08)',
-                            border: '1.5px solid var(--adonai-charcoal)',
-                            borderRadius: '2px',
-                            padding: '8px 10px',
-                            marginBottom: '16px',
-                            color: 'var(--adonai-charcoal)',
-                            fontSize: '0.82rem',
-                            fontWeight: 800,
-                            lineHeight: 1.35,
-                            fontFamily: "'Space Grotesk', sans-serif",
-                            textAlign: 'center',
-                        }}
-                    >
-                        EXPERIÊNCIA COMPLETA INDIVIDUAL
+                    <div className="pass-highlight-box single-box">
+                        🎒 <strong>EXPERIÊNCIA COMPLETA</strong>: Tudo incluso nos 3 dias.
                     </div>
 
-                    <div style={{ marginBottom: '20px' }}>
-                        <div
-                            style={{
-                                color: 'var(--adonai-charcoal)',
-                                fontSize: '2.8rem',
-                                fontWeight: 900,
-                                fontFamily: "'Space Grotesk', sans-serif",
-                                lineHeight: 1,
-                            }}
-                        >
-                            R$ 100
-                        </div>
-                        <span style={{ fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--adonai-charcoal)' }}>
-                            PRIMEIRA VEZ SOZINHO
-                        </span>
+                    <div className="pass-price-box rack-price-box">
+                        <div className="pass-price-val">R$ 100</div>
+                        <div className="pass-price-label">FULL SOLO PASS (ALL INCLUSIVE)</div>
                     </div>
 
-                    <ul
-                        style={{
-                            listStyle: 'none',
-                            padding: 0,
-                            margin: '0 0 30px 0',
-                            fontSize: '0.98rem',
-                            lineHeight: 1.9,
-                        }}
-                    >
-                        <li>✅ Acesso aos 3 dias do ADONAI</li>
-                        <li>✅ Alimentação durante os 3 dias</li>
-                        <li>✅ 1 Kit Holi</li>
-                        <li>✅ Todas as pregações</li>
-                        <li>✅ Todos os eventos</li>
-                        <li>✅ Praça de alimentação e estandes</li>
-                        <li>✅ Camiseta Oficial ADONAI</li>
-                        <li>✅ Crachá Especial ADONAI</li>
-                        <li>✅ Acesso ao Álbum de fotos</li>
-                        <li>✅ Foto Experience especial</li>
-                        <li>
-                            🎁 <strong>Benefício surpresa durante o ADONAI</strong>
-                        </li>
-                    </ul>
+                    <div className="pass-features-summary">
+                        <div className="pass-summary-item">✅ 1 Inscrição Individual Completa</div>
+                        <div className="pass-summary-item">✅ Alimentação, Alojamento e Shows</div>
+                        <div className="pass-summary-item">✅ 1 Kit Holi + Camiseta Oficial</div>
+                    </div>
 
-                    <Link to="/inscricao?pacote=experience" className="btn-sziget-primary">
+                    <Link to="/inscricao?pacote=experience" className="btn-sziget-primary stompbox-btn">
                         QUERO A EXPERIÊNCIA COMPLETA
                     </Link>
                 </div>
 
-                {/* CARD 3: ADONAI DUO */}
-                <div className="sziget-pass-card">
-                    <span className="pass-badge">
-                        🤝 PRIMEIRA VEZ COM AMIGO
-                    </span>
+                {/* CANAL 03: ADONAI DUO (VOCÊ + 1 AMIGO) */}
+                <div className="sziget-pass-card rack-channel-card featured">
+                    <div className="rack-channel-header">
+                        <div className="channel-id">CH-03 • DUAL LINK MODE</div>
+                        <span className="pilot-led-orange active-pulse" title="Mais Recomendado" />
+                    </div>
 
-                    <h3>ADONAI DUO</h3>
+                    <div className="pass-card-header">
+                        <span className="pass-badge duo">🤝 MELHOR ESCOLHA</span>
+                        <span className="pass-save-tag">SAVE R$ 80</span>
+                    </div>
 
-                    <p style={{ fontSize: '1rem', marginBottom: '12px', minHeight: '44px' }}>
-                        Porque experiência boa é experiência compartilhada.
+                    <h3 className="pass-card-title">ADONAI DUO</h3>
+                    <p className="pass-card-subtitle">
+                        Porque a melhor experiência é compartilhada com quem caminha ao seu lado.
                     </p>
 
-                    <div
-                        style={{
-                            background: 'rgba(32, 32, 32, 0.08)',
-                            border: '1.5px solid var(--adonai-charcoal)',
-                            borderRadius: '2px',
-                            padding: '8px 10px',
-                            marginBottom: '16px',
-                            color: 'var(--adonai-charcoal)',
-                            fontSize: '0.82rem',
-                            fontWeight: 900,
-                            lineHeight: 1.35,
-                            fontFamily: "'Space Grotesk', sans-serif",
-                            textAlign: 'center',
-                        }}
-                    >
-                        APENAS R$ 60 POR PESSOA
+                    <div className="pass-highlight-box duo-box">
+                        👥 <strong>APENAS R$ 60 POR PESSOA</strong> no pacote para 2 amigos!
                     </div>
 
-                    <div style={{ marginBottom: '20px' }}>
-                        <div
-                            style={{
-                                color: 'var(--adonai-terracotta)',
-                                fontSize: '2.8rem',
-                                fontWeight: 900,
-                                fontFamily: "'Space Grotesk', sans-serif",
-                                lineHeight: 1,
-                            }}
-                        >
-                            R$ 120
-                        </div>
-                        <span style={{ fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--adonai-charcoal)' }}>
-                            PARA 2 PESSOAS (VOCÊ + 1)
-                        </span>
+                    <div className="pass-price-box rack-price-box">
+                        <div className="pass-price-val">R$ 120</div>
+                        <div className="pass-price-label">TOTAL FOR 2 PERSONS (R$ 60/EACH)</div>
                     </div>
 
-                    <ul
-                        style={{
-                            listStyle: 'none',
-                            padding: 0,
-                            margin: '0 0 30px 0',
-                            fontSize: '0.98rem',
-                            lineHeight: 1.9,
-                        }}
-                    >
-                        <li>✅ Acesso aos 3 dias do ADONAI</li>
-                        <li>✅ Alimentação durante os 3 dias</li>
-                        <li>✅ 2 Kits Holi</li>
-                        <li>✅ Todas as pregações</li>
-                        <li>✅ Todos os eventos</li>
-                        <li>✅ Praça de alimentação e estandes</li>
-                        <li>✅ 2 Camisetas Oficiais ADONAI</li>
-                        <li>✅ 2 Crachás Especiais ADONAI</li>
-                        <li>✅ Acesso ao Álbum de fotos</li>
-                        <li>✅ Foto Experience especial</li>
-                        <li>
-                            🎁 <strong>Benefício surpresa durante o ADONAI</strong>
-                        </li>
-                    </ul>
+                    <div className="pass-features-summary">
+                        <div className="pass-summary-item">✅ 2 Inscrições Completas (Você + 1)</div>
+                        <div className="pass-summary-item">✅ 2 Camisetas Oficiais + 2 Kits Holi</div>
+                        <div className="pass-summary-item">✅ Economia máxima garantida</div>
+                    </div>
 
-                    <Link to="/inscricao?pacote=duo" className="btn-sziget-primary">
+                    <Link to="/inscricao?pacote=duo" className="btn-sziget-primary stompbox-btn">
                         CHAMAR MEU DUO
                     </Link>
                 </div>
             </div>
 
             {/* BENEFÍCIO EXTRA: TURMA ADONAI 2026 */}
-            <div className="turma-adonai-box">
-                <span
-                    style={{
-                        fontFamily: "'Space Grotesk', sans-serif",
-                        fontWeight: 900,
-                        textTransform: 'uppercase',
-                        letterSpacing: '2px',
-                        color: 'var(--adonai-orange)',
-                        display: 'block',
-                        marginBottom: '8px',
-                    }}
-                >
-                    🏆 TURMA ADONAI 2026
+            <div className="turma-adonai-box rack-accent-box">
+                <span className="turma-adonai-badge">
+                    🏆 MURAL DIGITAL OFICIAL • HALL OF FAME
                 </span>
-
-                <h3 style={{ fontSize: '1.6rem', margin: '0 0 10px 0', fontWeight: 900 }}>
-                    Faça parte da história.
+                <h3 className="turma-adonai-title">
+                    Faça parte da Turma ADONAI 2026
                 </h3>
-
-                <p style={{ fontSize: '1rem', margin: 0, lineHeight: 1.6 }}>
-                    Os primeiros inscritos farão parte da Turma ADONAI 2026 e terão seus nomes registrados no mural digital oficial desta edição.
+                <p className="turma-adonai-desc">
+                    Os primeiros inscritos terão seus nomes gravados no painel digital oficial desta edição comemorativa. Garanta sua inscrição antes da virada de lote!
                 </p>
             </div>
         </section>
