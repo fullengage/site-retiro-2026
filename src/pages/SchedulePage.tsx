@@ -1,88 +1,14 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
     Clock, Calendar, Sparkles, Utensils, Moon,
-    Sun, Heart, Church, CheckCircle2, ArrowRight
+    Sun, Heart, Church, CheckCircle2, ArrowRight, RefreshCw
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { scheduleService, FALLBACK_SCHEDULE } from '@/services/scheduleService'
+import { DaySchedule, ScheduleCategory } from '@/types/schedule'
 
-interface ScheduleItem {
-    time: string
-    title: string
-    category: 'welcome' | 'meal' | 'prayer' | 'activity' | 'break' | 'mass' | 'rest'
-    highlight?: boolean
-}
-
-interface DaySchedule {
-    id: string
-    dayName: string
-    date: string
-    subtitle: string
-    tag: string
-    color: string
-    events: ScheduleItem[]
-}
-
-const SCHEDULE_DATA: DaySchedule[] = [
-    {
-        id: 'sexta',
-        dayName: 'Sexta-feira',
-        date: '25 de Setembro de 2026',
-        subtitle: 'Acolhida & Início da Jornada',
-        tag: '25/09',
-        color: 'from-fuchsia-500 to-pink-600',
-        events: [
-            { time: '19h00', title: 'Acolhida e abertura do retiro', category: 'welcome', highlight: true },
-            { time: '20h30', title: 'Jantar', category: 'meal' },
-            { time: '21h30', title: 'Momento de oração e Adoração', category: 'prayer', highlight: true },
-            { time: '22h30', title: 'Lanche', category: 'meal' },
-            { time: '23h00', title: 'Banho e descanso', category: 'rest' }
-        ]
-    },
-    {
-        id: 'sabado',
-        dayName: 'Sábado',
-        date: '26 de Setembro de 2026',
-        subtitle: 'Imersão, Atividades & Celebração',
-        tag: '26/09',
-        color: 'from-amber-400 to-orange-500',
-        events: [
-            { time: '08h00', title: 'Recepção e café da manhã', category: 'meal' },
-            { time: '08h30', title: 'Início das atividades', category: 'activity', highlight: true },
-            { time: '10h25', title: 'Intervalo', category: 'break' },
-            { time: '12h30', title: 'Almoço', category: 'meal' },
-            { time: '14h30', title: 'Retorno das atividades', category: 'activity' },
-            { time: '16h50', title: 'Intervalo', category: 'break' },
-            { time: '20h00', title: 'Tempo livre e organização pessoal', category: 'rest' },
-            { time: '20h30', title: 'Jantar', category: 'meal' },
-            { time: '21h30', title: 'Adoração', category: 'prayer', highlight: true },
-            { time: '22h30', title: 'Lanche', category: 'meal' },
-            { time: '23h00', title: 'Banho e descanso', category: 'rest' }
-        ]
-    },
-    {
-        id: 'domingo',
-        dayName: 'Domingo',
-        date: '27 de Setembro de 2026',
-        subtitle: 'Ápice da Fé & Missa Solene',
-        tag: '27/09',
-        color: 'from-cyan-400 to-blue-600',
-        events: [
-            { time: '07h00', title: 'Despertar', category: 'rest' },
-            { time: '07h30', title: 'Café da manhã', category: 'meal' },
-            { time: '09h00', title: 'Início das atividades', category: 'activity' },
-            { time: '10h30', title: 'Intervalo', category: 'break' },
-            { time: '12h30', title: 'Almoço', category: 'meal' },
-            { time: '14h00', title: 'Retorno das atividades', category: 'activity' },
-            { time: '15h00', title: 'Santa Missa com Dom José', category: 'mass', highlight: true },
-            { time: '16h00', title: 'Intervalo', category: 'break' },
-            { time: '16h45', title: 'Retorno das atividades', category: 'activity' },
-            { time: 'Após as atividades', title: 'Encerramento previsto do retiro', category: 'welcome', highlight: true }
-        ]
-    }
-]
-
-const getCategoryBadge = (category: ScheduleItem['category']) => {
+const getCategoryBadge = (category: ScheduleCategory) => {
     switch (category) {
         case 'mass':
             return {
@@ -131,11 +57,26 @@ const getCategoryBadge = (category: ScheduleItem['category']) => {
 }
 
 export const SchedulePage: React.FC = () => {
+    const [days, setDays] = useState<DaySchedule[]>(FALLBACK_SCHEDULE)
     const [selectedTab, setSelectedTab] = useState<string>('todos')
+    const [loading, setLoading] = useState<boolean>(true)
+
+    useEffect(() => {
+        const fetchSchedule = async () => {
+            setLoading(true)
+            const { data } = await scheduleService.getSchedule()
+            if (data && data.length > 0) {
+                setDays(data)
+            }
+            setLoading(false)
+        }
+
+        fetchSchedule()
+    }, [])
 
     const displayedDays = selectedTab === 'todos'
-        ? SCHEDULE_DATA
-        : SCHEDULE_DATA.filter(day => day.id === selectedTab)
+        ? days
+        : days.filter(day => day.id === selectedTab)
 
     return (
         <div className="pt-28 pb-24 min-h-screen bg-[#060309] text-white relative overflow-hidden">
@@ -185,7 +126,7 @@ export const SchedulePage: React.FC = () => {
                         >
                             Todos os Dias
                         </button>
-                        {SCHEDULE_DATA.map(day => (
+                        {days.map(day => (
                             <button
                                 key={day.id}
                                 onClick={() => setSelectedTab(day.id)}
@@ -195,93 +136,100 @@ export const SchedulePage: React.FC = () => {
                                         : 'bg-white/5 text-gray-400 border-white/10 hover:bg-white/10 hover:text-white'
                                 }`}
                             >
-                                {day.dayName} ({day.tag})
+                                {day.day_name} ({day.tag})
                             </button>
                         ))}
                     </div>
                 </div>
 
                 {/* TIMELINE DE DIAS */}
-                <div className="space-y-16">
-                    <AnimatePresence mode="wait">
-                        {displayedDays.map((day, dayIdx) => (
-                            <motion.div
-                                key={day.id}
-                                initial={{ opacity: 0, y: 25 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -20 }}
-                                transition={{ duration: 0.4, delay: dayIdx * 0.1 }}
-                                className="bg-[#11071c]/80 backdrop-blur-xl border border-white/10 rounded-[2.5rem] p-6 sm:p-10 shadow-2xl relative overflow-hidden"
-                            >
-                                {/* Header do Card do Dia */}
-                                <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-8 mb-8 border-b border-white/10 gap-4">
-                                    <div className="flex items-center gap-4">
-                                        <div className="bg-gradient-to-r from-holi-primary to-purple-600 text-white font-marker text-2xl sm:text-3xl px-6 py-2.5 rounded-2xl shadow-lg border-2 border-black">
-                                            {day.tag}
+                {loading ? (
+                    <div className="py-24 text-center text-gray-400 font-mono flex flex-col items-center justify-center gap-3">
+                        <RefreshCw className="animate-spin text-holi-primary" size={32} />
+                        <p className="text-sm">Carregando programação...</p>
+                    </div>
+                ) : (
+                    <div className="space-y-16">
+                        <AnimatePresence mode="wait">
+                            {displayedDays.map((day, dayIdx) => (
+                                <motion.div
+                                    key={day.id}
+                                    initial={{ opacity: 0, y: 25 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -20 }}
+                                    transition={{ duration: 0.4, delay: dayIdx * 0.1 }}
+                                    className="bg-[#11071c]/80 backdrop-blur-xl border border-white/10 rounded-[2.5rem] p-6 sm:p-10 shadow-2xl relative overflow-hidden"
+                                >
+                                    {/* Header do Card do Dia */}
+                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-8 mb-8 border-b border-white/10 gap-4">
+                                        <div className="flex items-center gap-4">
+                                            <div className="bg-gradient-to-r from-holi-primary to-purple-600 text-white font-marker text-2xl sm:text-3xl px-6 py-2.5 rounded-2xl shadow-lg border-2 border-black">
+                                                {day.tag}
+                                            </div>
+                                            <div>
+                                                <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-white">
+                                                    {day.day_name}
+                                                </h2>
+                                                <p className="text-xs sm:text-sm text-gray-400 font-medium">
+                                                    {day.date_text} • <span className="text-holi-secondary">{day.subtitle}</span>
+                                                </p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-white">
-                                                {day.dayName}
-                                            </h2>
-                                            <p className="text-xs sm:text-sm text-gray-400 font-medium">
-                                                {day.date} • <span className="text-holi-secondary">{day.subtitle}</span>
-                                            </p>
+                                        <div className="text-xs font-mono uppercase text-gray-500 tracking-wider">
+                                            {day.events.length} HORÁRIOS PROGRAMADOS
                                         </div>
                                     </div>
-                                    <div className="text-xs font-mono uppercase text-gray-500 tracking-wider">
-                                        {day.events.length} HORÁRIOS PROGRAMADOS
-                                    </div>
-                                </div>
 
-                                {/* Lista de Horários */}
-                                <div className="space-y-3.5">
-                                    {day.events.map((event, eventIdx) => {
-                                        const badge = getCategoryBadge(event.category)
+                                    {/* Lista de Horários */}
+                                    <div className="space-y-3.5">
+                                        {day.events.map((event, eventIdx) => {
+                                            const badge = getCategoryBadge(event.category)
 
-                                        return (
-                                            <motion.div
-                                                key={eventIdx}
-                                                whileHover={{ scale: 1.01, x: 4 }}
-                                                className={`p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-6 border transition-all duration-300 ${
-                                                    event.highlight
-                                                        ? 'bg-white/10 border-holi-primary/40 shadow-lg shadow-holi-primary/10'
-                                                        : 'bg-black/40 border-white/5 hover:border-white/20'
-                                                }`}
-                                            >
-                                                {/* Horário + Ícone */}
-                                                <div className="flex items-center gap-3 shrink-0">
-                                                    <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-holi-secondary">
-                                                        <Clock size={18} />
+                                            return (
+                                                <motion.div
+                                                    key={event.id || eventIdx}
+                                                    whileHover={{ scale: 1.01, x: 4 }}
+                                                    className={`p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-6 border transition-all duration-300 ${
+                                                        event.highlight
+                                                            ? 'bg-white/10 border-holi-primary/40 shadow-lg shadow-holi-primary/10'
+                                                            : 'bg-black/40 border-white/5 hover:border-white/20'
+                                                    }`}
+                                                >
+                                                    {/* Horário + Ícone */}
+                                                    <div className="flex items-center gap-3 shrink-0">
+                                                        <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-holi-secondary">
+                                                            <Clock size={18} />
+                                                        </div>
+                                                        <span className="font-mono font-black text-lg sm:text-xl text-white tracking-tight min-w-[90px]">
+                                                            {event.time}
+                                                        </span>
                                                     </div>
-                                                    <span className="font-mono font-black text-lg sm:text-xl text-white tracking-tight min-w-[90px]">
-                                                        {event.time}
-                                                    </span>
-                                                </div>
 
-                                                {/* Título da Programação */}
-                                                <div className="flex-1">
-                                                    <h3 className={`text-base sm:text-lg font-bold uppercase tracking-wide ${
-                                                        event.highlight ? 'text-[#fff53c]' : 'text-gray-100'
-                                                    }`}>
-                                                        {event.title}
-                                                    </h3>
-                                                </div>
+                                                    {/* Título da Programação */}
+                                                    <div className="flex-1">
+                                                        <h3 className={`text-base sm:text-lg font-bold uppercase tracking-wide ${
+                                                            event.highlight ? 'text-[#fff53c]' : 'text-gray-100'
+                                                        }`}>
+                                                            {event.title}
+                                                        </h3>
+                                                    </div>
 
-                                                {/* Badge da Categoria */}
-                                                <div className="shrink-0">
-                                                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${badge.bg}`}>
-                                                        {badge.icon}
-                                                        <span>{badge.label}</span>
-                                                    </span>
-                                                </div>
-                                            </motion.div>
-                                        )
-                                    })}
-                                </div>
-                            </motion.div>
-                        ))}
-                    </AnimatePresence>
-                </div>
+                                                    {/* Badge da Categoria */}
+                                                    <div className="shrink-0">
+                                                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${badge.bg}`}>
+                                                            {badge.icon}
+                                                            <span>{badge.label}</span>
+                                                        </span>
+                                                    </div>
+                                                </motion.div>
+                                            )
+                                        })}
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </AnimatePresence>
+                    </div>
+                )}
 
                 {/* INFORMAÇÕES IMPORTANTES & ORIENTAÇÕES */}
                 <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6">

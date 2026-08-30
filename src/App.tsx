@@ -13,6 +13,7 @@ import RegistrationAdmin from './pages/RegistrationAdmin'
 import AngelPortfolioPage from './pages/AngelPortfolioPage'
 import GalleryAdmin from './pages/GalleryAdmin'
 import DonationAdmin from './pages/DonationAdmin'
+import ScheduleAdmin from './pages/ScheduleAdmin'
 import ComingSoonPage from './pages/ComingSoonPage'
 import AdminLayout from './components/AdminLayout'
 import AuthGuard from './components/AuthGuard'
@@ -45,6 +46,7 @@ function AppContent() {
                 <Route path="/inscricao" element={<RegistrationPage />} />
                 <Route path="/admin" element={<AdminLayout />}>
                     <Route index element={<NewsAdmin />} />
+                    <Route path="cronograma" element={<ScheduleAdmin />} />
                     <Route path="inscricoes" element={<RegistrationAdmin />} />
                     <Route path="anjos" element={<AngelPortfolioPage />} />
                     <Route path="galeria" element={<GalleryAdmin />} />
