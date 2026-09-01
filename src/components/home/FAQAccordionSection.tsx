@@ -24,7 +24,7 @@ const FAQS: FAQItem[] = [
     },
     {
         question: 'Quais são as opções e formas de pagamento?',
-        answer: 'Oferecemos pagamento facilitado via PIX diretamente pelo site com confirmação instantânea. Se você participou do Retiro de Carnaval, possui o benefício do Pré-Convite com 50% de desconto (R$ 50). Também temos a opção ADONAI DUO (R$ 120 para duas pessoas, saindo R$ 60 por pessoa).',
+        answer: 'Oferecemos pagamento facilitado via PIX diretamente pelo site com confirmação rápida. As opções são: Inscrição Sem Camiseta por R$ 50,00 e Inscrição Com Camiseta inclusa por R$ 70,00 (lote promocional válido até 10/09 — após 10/09 o valor de R$ 70,00 passa a ser sem camiseta).',
     },
     {
         question: 'Menores de idade podem participar sozinhos?',

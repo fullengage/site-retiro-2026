@@ -29,138 +29,105 @@ export const TicketsSection: React.FC = () => {
                     <span>⛺ 3 Dias de Festival</span>
                     <span>🍽️ Alimentação Completa</span>
                     <span>🎨 1 Kit Holi (Festa das Cores)</span>
-                    <span>👕 Camiseta Oficial 2026</span>
                     <span>🏷️ Crachá de Acesso</span>
                     <span>🎸 Todos os Shows & Pregações</span>
                     <span>📸 Álbum de Fotos Oficial</span>
                     <span>🎁 Benefício Surpresa no Evento</span>
+                    <span>👕 Camiseta Oficial (no pacote de R$ 70 até 10/09)</span>
                 </div>
             </div>
 
-            {/* RACK DE 3 CANAIS DE PASSAPORTE */}
+            {/* RACK DE 2 CANAIS DE PASSAPORTE */}
             <div className="adonai-tickets-grid soundboard-rack-grid">
-                {/* CANAL 01: ADONAI ESSENCIAL (VETERANOS) */}
+                {/* CANAL 01: ADONAI SEM CAMISETA (R$ 50) */}
                 <div className="sziget-pass-card rack-channel-card">
                     <div className="rack-channel-header">
-                        <div className="channel-id">CH-01 • VETERAN GAIN</div>
-                        <span className="pilot-led-amber" title="Lote exclusivo" />
+                        <div className="channel-id">CH-01 • BASIC PASS</div>
+                        <span className="pilot-led-green active" title="Lote Disponível" />
                     </div>
 
                     <div className="pass-card-header">
-                        <span className="pass-badge">🎟️ PRÉ-CONVITE</span>
-                        <span className="pass-urgency-tag">⏰ ATÉ 31/08</span>
+                        <span className="pass-badge">🎟️ SEM CAMISETA</span>
+                        <span className="pass-stock-tag">VALOR ACESSÍVEL</span>
                     </div>
 
-                    <h3 className="pass-card-title">ADONAI ESSENCIAL</h3>
+                    <h3 className="pass-card-title">ADONAI SEM CAMISETA</h3>
                     <p className="pass-card-subtitle">
-                        Exclusivo para quem participou do Retiro de Carnaval e quer garantir a vaga com benefício antecipado.
+                        Para quem deseja viver toda a intensidade dos 3 dias de retiro, louvor e comunhão com o melhor custo-benefício.
                     </p>
 
-                    <div className="pass-highlight-box veteran-box">
-                        ⚡ <strong>50% OFF</strong> para quem esteve no Retiro de Carnaval!
+                    <div className="pass-highlight-box single-box">
+                        🎒 <strong>INSCRIÇÃO COMPLETA</strong>: Acesso a todos os dias, alimentação, kit Holi e shows!
                     </div>
 
                     <div className="pass-price-box rack-price-box">
                         <div className="pass-price-val">R$ 50</div>
-                        <div className="pass-price-label">PRE-ORDER GAIN (50% OFF)</div>
+                        <div className="pass-price-label">INSCRIÇÃO INDIVIDUAL (SEM CAMISETA)</div>
                     </div>
 
                     <div className="pass-features-summary">
-                        <div className="pass-summary-item">✅ Vaga individual garantida</div>
-                        <div className="pass-summary-item">✅ 1 Kit Holi + Camiseta Oficial</div>
-                        <div className="pass-summary-item">✅ Desconto exclusivo de veterano</div>
+                        <div className="pass-summary-item">✅ Vaga individual nos 3 dias de festival</div>
+                        <div className="pass-summary-item">✅ Alimentação Completa e Alojamento no FAF</div>
+                        <div className="pass-summary-item">✅ 1 Kit Holi (Festa das Cores) + Shows</div>
+                        <div className="pass-summary-item">❌ Não inclui camiseta oficial</div>
                     </div>
 
-                    <Link to="/inscricao?pacote=essencial" className="btn-sziget-primary stompbox-btn">
-                        CONFIRMAR MINHA VAGA
+                    <Link to="/inscricao?pacote=sem-camiseta" className="btn-sziget-primary stompbox-btn">
+                        GARANTIR POR R$ 50
                     </Link>
                 </div>
 
-                {/* CANAL 02: ADONAI EXPERIENCE (INDIVIDUAL) */}
-                <div className="sziget-pass-card rack-channel-card">
-                    <div className="rack-channel-header">
-                        <div className="channel-id">CH-02 • SOLO EXPERIENCE</div>
-                        <span className="pilot-led-green active" title="Lote Aberto" />
-                    </div>
-
-                    <div className="pass-card-header">
-                        <span className="pass-badge highlight">🔥 INDIVIDUAL</span>
-                        <span className="pass-stock-tag">1º LOTE</span>
-                    </div>
-
-                    <h3 className="pass-card-title">ADONAI EXPERIENCE</h3>
-                    <p className="pass-card-subtitle">
-                        Para quem vai viver a experiência pela primeira vez ou participar de forma independente.
-                    </p>
-
-                    <div className="pass-highlight-box single-box">
-                        🎒 <strong>EXPERIÊNCIA COMPLETA</strong>: Tudo incluso nos 3 dias.
-                    </div>
-
-                    <div className="pass-price-box rack-price-box">
-                        <div className="pass-price-val">R$ 100</div>
-                        <div className="pass-price-label">FULL SOLO PASS (ALL INCLUSIVE)</div>
-                    </div>
-
-                    <div className="pass-features-summary">
-                        <div className="pass-summary-item">✅ 1 Inscrição Individual Completa</div>
-                        <div className="pass-summary-item">✅ Alimentação, Alojamento e Shows</div>
-                        <div className="pass-summary-item">✅ 1 Kit Holi + Camiseta Oficial</div>
-                    </div>
-
-                    <Link to="/inscricao?pacote=experience" className="btn-sziget-primary stompbox-btn">
-                        QUERO A EXPERIÊNCIA COMPLETA
-                    </Link>
-                </div>
-
-                {/* CANAL 03: ADONAI DUO (VOCÊ + 1 AMIGO) */}
+                {/* CANAL 02: ADONAI COM CAMISETA (R$ 70 - ATÉ 10/09) */}
                 <div className="sziget-pass-card rack-channel-card featured">
                     <div className="rack-channel-header">
-                        <div className="channel-id">CH-03 • DUAL LINK MODE</div>
-                        <span className="pilot-led-orange active-pulse" title="Mais Recomendado" />
+                        <div className="channel-id">CH-02 • FULL EXPERIENCE</div>
+                        <span className="pilot-led-orange active-pulse" title="Promocional até 10/09" />
                     </div>
 
                     <div className="pass-card-header">
-                        <span className="pass-badge duo">🤝 MELHOR ESCOLHA</span>
-                        <span className="pass-save-tag">SAVE R$ 80</span>
+                        <span className="pass-badge duo">🔥 COM CAMISETA</span>
+                        <span className="pass-urgency-tag">⏰ ATÉ 10/09</span>
                     </div>
 
-                    <h3 className="pass-card-title">ADONAI DUO</h3>
+                    <h3 className="pass-card-title">ADONAI COM CAMISETA</h3>
                     <p className="pass-card-subtitle">
-                        Porque a melhor experiência é compartilhada com quem caminha ao seu lado.
+                        A experiência completa do festival com a Camiseta Oficial 2026 inclusa por preço promocional.
                     </p>
 
                     <div className="pass-highlight-box duo-box">
-                        👥 <strong>APENAS R$ 60 POR PESSOA</strong> no pacote para 2 amigos!
+                        ⏰ <strong>PROMOÇÃO ATÉ 10/09</strong>: Camiseta oficial inclusa por apenas R$ 70! Após 10/09, o valor de R$ 70 passa a ser sem camiseta.
                     </div>
 
                     <div className="pass-price-box rack-price-box">
-                        <div className="pass-price-val">R$ 120</div>
-                        <div className="pass-price-label">TOTAL FOR 2 PERSONS (R$ 60/EACH)</div>
+                        <div className="pass-price-val">R$ 70</div>
+                        <div className="pass-price-label">LOTE PROMOCIONAL (COM CAMISETA ATÉ 10/09)</div>
                     </div>
 
                     <div className="pass-features-summary">
-                        <div className="pass-summary-item">✅ 2 Inscrições Completas (Você + 1)</div>
-                        <div className="pass-summary-item">✅ 2 Camisetas Oficiais + 2 Kits Holi</div>
-                        <div className="pass-summary-item">✅ Economia máxima garantida</div>
+                        <div className="pass-summary-item">✅ 1 Inscrição Individual Completa (3 dias)</div>
+                        <div className="pass-summary-item">✅ 1 Camiseta Oficial do Retiro 2026</div>
+                        <div className="pass-summary-item">✅ Alimentação Completa e Alojamento no FAF</div>
+                        <div className="pass-summary-item">✅ 1 Kit Holi (Festa das Cores) + Shows</div>
                     </div>
 
-                    <Link to="/inscricao?pacote=duo" className="btn-sziget-primary stompbox-btn">
-                        CHAMAR MEU DUO
+                    <Link to="/inscricao?pacote=com-camiseta" className="btn-sziget-primary stompbox-btn">
+                        QUERO COM CAMISETA (R$ 70)
                     </Link>
                 </div>
             </div>
 
-            {/* BENEFÍCIO EXTRA: TURMA ADONAI 2026 */}
-            <div className="turma-adonai-box rack-accent-box">
+            {/* AVISO IMPORTANTE DE VIRADA DE LOTE */}
+            <div className="turma-adonai-box rack-accent-box" style={{ marginTop: '24px' }}>
                 <span className="turma-adonai-badge">
-                    🏆 MURAL DIGITAL OFICIAL • HALL OF FAME
+                    ⏰ CRONOGRAMA DE LOTES & VALORES
                 </span>
                 <h3 className="turma-adonai-title">
-                    Faça parte da Turma ADONAI 2026
+                    Fique atento às datas da inscrição
                 </h3>
                 <p className="turma-adonai-desc">
-                    Os primeiros inscritos terão seus nomes gravados no painel digital oficial desta edição comemorativa. Garanta sua inscrição antes da virada de lote!
+                    • <strong>Até dia 10/09:</strong> R$ 50,00 (Sem camiseta) e R$ 70,00 (Com camiseta oficial inclusa).<br />
+                    • <strong>Após dia 10/09:</strong> O valor de R$ 70,00 passa a ser <strong>SEM camiseta</strong>.<br />
+                    Garanta a sua inscrição antes da virada do lote para garantir sua camiseta oficial com o melhor preço!
                 </p>
             </div>
         </section>

@@ -34,25 +34,17 @@ export const DEFAULT_EVENTS: EventItem[] = [
         status: 'active',
         kit_options: [
             {
-                id: 'adonai_essencial_50',
-                name: 'ADONAI ESSENCIAL — PRÉ-CONVITE (Válido até 31/08) (R$ 50,00)',
+                id: 'adonai_sem_camiseta_50',
+                name: 'ADONAI — SEM CAMISETA (R$ 50,00)',
                 price: 50,
-                includesTshirt: true,
-                tshirtCount: 1,
+                includesTshirt: false,
             },
             {
-                id: 'adonai_experience_100',
-                name: 'ADONAI EXPERIENCE — PRIMEIRA VEZ SOZINHO (R$ 100,00)',
-                price: 100,
+                id: 'adonai_com_camiseta_70',
+                name: 'ADONAI — COM CAMISETA (Promocional até 10/09) (R$ 70,00)',
+                price: 70,
                 includesTshirt: true,
                 tshirtCount: 1,
-            },
-            {
-                id: 'adonai_duo_120',
-                name: 'ADONAI DUO — PRIMEIRA VEZ COM AMIGO (R$ 120,00)',
-                price: 120,
-                includesTshirt: true,
-                tshirtCount: 2,
             }
         ],
         pix_info: {

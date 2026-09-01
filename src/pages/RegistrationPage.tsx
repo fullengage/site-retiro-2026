@@ -86,12 +86,10 @@ const RegistrationPage = () => {
 
                 let matchedKit = activeEvent.kit_options[0]
                 if (pacoteParam) {
-                    if (pacoteParam.includes('essencial') || pacoteParam.includes('50') || pacoteParam.includes('carnaval')) {
+                    if (pacoteParam.includes('com') || pacoteParam.includes('70') || pacoteParam.includes('experience') || pacoteParam.includes('camiseta')) {
+                        matchedKit = activeEvent.kit_options.find(k => k.price === 70) || activeEvent.kit_options[1] || activeEvent.kit_options[0]
+                    } else if (pacoteParam.includes('sem') || pacoteParam.includes('50') || pacoteParam.includes('essencial') || pacoteParam.includes('carnaval')) {
                         matchedKit = activeEvent.kit_options.find(k => k.price === 50) || activeEvent.kit_options[0]
-                    } else if (pacoteParam.includes('experience') || pacoteParam.includes('100') || pacoteParam.includes('sozinho')) {
-                        matchedKit = activeEvent.kit_options.find(k => k.price === 100) || activeEvent.kit_options[1]
-                    } else if (pacoteParam.includes('duo') || pacoteParam.includes('120') || pacoteParam.includes('amigo')) {
-                        matchedKit = activeEvent.kit_options.find(k => k.price === 120) || activeEvent.kit_options[2]
                     }
                 }
 
@@ -798,8 +796,18 @@ const RegistrationPage = () => {
                                             <div>
                                                 <span className="text-white font-bold block text-sm">{kit.name}</span>
                                                 {kit.price === 50 && (
-                                                    <span className="inline-block bg-red-500/20 text-red-300 text-[11px] font-bold px-2 py-0.5 rounded border border-red-500/30 mt-1">
-                                                        ⏰ Pré-convite válido só até 31/08 • 50% OFF para quem já participou do Carnaval!
+                                                    <span className="inline-block bg-emerald-500/20 text-emerald-300 text-[11px] font-bold px-2 py-0.5 rounded border border-emerald-500/30 mt-1">
+                                                        🎟️ Inscrição Completa (Sem Camiseta)
+                                                    </span>
+                                                )}
+                                                {kit.price === 70 && kit.includesTshirt && (
+                                                    <span className="inline-block bg-amber-500/20 text-amber-300 text-[11px] font-bold px-2 py-0.5 rounded border border-amber-500/30 mt-1">
+                                                        ⏰ Promocional até 10/09 com Camiseta inclusa! (Após 10/09: R$ 70 sem camiseta)
+                                                    </span>
+                                                )}
+                                                {kit.price === 70 && !kit.includesTshirt && (
+                                                    <span className="inline-block bg-blue-500/20 text-blue-300 text-[11px] font-bold px-2 py-0.5 rounded border border-blue-500/30 mt-1">
+                                                        🎟️ Inscrição Completa (Sem Camiseta)
                                                     </span>
                                                 )}
                                                 {kit.includesTshirt && (
