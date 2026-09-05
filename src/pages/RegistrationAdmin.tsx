@@ -58,70 +58,10 @@ const RegistrationAdmin = () => {
     const loadRegistrations = async () => {
         setLoading(true)
         try {
-            // Tenta buscar no modelo normalizado
+            // Busca já filtrada pelo evento selecionado (registrations.event_id real,
+            // não mistura mais retiros diferentes na mesma lista)
             const data = await fetchAllDetailedRegistrations(selectedEventSlug)
-            if (data && data.length > 0) {
-                setRegistrations(data)
-            } else {
-                // Fallback para tabela legada event_registrations caso ainda não tenha rodado a migration
-                const { data: legacyData, error: legacyError } = await supabase
-                    .from('event_registrations')
-                    .select('*')
-                    .order('created_at', { ascending: false })
-
-                if (!legacyError && legacyData) {
-                    // Converter dados legados para o formato detalhado
-                    const converted: RegistrationDetailed[] = legacyData.map(leg => ({
-                        id: leg.id,
-                        created_at: leg.created_at,
-                        kit_option: leg.kit_option || 'Kit 01 - Inscrição',
-                        tshirt_size: leg.tshirt_size,
-                        tshirt_size_2: leg.tshirt_size_2,
-                        staying_on_site: leg.staying_on_site,
-                        assigned_angel: leg.assigned_angel,
-                        status: leg.payment_status === 'Pago' ? 'Confirmada' : 'Pendente',
-                        notes: null,
-                        participant: {
-                            id: leg.id,
-                            full_name: leg.full_name || 'Participante',
-                            email: leg.email,
-                            phone: leg.phone,
-                            birth_date: leg.birth_date,
-                            gender: leg.gender,
-                            address: leg.address,
-                            city: leg.city,
-                            parish: leg.parish,
-                            emergency_phone: leg.emergency_phone
-                        },
-                        event: {
-                            id: 'legacy-event',
-                            slug: 'carnaval-2026',
-                            name: 'Retiro de Carnaval 2026',
-                            year: 2026,
-                            status: 'completed',
-                            kit_options: [],
-                            pix_info: { key: '', keyType: '', receiver: '' }
-                        },
-                        payment: {
-                            id: leg.id,
-                            registration_id: leg.id,
-                            amount: leg.payment_amount || 50,
-                            status: leg.payment_status || 'Pendente',
-                            payment_method: 'PIX',
-                            payment_receipt_url: leg.payment_receipt_url,
-                            paid_at: leg.payment_status === 'Pago' ? leg.created_at : null
-                        }
-                    }))
-
-                    if (selectedEventSlug === 'all' || selectedEventSlug === 'carnaval-2026') {
-                        setRegistrations(converted)
-                    } else {
-                        setRegistrations([])
-                    }
-                } else {
-                    setRegistrations([])
-                }
-            }
+            setRegistrations(data)
         } catch (err) {
             console.error('Erro ao carregar inscrições:', err)
         } finally {
@@ -147,8 +87,7 @@ const RegistrationAdmin = () => {
         try {
             await updatePaymentAndRegistrationStatus({
                 registrationId: reg.id,
-                paymentId: reg.payment?.id,
-                newPaymentStatus: nextStatus
+                paymentStatus: nextStatus
             })
 
             // Atualização otimista
@@ -176,9 +115,7 @@ const RegistrationAdmin = () => {
             await deleteRegistrationCascade(id)
             setRegistrations(prev => prev.filter(r => r.id !== id))
         } catch (err: any) {
-            // Fallback caso seja tabela legada
-            await supabase.from('event_registrations').delete().eq('id', id)
-            setRegistrations(prev => prev.filter(r => r.id !== id))
+            alert('Erro ao excluir inscrição: ' + err.message)
         } finally {
             setDeletingId(null)
         }

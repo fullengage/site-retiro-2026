@@ -33,6 +33,9 @@ const RegistrationPage = () => {
     const [isSearchingName, setIsSearchingName] = useState(false)
     const [showSuggestions, setShowSuggestions] = useState(false)
     const [foundParticipant, setFoundParticipant] = useState<ParticipantSearchResult | null>(null)
+    // Confirmado via e-mail/telefone/CPF (não apenas nome) — só aqui os dados sensíveis
+    // e o "já inscrito neste evento" são reais e confiáveis (ver find_my_registration_status)
+    const [verifiedParticipant, setVerifiedParticipant] = useState<ParticipantSearchResult | null>(null)
     const [copiedPix, setCopiedPix] = useState(false)
 
     // Dados da inscrição concluída
@@ -157,7 +160,7 @@ const RegistrationPage = () => {
     // Busca inteligente onBlur para email, telefone ou cpf
     const handleCheckIdentifier = async (field: 'email' | 'phone' | 'cpf', val: string) => {
         if (!val || val.length < 5) return
-        if (foundParticipant) return
+        if (verifiedParticipant) return
 
         try {
             const found = await findParticipantByIdentifier({
@@ -165,6 +168,7 @@ const RegistrationPage = () => {
                 activeEventId: event?.id
             })
             if (found) {
+                setVerifiedParticipant(found)
                 handleSelectParticipant(found)
             }
         } catch (err) {
@@ -278,6 +282,35 @@ const RegistrationPage = () => {
                 <div className="text-center">
                     <Loader2 className="w-12 h-12 animate-spin text-holi-primary mx-auto mb-4" />
                     <p className="text-gray-400 font-medium">Carregando informações do retiro...</p>
+                </div>
+            </div>
+        )
+    }
+
+    // BLOQUEIO: pessoa já inscrita neste evento (checagem real via identidade verificada)
+    if (!submitted && verifiedParticipant?.isRegisteredInActiveEvent && event) {
+        return (
+            <div className="min-h-screen pt-32 pb-20 px-4 flex items-center justify-center">
+                <div className="max-w-lg mx-auto bg-holi-surface border border-white/10 rounded-3xl p-8 md:p-12 text-center">
+                    <div className="w-20 h-20 bg-holi-primary/20 border border-holi-primary/40 rounded-full flex items-center justify-center mx-auto mb-8">
+                        <CheckCircle size={40} className="text-holi-primary" />
+                    </div>
+                    <h2 className="text-2xl md:text-3xl font-black mb-4 uppercase tracking-tight text-white">
+                        Você já está inscrito(a)!
+                    </h2>
+                    <p className="text-gray-300 mb-6">
+                        Olá, {verifiedParticipant.participant.full_name.split(' ')[0]}! Encontramos uma inscrição sua para o <strong className="text-white">{event.name}</strong>. Sua vaga já está garantida — não é necessário se inscrever novamente.
+                    </p>
+                    {event.pix_info?.whatsappSupport && (
+                        <a
+                            href={`https://wa.me/${event.pix_info.whatsappSupport}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-block px-6 py-3 bg-holi-primary/20 hover:bg-holi-primary/30 text-white font-bold rounded-xl transition-colors"
+                        >
+                            Dúvidas? Fale com o suporte no WhatsApp
+                        </a>
+                    )}
                 </div>
             </div>
         )
@@ -470,7 +503,7 @@ const RegistrationPage = () => {
                 >
                     {/* Alerta de Participante e Histórico de Retiro Encontrado */}
                     <AnimatePresence>
-                        {foundParticipant && (
+                        {(verifiedParticipant || foundParticipant) && (
                             <motion.div
                                 initial={{ opacity: 0, height: 0, y: -10 }}
                                 animate={{ opacity: 1, height: 'auto', y: 0 }}
@@ -483,23 +516,21 @@ const RegistrationPage = () => {
                                 <div className="flex-1">
                                     <div className="flex flex-wrap items-center gap-2 mb-1">
                                         <h4 className="text-white font-black text-base">
-                                            Olá, {foundParticipant.participant.full_name}! ✨
+                                            Olá, {(verifiedParticipant || foundParticipant)!.participant.full_name}! ✨
                                         </h4>
-                                        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-white/10 text-holi-accent border border-holi-accent/30 flex items-center gap-1">
-                                            <History size={12} />
-                                            Já participou: {foundParticipant.pastRetreats.join(', ')}
-                                        </span>
+                                        {(verifiedParticipant || foundParticipant)!.pastRetreats.length > 0 && (
+                                            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-white/10 text-holi-accent border border-holi-accent/30 flex items-center gap-1">
+                                                <History size={12} />
+                                                Já participou: {(verifiedParticipant || foundParticipant)!.pastRetreats.join(', ')}
+                                            </span>
+                                        )}
                                     </div>
                                     <p className="text-xs text-gray-300 leading-relaxed">
-                                        Encontramos seu cadastro anterior! Seus dados foram preenchidos automaticamente abaixo para você se inscrever no <strong>{event?.name}</strong>. Por favor, confira e atualize o que mudou.
+                                        {verifiedParticipant
+                                            ? <>Você já é da família! Seus dados foram preenchidos automaticamente abaixo — confira e confirme sua vaga no <strong>{event?.name}</strong> em poucos cliques.</>
+                                            : <>Encontramos alguém com esse nome. Digite seu e-mail, telefone ou CPF abaixo para recuperarmos seus dados automaticamente.</>
+                                        }
                                     </p>
-
-                                    {foundParticipant.isRegisteredInActiveEvent && (
-                                        <div className="mt-2.5 p-2 bg-amber-500/20 border border-amber-500/30 rounded-xl text-amber-300 text-xs flex items-center gap-2">
-                                            <AlertCircle size={14} className="shrink-0" />
-                                            <span>Você já possui uma inscrição cadastrada para o <strong>{event?.name}</strong>!</span>
-                                        </div>
-                                    )}
                                 </div>
                             </motion.div>
                         )}

@@ -16,6 +16,7 @@ dist-ssr
 # Editor / OS / IDE
 .agent
 .gemini
+.claude
 .vscode/*
 !.vscode/extensions.json
 .idea
