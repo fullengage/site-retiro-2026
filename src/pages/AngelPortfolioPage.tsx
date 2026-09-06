@@ -47,68 +47,7 @@ const AngelPortfolioPage = () => {
         setLoading(true)
         try {
             const data = await fetchAllDetailedRegistrations(selectedEventSlug)
-            if (data && data.length > 0) {
-                setRegistrations(data)
-            } else {
-                // Fallback legada
-                const { data: legacyData } = await supabase
-                    .from('event_registrations')
-                    .select('*')
-                    .order('created_at', { ascending: false })
-
-                if (legacyData && legacyData.length > 0) {
-                    const converted: RegistrationDetailed[] = legacyData.map(leg => ({
-                        id: leg.id,
-                        created_at: leg.created_at,
-                        kit_option: leg.kit_option || 'Kit 01 - Inscrição',
-                        tshirt_size: leg.tshirt_size,
-                        tshirt_size_2: leg.tshirt_size_2,
-                        staying_on_site: leg.staying_on_site,
-                        assigned_angel: leg.assigned_angel,
-                        status: leg.payment_status === 'Pago' ? 'Confirmada' : 'Pendente',
-                        notes: null,
-                        participant: {
-                            id: leg.id,
-                            full_name: leg.full_name || 'Participante',
-                            email: leg.email,
-                            phone: leg.phone,
-                            birth_date: leg.birth_date,
-                            gender: leg.gender,
-                            address: leg.address,
-                            city: leg.city,
-                            parish: leg.parish,
-                            emergency_phone: leg.emergency_phone
-                        },
-                        event: {
-                            id: 'legacy-event',
-                            slug: 'carnaval-2026',
-                            name: 'Retiro de Carnaval 2026',
-                            year: 2026,
-                            status: 'completed',
-                            kit_options: [],
-                            pix_info: { key: '', keyType: '', receiver: '' }
-                        },
-                        payment: {
-                            id: leg.id,
-                            registration_id: leg.id,
-                            amount: leg.payment_amount || 50,
-                            status: leg.payment_status || 'Pendente',
-                            payment_method: 'PIX',
-                            payment_receipt_url: leg.payment_receipt_url,
-                            paid_at: leg.payment_status === 'Pago' ? leg.created_at : null
-                        }
-                    }))
-
-                    if (selectedEventSlug === 'all' || selectedEventSlug === 'carnaval-2026') {
-                        setRegistrations(converted)
-                    } else {
-                        // Se o evento novo ainda não tiver inscrições, exibe todas para facilitar o gerenciamento dos anjos
-                        setRegistrations(converted)
-                    }
-                } else {
-                    setRegistrations([])
-                }
-            }
+            setRegistrations(data || [])
         } catch (err) {
             console.error('Erro ao carregar anjos:', err)
         } finally {

@@ -210,20 +210,34 @@ CREATE INDEX IF NOT EXISTS idx_payments_status ON payments(status);
 
 DO $$
 DECLARE
-    carnaval_event_id UUID;
+    v_adonai_id UUID;
+    v_carnaval_id UUID;
+    v_ato_id UUID;
+    v_target_event_id UUID;
     rec RECORD;
     v_participant_id UUID;
     v_registration_id UUID;
 BEGIN
-    SELECT id INTO carnaval_event_id FROM events WHERE slug = 'carnaval-2026';
-
-    IF carnaval_event_id IS NULL THEN
-        RAISE NOTICE 'Evento carnaval-2026 não encontrado em events — pulando migração do histórico legado.';
-        RETURN;
-    END IF;
+    SELECT id INTO v_adonai_id FROM events WHERE slug = 'adonai-2026';
+    SELECT id INTO v_carnaval_id FROM events WHERE slug = 'carnaval-2026';
+    SELECT id INTO v_ato_id FROM events WHERE slug = 'ato-2026';
 
     IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'event_registrations') THEN
         FOR rec IN SELECT * FROM event_registrations LOOP
+            -- 1. Identificar o evento correto baseado no kit_option
+            IF rec.kit_option ILIKE '%ADONAI%' THEN
+                v_target_event_id := v_adonai_id;
+            ELSIF rec.kit_option ILIKE '%ATO%' THEN
+                v_target_event_id := v_ato_id;
+            ELSE
+                v_target_event_id := v_carnaval_id;
+            END IF;
+
+            IF v_target_event_id IS NULL THEN
+                v_target_event_id := v_carnaval_id;
+            END IF;
+
+            -- 2. Encontrar ou criar o participante
             v_participant_id := NULL;
 
             IF rec.email IS NOT NULL AND rec.email <> '' THEN
@@ -239,20 +253,32 @@ BEGIN
                     full_name, email, phone, birth_date, gender, address, city, parish, emergency_phone, created_at
                 ) VALUES (
                     COALESCE(rec.full_name, 'Participante'),
-                    rec.email, rec.phone, rec.birth_date, rec.gender, rec.address, rec.city, rec.parish, rec.emergency_phone,
+                    rec.email, rec.phone, rec.birth_date::text, rec.gender, rec.address, rec.city, rec.parish, rec.emergency_phone,
                     COALESCE(rec.created_at, now())
                 ) RETURNING id INTO v_participant_id;
+            ELSE
+                UPDATE participants SET
+                    full_name = COALESCE(NULLIF(rec.full_name, ''), full_name),
+                    phone = COALESCE(NULLIF(rec.phone, ''), phone),
+                    birth_date = COALESCE(NULLIF(rec.birth_date::text, ''), birth_date),
+                    gender = COALESCE(NULLIF(rec.gender, ''), gender),
+                    address = COALESCE(NULLIF(rec.address, ''), address),
+                    city = COALESCE(NULLIF(rec.city, ''), city),
+                    parish = COALESCE(NULLIF(rec.parish, ''), parish),
+                    emergency_phone = COALESCE(NULLIF(rec.emergency_phone, ''), emergency_phone),
+                    updated_at = now()
+                WHERE id = v_participant_id;
             END IF;
 
             SELECT id INTO v_registration_id FROM registrations
-            WHERE participant_id = v_participant_id AND event_id = carnaval_event_id;
+            WHERE participant_id = v_participant_id AND event_id = v_target_event_id;
 
             IF v_registration_id IS NULL THEN
                 INSERT INTO registrations (
                     participant_id, event_id, kit_option, tshirt_size, tshirt_size_2,
                     staying_on_site, assigned_angel, status, created_at
                 ) VALUES (
-                    v_participant_id, carnaval_event_id,
+                    v_participant_id, v_target_event_id,
                     COALESCE(rec.kit_option, 'Kit 01 - Inscrição'),
                     rec.tshirt_size, rec.tshirt_size_2,
                     COALESCE(rec.staying_on_site, false), rec.assigned_angel,
@@ -265,9 +291,18 @@ BEGIN
                     v_registration_id, COALESCE(rec.payment_amount, 50.00), COALESCE(rec.payment_status, 'Pendente'),
                     'PIX', rec.payment_receipt_url, COALESCE(rec.created_at, now())
                 );
+            ELSE
+                UPDATE registrations SET
+                    kit_option = COALESCE(rec.kit_option, kit_option),
+                    tshirt_size = COALESCE(rec.tshirt_size, tshirt_size),
+                    tshirt_size_2 = COALESCE(rec.tshirt_size_2, tshirt_size_2),
+                    staying_on_site = COALESCE(rec.staying_on_site, staying_on_site),
+                    assigned_angel = COALESCE(rec.assigned_angel, assigned_angel),
+                    status = CASE WHEN rec.payment_status = 'Pago' THEN 'Confirmada' ELSE status END
+                WHERE id = v_registration_id;
             END IF;
         END LOOP;
-        RAISE NOTICE 'Migração de histórico do Carnaval 2026 concluída.';
+        RAISE NOTICE 'Migração de histórico inteligente por kit concluída.';
     END IF;
 END $$;
 

@@ -98,7 +98,7 @@ export async function fetchAllDetailedRegistrations(eventSlug?: string): Promise
             .select('*, participant:participants(*), event:events(*), payment:payments(*)')
             .order('created_at', { ascending: false })
 
-        if (eventSlug) {
+        if (eventSlug && eventSlug !== 'all') {
             const { data: evt } = await supabase.from('events').select('id').eq('slug', eventSlug).maybeSingle()
             if (!evt) return []
             query = query.eq('event_id', evt.id)
