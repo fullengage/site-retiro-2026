@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, useLocation, Link } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, useLocation, Link, Navigate } from 'react-router-dom'
 import { useEffect } from 'react'
 import Navbar from './components/Navbar'
 import Background from './components/Background'
@@ -46,13 +46,17 @@ function AppContent() {
                 <Route path="/inscricao" element={<RegistrationPage />} />
                 <Route path="/admin" element={<AdminLayout />}>
                     <Route index element={<NewsAdmin />} />
+                    <Route path="dashboard" element={<Navigate to="/admin" replace />} />
+                    <Route path="noticias" element={<NewsAdmin />} />
                     <Route path="cronograma" element={<ScheduleAdmin />} />
                     <Route path="inscricoes" element={<RegistrationAdmin />} />
                     <Route path="anjos" element={<AngelPortfolioPage />} />
                     <Route path="galeria" element={<GalleryAdmin />} />
                     <Route path="doacoes" element={<DonationAdmin />} />
+                    <Route path="*" element={<Navigate to="/admin" replace />} />
                 </Route>
                 <Route path="/em-breve" element={<ComingSoonPage />} />
+                <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
 
             {!isAdmin && !isComingSoon && (
@@ -78,7 +82,7 @@ function AppContent() {
 
 function App() {
     return (
-        <Router>
+        <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <ScrollToTop />
             <AppContent />
         </Router>
