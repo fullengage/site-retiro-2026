@@ -173,17 +173,22 @@ const RegistrationAdmin = () => {
     const uniqueAngels = Array.from(new Set(registrations.map(r => r.assigned_angel?.trim()).filter(Boolean))).sort()
 
     const filtered = registrations.filter(reg => {
-        const lowerSearch = searchTerm.toLowerCase().trim()
+        const lowerSearch = (searchTerm || '').toLowerCase().trim()
+        const participantName = reg.participant?.full_name || ''
+        const participantEmail = reg.participant?.email || ''
+        const participantPhone = reg.participant?.phone || ''
+        const assignedAngel = reg.assigned_angel || ''
+
         const matchesSearch =
-            reg.participant.full_name.toLowerCase().includes(lowerSearch) ||
-            (reg.participant.email || '').toLowerCase().includes(lowerSearch) ||
-            (reg.participant.phone || '').includes(lowerSearch) ||
-            (reg.assigned_angel || '').toLowerCase().includes(lowerSearch)
+            participantName.toLowerCase().includes(lowerSearch) ||
+            participantEmail.toLowerCase().includes(lowerSearch) ||
+            participantPhone.includes(lowerSearch) ||
+            assignedAngel.toLowerCase().includes(lowerSearch)
 
         const matchesStatus = filterStatus === 'Todos' || (reg.payment?.status || 'Pendente') === filterStatus
 
-        const normalizedAssignedAngel = (reg.assigned_angel || '').trim()
-        const normalizedFilterAngel = filterAngel.trim()
+        const normalizedAssignedAngel = assignedAngel.trim()
+        const normalizedFilterAngel = (filterAngel || '').trim()
 
         const matchesAngel = normalizedFilterAngel === 'Todos'
             ? true
@@ -508,11 +513,11 @@ const RegistrationAdmin = () => {
                                             <td className="py-4 px-6">
                                                 <div className="flex items-center gap-3">
                                                     <div className="w-9 h-9 rounded-full bg-gradient-to-br from-holi-primary/30 to-purple-600/30 border border-white/10 flex items-center justify-center text-white font-black text-sm">
-                                                        {reg.participant.full_name.charAt(0)}
+                                                        {(reg.participant?.full_name || 'P').charAt(0).toUpperCase()}
                                                     </div>
                                                     <div>
                                                         <div className="font-bold text-white flex items-center gap-2">
-                                                            {reg.participant.full_name}
+                                                            {reg.participant?.full_name || 'Participante'}
                                                             {/* Botão para abrir histórico do participante */}
                                                             <button
                                                                 type="button"
@@ -520,10 +525,10 @@ const RegistrationAdmin = () => {
                                                                 onClick={(e) => {
                                                                     e.stopPropagation()
                                                                     openParticipantHistory({
-                                                                        id: reg.participant.id,
-                                                                        name: reg.participant.full_name,
-                                                                        email: reg.participant.email,
-                                                                        phone: reg.participant.phone
+                                                                        id: reg.participant?.id || '',
+                                                                        name: reg.participant?.full_name || 'Participante',
+                                                                        email: reg.participant?.email || '',
+                                                                        phone: reg.participant?.phone || ''
                                                                     })
                                                                 }}
                                                                 className="p-1 rounded-md bg-white/5 hover:bg-holi-primary/20 text-gray-400 hover:text-holi-accent transition-colors"
@@ -532,7 +537,7 @@ const RegistrationAdmin = () => {
                                                             </button>
                                                         </div>
                                                         <span className="text-xs text-gray-500">
-                                                            {calculateAge(reg.participant.birth_date)} anos • {reg.participant.gender || 'Não informado'}
+                                                            {calculateAge(reg.participant?.birth_date)} anos • {reg.participant?.gender || 'Não informado'}
                                                         </span>
                                                     </div>
                                                 </div>

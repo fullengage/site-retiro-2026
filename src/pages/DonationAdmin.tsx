@@ -163,7 +163,8 @@ const DonationAdmin = () => {
     const addCategories = Array.from(new Set(items.map(i => i.category))).sort()
 
     const filteredItems = items.filter(item => {
-        const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase())
+        const lowerSearch = (searchTerm || '').toLowerCase().trim()
+        const matchesSearch = (item.name || '').toLowerCase().includes(lowerSearch)
         const matchesCategory = filterCategory === 'Todas' || item.category === filterCategory
         return matchesSearch && matchesCategory
     })

@@ -111,32 +111,62 @@ export async function fetchAllDetailedRegistrations(eventSlug?: string): Promise
             return []
         }
 
-        return data.map((reg: any) => ({
-            id: reg.id,
-            created_at: reg.created_at,
-            kit_option: reg.kit_option || 'Kit Inscrição',
-            tshirt_size: reg.tshirt_size,
-            tshirt_size_2: reg.tshirt_size_2,
-            staying_on_site: reg.staying_on_site || false,
-            assigned_angel: reg.assigned_angel,
-            status: reg.status,
-            notes: reg.notes,
-            participant: reg.participant,
-            event: {
-                ...reg.event,
-                kit_options: Array.isArray(reg.event?.kit_options) ? reg.event.kit_options : [],
-                pix_info: reg.event?.pix_info || {}
-            },
-            payment: reg.payment ? {
-                id: reg.payment.id,
-                registration_id: reg.id,
-                amount: reg.payment.amount || 0,
-                status: reg.payment.status || 'Pendente',
-                payment_method: reg.payment.payment_method || 'PIX',
-                payment_receipt_url: reg.payment.payment_receipt_url,
-                paid_at: reg.payment.paid_at
-            } : null
-        }))
+        return data.map((reg: any) => {
+            const rawPayment = Array.isArray(reg.payment) ? reg.payment[0] : reg.payment
+            const rawParticipant = Array.isArray(reg.participant) ? reg.participant[0] : reg.participant
+            const rawEvent = Array.isArray(reg.event) ? reg.event[0] : reg.event
+
+            return {
+                id: reg.id,
+                created_at: reg.created_at,
+                kit_option: reg.kit_option || 'Kit Inscrição',
+                tshirt_size: reg.tshirt_size,
+                tshirt_size_2: reg.tshirt_size_2,
+                staying_on_site: reg.staying_on_site || false,
+                assigned_angel: reg.assigned_angel,
+                status: reg.status,
+                notes: reg.notes,
+                participant: rawParticipant ? {
+                    id: rawParticipant.id || '',
+                    full_name: rawParticipant.full_name || rawParticipant.name || 'Participante',
+                    email: rawParticipant.email || '',
+                    phone: rawParticipant.phone || rawParticipant.whatsapp || '',
+                    cpf: rawParticipant.cpf || '',
+                    birth_date: rawParticipant.birth_date || null,
+                    gender: rawParticipant.gender || null,
+                    address: rawParticipant.address || '',
+                    city: rawParticipant.city || '',
+                    parish: rawParticipant.parish || '',
+                    emergency_phone: rawParticipant.emergency_phone || ''
+                } : {
+                    id: '',
+                    full_name: 'Participante',
+                    email: '',
+                    phone: '',
+                    cpf: '',
+                    birth_date: null,
+                    gender: null,
+                    address: '',
+                    city: '',
+                    parish: '',
+                    emergency_phone: ''
+                },
+                event: {
+                    ...rawEvent,
+                    kit_options: Array.isArray(rawEvent?.kit_options) ? rawEvent.kit_options : [],
+                    pix_info: rawEvent?.pix_info || {}
+                },
+                payment: rawPayment ? {
+                    id: rawPayment.id,
+                    registration_id: reg.id,
+                    amount: Number(rawPayment.amount) || 0,
+                    status: rawPayment.status || 'Pendente',
+                    payment_method: rawPayment.payment_method || 'PIX',
+                    payment_receipt_url: rawPayment.payment_receipt_url,
+                    paid_at: rawPayment.paid_at
+                } : null
+            }
+        })
     } catch (err) {
         console.error('Erro ao buscar inscrições:', err)
         return []

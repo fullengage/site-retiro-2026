@@ -254,13 +254,16 @@ const AngelPortfolioPage = () => {
         })
     }, [registrations])
 
-    const filteredPortfolios = angelPortfolios.filter(portfolio =>
-        portfolio.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        portfolio.registrations.some(r =>
-            r.participant.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (r.participant.email || '').toLowerCase().includes(searchTerm.toLowerCase())
-        )
-    )
+    const filteredPortfolios = angelPortfolios.filter(portfolio => {
+        const lowerSearch = (searchTerm || '').toLowerCase().trim()
+        const portfolioName = portfolio.name || ''
+        return portfolioName.toLowerCase().includes(lowerSearch) ||
+            portfolio.registrations.some(r => {
+                const name = r.participant?.full_name || ''
+                const email = r.participant?.email || ''
+                return name.toLowerCase().includes(lowerSearch) || email.toLowerCase().includes(lowerSearch)
+            })
+    })
 
     const grandTotalRevenue = angelPortfolios.reduce((sum, p) => sum + p.totalRevenue, 0)
     const grandTotalPaid = angelPortfolios.reduce((sum, p) => sum + p.paidCount, 0)

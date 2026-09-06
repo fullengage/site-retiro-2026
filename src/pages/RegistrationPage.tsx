@@ -115,7 +115,7 @@ const RegistrationPage = () => {
         }
 
         // Se já foi selecionado, não reabre busca
-        if (foundParticipant && foundParticipant.participant.full_name.toLowerCase() === formData.full_name.toLowerCase().trim()) {
+        if (foundParticipant && (foundParticipant.participant?.full_name || '').toLowerCase().trim() === (formData.full_name || '').toLowerCase().trim()) {
             return
         }
 
