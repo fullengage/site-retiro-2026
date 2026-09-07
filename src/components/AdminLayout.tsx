@@ -3,7 +3,7 @@ import { Outlet, Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
     LayoutDashboard, Users, Image as ImageIcon,
-    ShoppingBag, LogIn, Sun, LogOut, Menu, X, Shield, Heart, Calendar
+    ShoppingBag, LogIn, Sun, LogOut, Menu, X, Shield, Heart, Calendar, Shirt
 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 
@@ -186,6 +186,7 @@ export default function AdminLayout() {
         { path: '/admin', icon: <LayoutDashboard size={20} />, label: 'Painel / Notícias', exact: true },
         { path: '/admin/cronograma', icon: <Calendar size={20} />, label: 'Cronograma' },
         { path: '/admin/inscricoes', icon: <Users size={20} />, label: 'Inscrições' },
+        { path: '/admin/camisetas', icon: <Shirt size={20} />, label: 'Camisetas' },
         { path: '/admin/anjos', icon: <Heart size={20} />, label: 'Carteira de Anjos' },
         { path: '/admin/galeria', icon: <ImageIcon size={20} />, label: 'Galeria' },
         { path: '/admin/doacoes', icon: <ShoppingBag size={20} />, label: 'Doações' },
