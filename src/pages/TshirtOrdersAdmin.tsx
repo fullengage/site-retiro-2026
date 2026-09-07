@@ -1,10 +1,12 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
     Shirt, Search, Download, CheckCircle, AlertCircle,
     Plus, Filter, Printer, Users, Heart, ShoppingBag,
-    Sparkles, RefreshCw, ChevronDown, Check, X, FileText
+    Sparkles, RefreshCw, ChevronDown, Check, X, FileText,
+    Loader2, DollarSign, CreditCard, Banknote, Upload, Trash2, Edit3
 } from 'lucide-react'
+import { supabase } from '../lib/supabase'
 
 export interface TshirtOrderItem {
     id: string
@@ -13,139 +15,320 @@ export interface TshirtOrderItem {
     size: 'PP' | 'P' | 'M' | 'G' | 'GG' | 'G1' | 'G2' | 'EXG'
     status: 'Pago' | 'Pendente'
     amount?: number
+    payment_method?: string
     phone?: string
     notes?: string
-    receiptUrl?: string
+    receipt_url?: string
+    registration_id?: string
+    created_at?: string
 }
 
-const INITIAL_TSHIRT_ORDERS: TshirtOrderItem[] = [
-    // --- PARTICIPANTES PAGOS (23) ---
-    { id: 'part-1', name: 'Amanda dadda Rodrigues', category: 'Participante', size: 'P', status: 'Pago', amount: 50, phone: '(17) 99755-7925', notes: 'Pré-Convite' },
-    { id: 'part-2', name: 'Elisa Rosani Top', category: 'Participante', size: 'P', status: 'Pago', amount: 50, phone: '(17) 99650-7550', notes: 'Pré-Convite' },
-    { id: 'part-3', name: 'Heitor Pedroso L. Gradella Sperandio', category: 'Participante', size: 'P', status: 'Pago', amount: 50, phone: '(17) 99111-0214', notes: 'Pré-Convite' },
-    { id: 'part-4', name: 'Helena Fermino da Silva', category: 'Participante', size: 'M', status: 'Pago', amount: 50, phone: '(16) 99747-1543', notes: 'Pré-Convite' },
-    { id: 'part-5', name: 'Heloísa Men Pereira', category: 'Participante', size: 'P', status: 'Pago', amount: 50, phone: '(17) 99766-6337', notes: 'Pré-Convite' },
-    { id: 'part-6', name: 'Heloísa Oliveira Balero', category: 'Participante', size: 'G', status: 'Pago', amount: 50, phone: '(17) 99127-2008', notes: 'Pré-Convite' },
-    { id: 'part-7', name: 'Higor Acácio Marques Paulino', category: 'Participante', size: 'M', status: 'Pago', amount: 50, phone: '(17) 91000-3428', notes: 'Pré-Convite' },
-    { id: 'part-8', name: 'Isabela Nascimento Marotto', category: 'Participante', size: 'G', status: 'Pago', amount: 100, phone: '(17) 99113-4769', notes: 'Experience' },
-    { id: 'part-9', name: 'Isadora Abreu', category: 'Participante', size: 'P', status: 'Pago', amount: 50, phone: '(17) 99658-1235', notes: 'Pré-Convite' },
-    { id: 'part-10', name: 'Ísis Eduarda de Brito Pinheiro', category: 'Participante', size: 'P', status: 'Pago', amount: 70, phone: '(17) 98221-1269', notes: 'Com Camiseta' },
-    { id: 'part-11', name: 'Izadora de Jesus Estopa', category: 'Participante', size: 'P', status: 'Pago', amount: 50, phone: '(35) 98424-5785', notes: 'Pré-Convite' },
-    { id: 'part-12', name: 'Izadora Siviero de Souza', category: 'Participante', size: 'P', status: 'Pago', amount: 50, phone: '(17) 99211-3565', notes: 'Pré-Convite' },
-    { id: 'part-13', name: 'José Otávio Prado Marotto', category: 'Participante', size: 'P', status: 'Pago', amount: 50, phone: '(17) 99669-8684', notes: 'Pré-Convite' },
-    { id: 'part-14', name: 'Kauã Alves das Dores', category: 'Participante', size: 'G', status: 'Pago', amount: 50, phone: '(17) 99785-2292', notes: 'Pré-Convite (Pago p/ Gisele)' },
-    { id: 'part-15', name: 'Laura Mandotti Perondi', category: 'Participante', size: 'P', status: 'Pago', amount: 50, phone: '(17) 99193-8301', notes: 'Pré-Convite' },
-    { id: 'part-16', name: 'Lívia Maysa Belmonte', category: 'Participante', size: 'P', status: 'Pago', amount: 50, phone: '(17) 99126-0259', notes: 'Pré-Convite' },
-    { id: 'part-17', name: 'Lorena Pereira Tomazela', category: 'Participante', size: 'P', status: 'Pago', amount: 50, phone: '(17) 99728-1527', notes: 'Pré-Convite' },
-    { id: 'part-18', name: 'Lucas Gabriel Salas da Silva', category: 'Participante', size: 'G', status: 'Pago', amount: 50, phone: '(17) 98138-8610', notes: 'Pré-Convite (Pago p/ Gisele)' },
-    { id: 'part-19', name: 'Maria Elisa Lima Alves', category: 'Participante', size: 'P', status: 'Pago', amount: 50, phone: '(17) 99210-5488', notes: 'Pré-Convite' },
-    { id: 'part-20', name: 'Maria Fernanda Escada Martins', category: 'Participante', size: 'P', status: 'Pago', amount: 50, phone: '(14) 99777-9479', notes: 'Pré-Convite' },
-    { id: 'part-21', name: 'Pietra Nicole Zadi Caraschi', category: 'Participante', size: 'P', status: 'Pago', amount: 50, phone: '(17) 99193-3540', notes: 'Pré-Convite' },
-    { id: 'part-22', name: 'Rafaela Trovo Cardoso Yago', category: 'Participante', size: 'P', status: 'Pago', amount: 70, phone: '(16) 99620-4425', notes: 'Com Camiseta' },
-    { id: 'part-23', name: 'Renata de Sousa', category: 'Participante', size: 'P', status: 'Pago', amount: 50, phone: '(17) 98833-0503', notes: 'Pré-Convite' },
-
-    // --- ANJOS PAGOS (17) ---
-    { id: 'anjo-1', name: 'Wagner', category: 'Anjo', size: 'GG', status: 'Pago', notes: 'Coordenação' },
-    { id: 'anjo-2', name: 'Flavia', category: 'Anjo', size: 'GG', status: 'Pago', notes: 'Equipe Anjo' },
-    { id: 'anjo-3', name: 'Felipe', category: 'Anjo', size: 'GG', status: 'Pago', notes: 'Equipe Anjo' },
-    { id: 'anjo-4', name: 'Eduardo', category: 'Anjo', size: 'GG', status: 'Pago', notes: 'Equipe Anjo' },
-    { id: 'anjo-5', name: 'João Vitor', category: 'Anjo', size: 'GG', status: 'Pago', notes: 'Equipe Anjo' },
-    { id: 'anjo-6', name: 'Mandotti', category: 'Anjo', size: 'G2', status: 'Pago', notes: 'Equipe Anjo' },
-    { id: 'anjo-7', name: 'Simone', category: 'Anjo', size: 'G', status: 'Pago', notes: 'Equipe Anjo' },
-    { id: 'anjo-8', name: 'Rafael', category: 'Anjo', size: 'M', status: 'Pago', notes: 'Equipe Anjo' },
-    { id: 'anjo-9', name: 'Rabachin', category: 'Anjo', size: 'M', status: 'Pago', notes: 'Equipe Anjo' },
-    { id: 'anjo-10', name: 'Cassiano', category: 'Anjo', size: 'M', status: 'Pago', notes: 'Equipe Anjo' },
-    { id: 'anjo-11', name: 'Gabriel E.', category: 'Anjo', size: 'M', status: 'Pago', notes: 'Equipe Anjo' },
-    { id: 'anjo-12', name: 'Julia', category: 'Anjo', size: 'P', status: 'Pago', notes: 'Equipe Anjo' },
-    { id: 'anjo-13', name: 'Mabel', category: 'Anjo', size: 'P', status: 'Pago', notes: 'Equipe Anjo' },
-    { id: 'anjo-14', name: 'Maria Fernanda', category: 'Anjo', size: 'P', status: 'Pago', notes: 'Equipe Anjo' },
-    { id: 'anjo-15', name: 'Marie', category: 'Anjo', size: 'P', status: 'Pago', notes: 'Equipe Anjo' },
-    { id: 'anjo-16', name: 'Leonardo', category: 'Anjo', size: 'EXG', status: 'Pago', notes: 'Equipe Anjo' },
-    { id: 'anjo-17', name: 'Elisangela', category: 'Anjo', size: 'EXG', status: 'Pago', notes: 'Equipe Anjo' },
-
-    // --- FAMÍLIA ROSA MARIA (3) ---
-    { id: 'avulso-1', name: 'Filha da Rosa Maria', category: 'Avulso', size: 'PP', status: 'Pago', notes: 'Tamanho 16 / PP Infantil' },
-    { id: 'avulso-2', name: 'Rosa Maria', category: 'Avulso', size: 'P', status: 'Pago', notes: 'Venda Avulsa' },
-    { id: 'avulso-3', name: 'Esposo da Rosa Maria', category: 'Avulso', size: 'G1', status: 'Pago', notes: 'Venda Avulsa' },
-
-    // --- PARTICIPANTES PENDENTES (19 participantes / 20 camisetas) ---
-    { id: 'part-pend-1', name: 'Ana Clara de Souza Ribeiro', category: 'Participante', size: 'P', status: 'Pendente', amount: 50, phone: '(17) 99676-8296' },
-    { id: 'part-pend-2', name: 'Anne dos Santos Siviero', category: 'Participante', size: 'P', status: 'Pendente', amount: 50, phone: '(17) 99731-3527' },
-    { id: 'part-pend-3', name: 'Francieli Serafim dos Santos', category: 'Participante', size: 'P', status: 'Pendente', amount: 50, phone: '(17) 99655-7603' },
-    { id: 'part-pend-4', name: 'Júlia de Farias Paes', category: 'Participante', size: 'P', status: 'Pendente', amount: 50, phone: '(17) 99207-5255' },
-    { id: 'part-pend-5', name: 'Júlia Cristina de Souza Pereira', category: 'Participante', size: 'P', status: 'Pendente', amount: 50, phone: '(17) 99738-1094' },
-    { id: 'part-pend-6', name: 'Leonardo Rodrigues do Prado', category: 'Participante', size: 'P', status: 'Pendente', amount: 50, phone: '(17) 99153-2595' },
-    { id: 'part-pend-7', name: 'Maria Júlia Sampaio Pereira', category: 'Participante', size: 'P', status: 'Pendente', amount: 50, phone: '(17) 99273-0230' },
-    { id: 'part-pend-8', name: 'Maria Luíza Siviero de Oliveira', category: 'Participante', size: 'P', status: 'Pendente', amount: 50, phone: '(17) 99198-5887' },
-    { id: 'part-pend-9', name: 'Miguel Scherite', category: 'Participante', size: 'P', status: 'Pendente', amount: 50, phone: '(17) 99214-0331' },
-    { id: 'part-pend-10', name: 'Otávio Aparecido Vidal', category: 'Participante', size: 'P', status: 'Pendente', amount: 50, phone: '(16) 99752-2641' },
-    { id: 'part-pend-11', name: 'Pietra dos Santos (1ª)', category: 'Participante', size: 'P', status: 'Pendente', amount: 50, phone: '(17) 98804-2120', notes: 'Kit Duo' },
-    { id: 'part-pend-12', name: 'Pietra dos Santos (2ª / Amigo)', category: 'Participante', size: 'P', status: 'Pendente', amount: 50, phone: '(17) 98804-2120', notes: 'Kit Duo Amigo' },
-    { id: 'part-pend-13', name: 'Victor Hugo Quintiliano', category: 'Participante', size: 'P', status: 'Pendente', amount: 50, phone: '(17) 99125-3816' },
-    { id: 'part-pend-14', name: 'Ana Clara Moreira', category: 'Participante', size: 'M', status: 'Pendente', amount: 100, phone: '(17) 98170-7522', notes: 'Experience' },
-    { id: 'part-pend-15', name: 'Bryan Henrique Broesler da Silva', category: 'Participante', size: 'M', status: 'Pendente', amount: 50, phone: '(17) 99187-7730' },
-    { id: 'part-pend-16', name: 'Cauã Sagiori', category: 'Participante', size: 'M', status: 'Pendente', amount: 50, phone: '(17) 99109-3232' },
-    { id: 'part-pend-17', name: 'Gabriel Henrique Monteiro Ramos', category: 'Participante', size: 'M', status: 'Pendente', amount: 50, phone: '(17) 99145-9981' },
-    { id: 'part-pend-18', name: 'Gabriel Milanezi Silva', category: 'Participante', size: 'M', status: 'Pendente', amount: 50, phone: '(17) 99701-1154' },
-    { id: 'part-pend-19', name: 'Kaio Gomes Braga', category: 'Participante', size: 'M', status: 'Pendente', amount: 50, phone: '(17) 99611-5759' },
-    { id: 'part-pend-20', name: 'João Vitor Silva', category: 'Participante', size: 'G', status: 'Pendente', amount: 50, phone: '(17) 98226-8286' },
-
-    // --- ANJOS PENDENTES (4) ---
-    { id: 'anjo-pend-1', name: 'João Pedro', category: 'Anjo', size: 'M', status: 'Pendente', notes: 'Equipe Anjo' },
-    { id: 'anjo-pend-2', name: 'Machado', category: 'Anjo', size: 'G', status: 'Pendente', notes: 'Equipe Anjo' },
-    { id: 'anjo-pend-3', name: 'Pedro Harada', category: 'Anjo', size: 'GG', status: 'Pendente', notes: 'Equipe Anjo' },
-    { id: 'anjo-pend-4', name: 'Varini', category: 'Anjo', size: 'GG', status: 'Pendente', notes: 'Equipe Anjo' }
-]
+const SIZES_ORDER: TshirtOrderItem['size'][] = ['PP', 'P', 'M', 'G', 'GG', 'G1', 'G2', 'EXG']
 
 export default function TshirtOrdersAdmin() {
-    const [orders, setOrders] = useState<TshirtOrderItem[]>(INITIAL_TSHIRT_ORDERS)
+    const [orders, setOrders] = useState<TshirtOrderItem[]>([])
+    const [loading, setLoading] = useState(true)
+    const [savingId, setSavingId] = useState<string | null>(null)
+    const [actionMessage, setActionMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null)
+
+    // Filtros e busca
     const [searchTerm, setSearchTerm] = useState('')
     const [filterCategory, setFilterCategory] = useState<string>('Todos')
     const [filterSize, setFilterSize] = useState<string>('Todos')
     const [filterStatus, setFilterStatus] = useState<string>('Todos')
     const [activeTab, setActiveTab] = useState<'list' | 'production'>('list')
 
-    // Modal para Adicionar Novo Pedido
-    const [isAddModalOpen, setIsAddModalOpen] = useState(false)
-    const [newName, setNewName] = useState('')
-    const [newCategory, setNewCategory] = useState<'Participante' | 'Anjo' | 'Avulso'>('Avulso')
-    const [newSize, setNewSize] = useState<TshirtOrderItem['size']>('M')
-    const [newStatus, setNewStatus] = useState<'Pago' | 'Pendente'>('Pago')
-    const [newPhone, setNewPhone] = useState('')
-    const [newNotes, setNewNotes] = useState('')
+    // Seleção múltipla
+    const [selectedIds, setSelectedIds] = useState<string[]>([])
+    const [bulkUpdating, setBulkUpdating] = useState(false)
 
-    // Alternar status de pagamento
-    const toggleStatus = (id: string) => {
-        setOrders(prev => prev.map(item => {
-            if (item.id === id) {
-                return {
-                    ...item,
-                    status: item.status === 'Pago' ? 'Pendente' : 'Pago'
-                }
+    // Modal para Adicionar/Editar
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+    const [editingItem, setEditingItem] = useState<TshirtOrderItem | null>(null)
+    const [formName, setFormName] = useState('')
+    const [formCategory, setFormCategory] = useState<'Participante' | 'Anjo' | 'Avulso'>('Avulso')
+    const [formSize, setFormSize] = useState<TshirtOrderItem['size']>('M')
+    const [formStatus, setFormStatus] = useState<'Pago' | 'Pendente'>('Pago')
+    const [formAmount, setFormAmount] = useState<number>(50)
+    const [formPaymentMethod, setFormPaymentMethod] = useState('PIX')
+    const [formPhone, setFormPhone] = useState('')
+    const [formNotes, setFormNotes] = useState('')
+
+    // Modal de Pagamento Rápido
+    const [paymentModalItem, setPaymentModalItem] = useState<TshirtOrderItem | null>(null)
+    const [quickMethod, setQuickMethod] = useState<'PIX' | 'Dinheiro' | 'Cartão' | 'Outro'>('PIX')
+
+    // Carregar pedidos do Supabase
+    const loadOrders = async () => {
+        setLoading(true)
+        try {
+            const { data, error } = await supabase
+                .from('tshirt_orders')
+                .select('*')
+                .order('created_at', { ascending: false })
+
+            if (error) throw error
+            if (data) {
+                setOrders(data as TshirtOrderItem[])
             }
-            return item
-        }))
+        } catch (err: any) {
+            console.error('Erro ao carregar camisetas:', err)
+            showMessage('Erro ao carregar dados: ' + err.message, 'error')
+        } finally {
+            setLoading(false)
+        }
     }
 
-    const handleAddOrder = (e: React.FormEvent) => {
-        e.preventDefault()
-        if (!newName.trim()) return
+    useEffect(() => {
+        loadOrders()
+    }, [])
 
-        const newItem: TshirtOrderItem = {
-            id: `custom-${Date.now()}`,
-            name: newName.trim(),
-            category: newCategory,
-            size: newSize,
-            status: newStatus,
-            phone: newPhone.trim() || undefined,
-            notes: newNotes.trim() || undefined
+    const showMessage = (text: string, type: 'success' | 'error' = 'success') => {
+        setActionMessage({ text, type })
+        setTimeout(() => setActionMessage(null), 4000)
+    }
+
+    // Alternar status de pagamento (1 clique)
+    const togglePaymentStatus = async (item: TshirtOrderItem) => {
+        const nextStatus = item.status === 'Pago' ? 'Pendente' : 'Pago'
+        setSavingId(item.id)
+
+        try {
+            // 1. Atualiza na tabela tshirt_orders
+            const { error } = await supabase
+                .from('tshirt_orders')
+                .update({
+                    status: nextStatus,
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', item.id)
+
+            if (error) throw error
+
+            // 2. Se for vinculado a uma inscrição de participante, sincroniza na tabela de registrations e payments
+            if (item.registration_id) {
+                await supabase
+                    .from('payments')
+                    .update({ status: nextStatus })
+                    .eq('registration_id', item.registration_id)
+
+                await supabase
+                    .from('registrations')
+                    .update({ status: nextStatus === 'Pago' ? 'Confirmada' : 'Pendente' })
+                    .eq('id', item.registration_id)
+            }
+
+            // Atualização otimista no estado local
+            setOrders(prev => prev.map(o => o.id === item.id ? { ...o, status: nextStatus } : o))
+            showMessage(`Camiseta de ${item.name} marcada como ${nextStatus}!`, 'success')
+        } catch (err: any) {
+            console.error('Erro ao atualizar status:', err)
+            showMessage('Erro ao atualizar status: ' + err.message, 'error')
+        } finally {
+            setSavingId(null)
         }
+    }
 
-        setOrders(prev => [newItem, ...prev])
+    // Confirmar pagamento rápido com método
+    const confirmQuickPayment = async () => {
+        if (!paymentModalItem) return
+        setSavingId(paymentModalItem.id)
+
+        try {
+            const { error } = await supabase
+                .from('tshirt_orders')
+                .update({
+                    status: 'Pago',
+                    payment_method: quickMethod,
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', paymentModalItem.id)
+
+            if (error) throw error
+
+            if (paymentModalItem.registration_id) {
+                await supabase
+                    .from('payments')
+                    .update({ status: 'Pago' })
+                    .eq('registration_id', paymentModalItem.registration_id)
+
+                await supabase
+                    .from('registrations')
+                    .update({ status: 'Confirmada' })
+                    .eq('id', paymentModalItem.registration_id)
+            }
+
+            setOrders(prev => prev.map(o => o.id === paymentModalItem.id ? { ...o, status: 'Pago', payment_method: quickMethod } : o))
+            showMessage(`Pagamento de ${paymentModalItem.name} confirmado via ${quickMethod}!`, 'success')
+            setPaymentModalItem(null)
+        } catch (err: any) {
+            showMessage('Erro ao confirmar pagamento: ' + err.message, 'error')
+        } finally {
+            setSavingId(null)
+        }
+    }
+
+    // Ação em massa: Marcar selecionados como Pago
+    const handleBulkMarkPaid = async () => {
+        if (selectedIds.length === 0) return
+        if (!confirm(`Deseja marcar ${selectedIds.length} camisetas selecionadas como PAGAS?`)) return
+
+        setBulkUpdating(true)
+        try {
+            const { error } = await supabase
+                .from('tshirt_orders')
+                .update({
+                    status: 'Pago',
+                    updated_at: new Date().toISOString()
+                })
+                .in('id', selectedIds)
+
+            if (error) throw error
+
+            // Sincronizar inscrições vinculadas
+            const selectedItems = orders.filter(o => selectedIds.includes(o.id) && o.registration_id)
+            for (const item of selectedItems) {
+                if (item.registration_id) {
+                    await supabase.from('payments').update({ status: 'Pago' }).eq('registration_id', item.registration_id)
+                    await supabase.from('registrations').update({ status: 'Confirmada' }).eq('id', item.registration_id)
+                }
+            }
+
+            setOrders(prev => prev.map(o => selectedIds.includes(o.id) ? { ...o, status: 'Pago' } : o))
+            showMessage(`${selectedIds.length} camisetas foram marcadas como PAGAS com sucesso!`, 'success')
+            setSelectedIds([])
+        } catch (err: any) {
+            showMessage('Erro ao atualizar selecionados: ' + err.message, 'error')
+        } finally {
+            setBulkUpdating(false)
+        }
+    }
+
+    // Salvar Pedido (Novo ou Edição)
+    const handleSaveOrder = async (e: React.FormEvent) => {
+        e.preventDefault()
+        if (!formName.trim()) return
+
+        try {
+            if (editingItem) {
+                // Editar existente
+                const { error } = await supabase
+                    .from('tshirt_orders')
+                    .update({
+                        name: formName.trim(),
+                        category: formCategory,
+                        size: formSize,
+                        status: formStatus,
+                        amount: formAmount,
+                        payment_method: formPaymentMethod,
+                        phone: formPhone.trim() || null,
+                        notes: formNotes.trim() || null,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', editingItem.id)
+
+                if (error) throw error
+
+                setOrders(prev => prev.map(o => o.id === editingItem.id ? {
+                    ...o,
+                    name: formName.trim(),
+                    category: formCategory,
+                    size: formSize,
+                    status: formStatus,
+                    amount: formAmount,
+                    payment_method: formPaymentMethod,
+                    phone: formPhone.trim() || undefined,
+                    notes: formNotes.trim() || undefined
+                } : o))
+
+                showMessage(`Pedido de ${formName} atualizado com sucesso!`)
+            } else {
+                // Inserir novo
+                const newPayload = {
+                    name: formName.trim(),
+                    category: formCategory,
+                    size: formSize,
+                    status: formStatus,
+                    amount: formAmount,
+                    payment_method: formPaymentMethod,
+                    phone: formPhone.trim() || null,
+                    notes: formNotes.trim() || null,
+                    event_slug: 'adonai-2026'
+                }
+
+                const { data, error } = await supabase
+                    .from('tshirt_orders')
+                    .insert([newPayload])
+                    .select()
+                    .single()
+
+                if (error) throw error
+                if (data) {
+                    setOrders(prev => [data as TshirtOrderItem, ...prev])
+                }
+                showMessage(`Nova camiseta para ${formName} adicionada com sucesso!`)
+            }
+
+            closeFormModal()
+        } catch (err: any) {
+            showMessage('Erro ao salvar: ' + err.message, 'error')
+        }
+    }
+
+    // Excluir Pedido
+    const handleDeleteOrder = async (item: TshirtOrderItem) => {
+        if (!confirm(`Tem certeza que deseja excluir a camiseta de "${item.name}"?`)) return
+
+        try {
+            const { error } = await supabase
+                .from('tshirt_orders')
+                .delete()
+                .eq('id', item.id)
+
+            if (error) throw error
+
+            setOrders(prev => prev.filter(o => o.id !== item.id))
+            showMessage(`Camiseta de ${item.name} removida.`, 'success')
+        } catch (err: any) {
+            showMessage('Erro ao excluir: ' + err.message, 'error')
+        }
+    }
+
+    const openEditModal = (item: TshirtOrderItem) => {
+        setEditingItem(item)
+        setFormName(item.name)
+        setFormCategory(item.category)
+        setFormSize(item.size)
+        setFormStatus(item.status)
+        setFormAmount(item.amount || 50)
+        setFormPaymentMethod(item.payment_method || 'PIX')
+        setFormPhone(item.phone || '')
+        setFormNotes(item.notes || '')
+        setIsAddModalOpen(true)
+    }
+
+    const closeFormModal = () => {
         setIsAddModalOpen(false)
-        setNewName('')
-        setNewPhone('')
-        setNewNotes('')
+        setEditingItem(null)
+        setFormName('')
+        setFormPhone('')
+        setFormNotes('')
+        setFormAmount(50)
+    }
+
+    // Seleção de todas as linhas filtradas
+    const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.checked) {
+            setSelectedIds(filteredOrders.map(o => o.id))
+        } else {
+            setSelectedIds([])
+        }
+    }
+
+    const handleToggleSelectOne = (id: string) => {
+        setSelectedIds(prev =>
+            prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+        )
     }
 
     // Filtragem
@@ -164,8 +347,6 @@ export default function TshirtOrdersAdmin() {
     }, [orders, searchTerm, filterCategory, filterSize, filterStatus])
 
     // Grade de Tamanhos
-    const SIZES_ORDER: TshirtOrderItem['size'][] = ['PP', 'P', 'M', 'G', 'GG', 'G1', 'G2', 'EXG']
-
     const sizeStats = useMemo(() => {
         const stats: Record<string, { paid: number; pending: number; total: number }> = {}
         SIZES_ORDER.forEach(s => {
@@ -194,13 +375,15 @@ export default function TshirtOrdersAdmin() {
 
     // Exportação CSV
     const exportCSV = () => {
-        const headers = ['#', 'Nome', 'Categoria', 'Tamanho', 'Status Pagamento', 'Telefone', 'Observações']
+        const headers = ['#', 'Nome', 'Categoria', 'Tamanho', 'Status Pagamento', 'Forma Pagamento', 'Valor (R$)', 'Telefone', 'Observações']
         const rows = filteredOrders.map((item, idx) => [
             idx + 1,
             `"${item.name}"`,
             `"${item.category}"`,
             `"${item.size}"`,
             `"${item.status}"`,
+            `"${item.payment_method || 'PIX'}"`,
+            `"${item.amount || 50}"`,
             `"${item.phone || ''}"`,
             `"${item.notes || ''}"`
         ])
@@ -215,14 +398,28 @@ export default function TshirtOrdersAdmin() {
         document.body.removeChild(link)
     }
 
-    // Impressão rápida
-    const handlePrint = () => {
-        window.print()
-    }
-
     return (
         <div className="space-y-8 p-4 md:p-8 max-w-7xl mx-auto">
-            {/* CABEÇALHO */}
+            {/* NOTIFICAÇÃO TOAST FLUTUANTE */}
+            <AnimatePresence>
+                {actionMessage && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        className={`fixed top-6 right-6 z-50 px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 border backdrop-blur-md ${
+                            actionMessage.type === 'success'
+                                ? 'bg-green-500/20 border-green-500/40 text-green-300'
+                                : 'bg-red-500/20 border-red-500/40 text-red-300'
+                        }`}
+                    >
+                        {actionMessage.type === 'success' ? <CheckCircle size={20} /> : <AlertCircle size={20} />}
+                        <span className="font-bold text-sm">{actionMessage.text}</span>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* CABEÇALHO PRINCIPAL */}
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 bg-holi-surface/80 border border-white/10 p-6 md:p-8 rounded-3xl backdrop-blur-md">
                 <div>
                     <div className="flex items-center gap-3 mb-2">
@@ -234,7 +431,7 @@ export default function TshirtOrdersAdmin() {
                                 Gestão de Camisetas • ADONAI 2026
                             </h1>
                             <p className="text-gray-400 text-xs md:text-sm">
-                                Controle de confecção unificado: Participantes, Anjos e Vendas Avulsas.
+                                Controle de pagamentos, confecção e vendas em tempo real.
                             </p>
                         </div>
                     </div>
@@ -242,7 +439,18 @@ export default function TshirtOrdersAdmin() {
 
                 <div className="flex flex-wrap items-center gap-3">
                     <button
-                        onClick={() => setIsAddModalOpen(true)}
+                        onClick={loadOrders}
+                        disabled={loading}
+                        className="p-3 bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white rounded-2xl transition-colors border border-white/10 cursor-pointer"
+                        title="Atualizar lista"
+                    >
+                        <RefreshCw size={18} className={loading ? 'animate-spin text-holi-primary' : ''} />
+                    </button>
+                    <button
+                        onClick={() => {
+                            setEditingItem(null)
+                            setIsAddModalOpen(true)
+                        }}
                         className="px-5 py-3 bg-gradient-to-r from-holi-primary to-purple-600 hover:brightness-110 text-white font-black text-xs uppercase tracking-wider rounded-2xl transition-all flex items-center gap-2 shadow-lg shadow-holi-primary/30 cursor-pointer"
                     >
                         <Plus size={16} /> Adicionar Camiseta
@@ -254,7 +462,7 @@ export default function TshirtOrdersAdmin() {
                         <Download size={16} /> CSV
                     </button>
                     <button
-                        onClick={handlePrint}
+                        onClick={() => window.print()}
                         className="px-4 py-3 bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white font-bold text-xs uppercase tracking-wider rounded-2xl transition-colors flex items-center gap-2 cursor-pointer"
                     >
                         <Printer size={16} /> Imprimir
@@ -268,10 +476,10 @@ export default function TshirtOrdersAdmin() {
                     <div className="flex justify-between items-start">
                         <div>
                             <span className="text-green-400 text-xs uppercase font-bold tracking-wider block mb-1">
-                                ✅ Pagas & Garantidas
+                                ✅ Pagas & Confirmadas
                             </span>
                             <div className="text-4xl font-black text-white">{totalPaid}</div>
-                            <span className="text-xs text-gray-400 mt-1 block">Produção 100% garantida</span>
+                            <span className="text-xs text-gray-400 mt-1 block">Produção garantida</span>
                         </div>
                         <div className="p-3 bg-green-500/10 rounded-2xl text-green-400 border border-green-500/20">
                             <CheckCircle size={28} />
@@ -286,7 +494,7 @@ export default function TshirtOrdersAdmin() {
                                 ⏳ Pendentes de Pagamento
                             </span>
                             <div className="text-4xl font-black text-white">{totalPending}</div>
-                            <span className="text-xs text-gray-400 mt-1 block">Aguardando PIX / Comprovante</span>
+                            <span className="text-xs text-gray-400 mt-1 block">Clique no botão para marcar Pago</span>
                         </div>
                         <div className="p-3 bg-amber-500/10 rounded-2xl text-amber-400 border border-amber-500/20">
                             <AlertCircle size={28} />
@@ -301,7 +509,7 @@ export default function TshirtOrdersAdmin() {
                                 📦 Total Geral Previsto
                             </span>
                             <div className="text-4xl font-black text-white">{totalAll}</div>
-                            <span className="text-xs text-gray-400 mt-1 block">Demanda máxima de confecção</span>
+                            <span className="text-xs text-gray-400 mt-1 block">Demanda máxima para confecção</span>
                         </div>
                         <div className="p-3 bg-holi-secondary/10 rounded-2xl text-holi-secondary border border-holi-secondary/20">
                             <Shirt size={28} />
@@ -317,7 +525,7 @@ export default function TshirtOrdersAdmin() {
                         <Shirt className="text-holi-secondary" size={22} /> Grade de Confecção por Tamanho
                     </h3>
                     <span className="text-xs text-gray-400 font-mono">
-                        (Pagos + Pendentes)
+                        (Clique num tamanho para filtrar)
                     </span>
                 </div>
 
@@ -330,7 +538,7 @@ export default function TshirtOrdersAdmin() {
                                 onClick={() => setFilterSize(filterSize === size ? 'Todos' : size)}
                                 className={`p-4 rounded-2xl border transition-all cursor-pointer text-center ${
                                     filterSize === size
-                                        ? 'bg-holi-primary/20 border-holi-primary shadow-lg shadow-holi-primary/20'
+                                        ? 'bg-holi-primary/20 border-holi-primary shadow-lg shadow-holi-primary/20 scale-105'
                                         : 'bg-black/40 border-white/10 hover:border-white/20'
                                 }`}
                             >
@@ -352,7 +560,7 @@ export default function TshirtOrdersAdmin() {
                 </div>
             </div>
 
-            {/* BARRA DE FILTROS & ABAS */}
+            {/* BARRA DE FERRAMENTAS & FILTROS */}
             <div className="flex flex-col md:flex-row gap-4 justify-between items-stretch md:items-center bg-holi-surface/60 p-4 border border-white/10 rounded-2xl">
                 <div className="flex flex-wrap items-center gap-3 flex-1">
                     {/* Busca */}
@@ -418,78 +626,196 @@ export default function TshirtOrdersAdmin() {
                             activeTab === 'production' ? 'bg-holi-primary text-white shadow-md' : 'text-gray-400 hover:text-white'
                         }`}
                     >
-                        Guia de Produção / Gráfica
+                        Guia da Gráfica
                     </button>
                 </div>
             </div>
 
-            {/* TAB 1: LISTAGEM COMPLETA DETALHADA */}
+            {/* BARRA DE AÇÕES EM MASSA (quando há itens selecionados) */}
+            {selectedIds.length > 0 && (
+                <div className="bg-gradient-to-r from-holi-primary/20 to-purple-600/20 border border-holi-primary/40 p-4 rounded-2xl flex items-center justify-between gap-4">
+                    <span className="text-sm font-bold text-white">
+                        {selectedIds.length} camisetas selecionadas
+                    </span>
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={handleBulkMarkPaid}
+                            disabled={bulkUpdating}
+                            className="px-4 py-2 bg-green-500 hover:bg-green-600 text-black font-black text-xs uppercase rounded-xl transition-all flex items-center gap-2 cursor-pointer shadow-lg shadow-green-500/20"
+                        >
+                            {bulkUpdating ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle size={14} />}
+                            Marcar como PAGO
+                        </button>
+                        <button
+                            onClick={() => setSelectedIds([])}
+                            className="px-3 py-2 bg-white/10 hover:bg-white/20 text-white font-bold text-xs uppercase rounded-xl transition-all cursor-pointer"
+                        >
+                            Limpar Seleção
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* TAB 1: LISTA DETALHADA COM GESTÃO DE PAGAMENTO */}
             {activeTab === 'list' && (
                 <div className="bg-holi-surface border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse">
-                            <thead>
-                                <tr className="border-b border-white/10 bg-black/40 text-[11px] uppercase tracking-wider text-gray-400">
-                                    <th className="py-4 px-6">#</th>
-                                    <th className="py-4 px-6">Nome</th>
-                                    <th className="py-4 px-4">Categoria</th>
-                                    <th className="py-4 px-4 text-center">Tamanho</th>
-                                    <th className="py-4 px-4">Status Pagamento</th>
-                                    <th className="py-4 px-6">Contato / Observações</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-white/5 text-sm">
-                                {filteredOrders.map((item, idx) => (
-                                    <tr key={item.id} className="hover:bg-white/[0.02] transition-colors group">
-                                        <td className="py-4 px-6 text-gray-500 font-mono text-xs">
-                                            {idx + 1}
-                                        </td>
-                                        <td className="py-4 px-6">
-                                            <div className="font-bold text-white flex items-center gap-2">
-                                                {item.name}
-                                            </div>
-                                        </td>
-                                        <td className="py-4 px-4">
-                                            <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-bold ${
-                                                item.category === 'Participante'
-                                                    ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
-                                                    : item.category === 'Anjo'
-                                                        ? 'bg-purple-500/10 text-purple-300 border border-purple-500/20'
-                                                        : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                                            }`}>
-                                                {item.category}
-                                            </span>
-                                        </td>
-                                        <td className="py-4 px-4 text-center">
-                                            <span className="inline-block px-3 py-1 rounded-xl bg-white/10 text-holi-secondary font-mono font-black text-sm border border-white/10">
-                                                {item.size}
-                                            </span>
-                                        </td>
-                                        <td className="py-4 px-4">
-                                            <button
-                                                type="button"
-                                                onClick={() => toggleStatus(item.id)}
-                                                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
-                                                    item.status === 'Pago'
-                                                        ? 'bg-green-500/20 text-green-400 border border-green-500/30 hover:bg-green-500/30'
-                                                        : 'bg-amber-500/20 text-amber-400 border border-amber-500/30 hover:bg-amber-500/30'
+                    {loading ? (
+                        <div className="py-20 text-center">
+                            <Loader2 className="w-10 h-10 animate-spin text-holi-primary mx-auto mb-3" />
+                            <p className="text-gray-400 text-sm">Carregando pedidos de camisetas...</p>
+                        </div>
+                    ) : filteredOrders.length === 0 ? (
+                        <div className="py-20 text-center text-gray-400">
+                            <Shirt className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                            <p className="text-lg font-bold text-white mb-1">Nenhum pedido encontrado</p>
+                            <p className="text-sm">Tente ajustar seus filtros de busca.</p>
+                        </div>
+                    ) : (
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left border-collapse">
+                                <thead>
+                                    <tr className="border-b border-white/10 bg-black/40 text-[11px] uppercase tracking-wider text-gray-400">
+                                        <th className="py-4 px-4 text-center w-10">
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedIds.length === filteredOrders.length && filteredOrders.length > 0}
+                                                onChange={handleSelectAll}
+                                                className="rounded bg-black/40 border-white/20 text-holi-primary focus:ring-0 cursor-pointer"
+                                            />
+                                        </th>
+                                        <th className="py-4 px-4">Nome</th>
+                                        <th className="py-4 px-4">Categoria</th>
+                                        <th className="py-4 px-4 text-center">Tamanho</th>
+                                        <th className="py-4 px-4">Status Pagamento (Clique p/ Mudar)</th>
+                                        <th className="py-4 px-4">Forma Pagto</th>
+                                        <th className="py-4 px-4">Contato / Detalhes</th>
+                                        <th className="py-4 px-6 text-right">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-white/5 text-sm">
+                                    {filteredOrders.map((item, idx) => {
+                                        const isSelected = selectedIds.includes(item.id)
+                                        const isSaving = savingId === item.id
+
+                                        return (
+                                            <tr
+                                                key={item.id}
+                                                className={`hover:bg-white/[0.02] transition-colors group ${
+                                                    isSelected ? 'bg-holi-primary/5' : ''
                                                 }`}
                                             >
-                                                {item.status === 'Pago' ? <CheckCircle size={12} /> : <AlertCircle size={12} />}
-                                                {item.status}
-                                            </button>
-                                        </td>
-                                        <td className="py-4 px-6 text-xs text-gray-400">
-                                            <div className="flex flex-col">
-                                                {item.phone && <span className="text-gray-300">{item.phone}</span>}
-                                                {item.notes && <span className="text-gray-500">{item.notes}</span>}
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                                                {/* CHECKBOX SELEÇÃO */}
+                                                <td className="py-4 px-4 text-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={isSelected}
+                                                        onChange={() => handleToggleSelectOne(item.id)}
+                                                        className="rounded bg-black/40 border-white/20 text-holi-primary focus:ring-0 cursor-pointer"
+                                                    />
+                                                </td>
+
+                                                {/* NOME */}
+                                                <td className="py-4 px-4">
+                                                    <div className="font-bold text-white flex items-center gap-2">
+                                                        {item.name}
+                                                    </div>
+                                                </td>
+
+                                                {/* CATEGORIA */}
+                                                <td className="py-4 px-4">
+                                                    <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-bold ${
+                                                        item.category === 'Participante'
+                                                            ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
+                                                            : item.category === 'Anjo'
+                                                                ? 'bg-purple-500/10 text-purple-300 border border-purple-500/20'
+                                                                : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                                                    }`}>
+                                                        {item.category}
+                                                    </span>
+                                                </td>
+
+                                                {/* TAMANHO */}
+                                                <td className="py-4 px-4 text-center">
+                                                    <span className="inline-block px-3 py-1 rounded-xl bg-white/10 text-holi-secondary font-mono font-black text-sm border border-white/10">
+                                                        {item.size}
+                                                    </span>
+                                                </td>
+
+                                                {/* STATUS DE PAGAMENTO COM TOGGLE RÁPIDO */}
+                                                <td className="py-4 px-4">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => togglePaymentStatus(item)}
+                                                        disabled={isSaving}
+                                                        className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer shadow-sm ${
+                                                            item.status === 'Pago'
+                                                                ? 'bg-green-500/20 text-green-400 border border-green-500/40 hover:bg-green-500/30'
+                                                                : 'bg-amber-500/20 text-amber-400 border border-amber-500/40 hover:bg-amber-500/30 hover:scale-105'
+                                                        }`}
+                                                        title="Clique para alternar Pago / Pendente"
+                                                    >
+                                                        {isSaving ? (
+                                                            <Loader2 size={12} className="animate-spin" />
+                                                        ) : item.status === 'Pago' ? (
+                                                            <CheckCircle size={13} />
+                                                        ) : (
+                                                            <AlertCircle size={13} />
+                                                        )}
+                                                        <span>{item.status}</span>
+                                                    </button>
+                                                </td>
+
+                                                {/* FORMA DE PAGAMENTO */}
+                                                <td className="py-4 px-4">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setPaymentModalItem(item)}
+                                                        className="text-xs text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 px-2.5 py-1 rounded-lg border border-white/10 transition-colors flex items-center gap-1 cursor-pointer"
+                                                        title="Alterar método de pagamento"
+                                                    >
+                                                        {item.payment_method === 'Dinheiro' && <Banknote size={12} className="text-emerald-400" />}
+                                                        {item.payment_method === 'Cartão' && <CreditCard size={12} className="text-blue-400" />}
+                                                        {(!item.payment_method || item.payment_method === 'PIX') && <DollarSign size={12} className="text-cyan-400" />}
+                                                        <span>{item.payment_method || 'PIX'}</span>
+                                                    </button>
+                                                </td>
+
+                                                {/* DETALHES / CONTATO */}
+                                                <td className="py-4 px-4 text-xs text-gray-400">
+                                                    <div className="flex flex-col">
+                                                        {item.phone && <span className="text-gray-300">{item.phone}</span>}
+                                                        {item.notes && <span className="text-gray-500 truncate max-w-[180px]">{item.notes}</span>}
+                                                    </div>
+                                                </td>
+
+                                                {/* AÇÕES (EDITAR / EXCLUIR) */}
+                                                <td className="py-4 px-6 text-right">
+                                                    <div className="flex items-center justify-end gap-2">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => openEditModal(item)}
+                                                            className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                                                            title="Editar Camiseta"
+                                                        >
+                                                            <Edit3 size={16} />
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleDeleteOrder(item)}
+                                                            className="p-1.5 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer"
+                                                            title="Excluir"
+                                                        >
+                                                            <Trash2 size={16} />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        )
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
                 </div>
             )}
 
@@ -501,10 +827,10 @@ export default function TshirtOrdersAdmin() {
                             <FileText className="text-holi-primary" size={24} />
                             <div>
                                 <h3 className="text-xl font-black text-white uppercase tracking-tight">
-                                    Resumo para Envio à Estamparia / Gráfica
+                                    Resumo Oficial para a Estamparia / Gráfica
                                 </h3>
                                 <p className="text-gray-400 text-xs">
-                                    Valores totalizados para corte, costura e estamparia das camisetas do Retiro ADONAI 2026.
+                                    Contagem exata por tamanho para confecção das camisetas do Retiro ADONAI 2026.
                                 </p>
                             </div>
                         </div>
@@ -514,7 +840,7 @@ export default function TshirtOrdersAdmin() {
                                 <thead>
                                     <tr className="border-b border-white/10 bg-black/40 text-xs uppercase tracking-wider text-gray-400">
                                         <th className="py-3 px-4">Tamanho</th>
-                                        <th className="py-3 px-4 text-center">Garantido (Pago)</th>
+                                        <th className="py-3 px-4 text-center">Garantido (Já Pago)</th>
                                         <th className="py-3 px-4 text-center">Pendente</th>
                                         <th className="py-3 px-4 text-right font-black">Total Previsto</th>
                                     </tr>
@@ -544,7 +870,80 @@ export default function TshirtOrdersAdmin() {
                 </div>
             )}
 
-            {/* MODAL: ADICIONAR NOVO PEDIDO DE CAMISETA */}
+            {/* MODAL: PAGAMENTO RÁPIDO */}
+            <AnimatePresence>
+                {paymentModalItem && (
+                    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            className="bg-holi-surface border border-white/10 rounded-3xl max-w-sm w-full p-6 shadow-2xl relative"
+                        >
+                            <button
+                                onClick={() => setPaymentModalItem(null)}
+                                className="absolute top-6 right-6 text-gray-400 hover:text-white p-1 rounded-lg bg-white/5 hover:bg-white/10 transition-colors cursor-pointer"
+                            >
+                                <X size={20} />
+                            </button>
+
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="w-10 h-10 rounded-xl bg-green-500/20 border border-green-500/30 flex items-center justify-center text-green-400">
+                                    <DollarSign size={22} />
+                                </div>
+                                <div>
+                                    <h3 className="text-lg font-black text-white">Confirmar Pagamento</h3>
+                                    <p className="text-xs text-gray-400">{paymentModalItem.name} ({paymentModalItem.size})</p>
+                                </div>
+                            </div>
+
+                            <div className="space-y-4 my-6">
+                                <label className="block text-xs font-bold uppercase text-gray-400">
+                                    Forma de Pagamento
+                                </label>
+                                <div className="grid grid-cols-2 gap-2">
+                                    {(['PIX', 'Dinheiro', 'Cartão', 'Outro'] as const).map(m => (
+                                        <button
+                                            key={m}
+                                            type="button"
+                                            onClick={() => setQuickMethod(m)}
+                                            className={`p-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                                                quickMethod === m
+                                                    ? 'bg-holi-primary text-white border-holi-primary shadow-lg shadow-holi-primary/20'
+                                                    : 'bg-black/40 border-white/10 text-gray-400 hover:text-white hover:border-white/20'
+                                            }`}
+                                        >
+                                            {m === 'PIX' && <DollarSign size={14} />}
+                                            {m === 'Dinheiro' && <Banknote size={14} />}
+                                            {m === 'Cartão' && <CreditCard size={14} />}
+                                            {m}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
+                                <button
+                                    type="button"
+                                    onClick={() => setPaymentModalItem(null)}
+                                    className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs uppercase cursor-pointer"
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={confirmQuickPayment}
+                                    className="px-5 py-2.5 rounded-xl bg-green-500 hover:bg-green-600 text-black font-black text-xs uppercase cursor-pointer shadow-lg shadow-green-500/20"
+                                >
+                                    Salvar como PAGO
+                                </button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* MODAL: ADICIONAR / EDITAR CAMISETA */}
             <AnimatePresence>
                 {isAddModalOpen && (
                     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
@@ -555,7 +954,7 @@ export default function TshirtOrdersAdmin() {
                             className="bg-holi-surface border border-white/10 rounded-3xl max-w-md w-full p-6 md:p-8 shadow-2xl relative"
                         >
                             <button
-                                onClick={() => setIsAddModalOpen(false)}
+                                onClick={closeFormModal}
                                 className="absolute top-6 right-6 text-gray-400 hover:text-white p-1 rounded-lg bg-white/5 hover:bg-white/10 transition-colors cursor-pointer"
                             >
                                 <X size={20} />
@@ -563,22 +962,22 @@ export default function TshirtOrdersAdmin() {
 
                             <div className="flex items-center gap-3 mb-6">
                                 <div className="w-10 h-10 rounded-xl bg-holi-primary/20 border border-holi-primary/30 flex items-center justify-center text-holi-primary">
-                                    <Plus size={20} />
+                                    {editingItem ? <Edit3 size={20} /> : <Plus size={20} />}
                                 </div>
                                 <h3 className="text-xl font-black text-white uppercase tracking-tight">
-                                    Adicionar Camiseta
+                                    {editingItem ? 'Editar Camiseta' : 'Adicionar Camiseta'}
                                 </h3>
                             </div>
 
-                            <form onSubmit={handleAddOrder} className="space-y-4 text-sm">
+                            <form onSubmit={handleSaveOrder} className="space-y-4 text-sm">
                                 <div>
                                     <label className="block text-xs font-bold uppercase text-gray-400 mb-1">
                                         Nome Completo
                                     </label>
                                     <input
                                         type="text"
-                                        value={newName}
-                                        onChange={e => setNewName(e.target.value)}
+                                        value={formName}
+                                        onChange={e => setFormName(e.target.value)}
                                         placeholder="Ex: João da Silva"
                                         required
                                         className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-holi-primary"
@@ -591,8 +990,8 @@ export default function TshirtOrdersAdmin() {
                                             Categoria
                                         </label>
                                         <select
-                                            value={newCategory}
-                                            onChange={e => setNewCategory(e.target.value as any)}
+                                            value={formCategory}
+                                            onChange={e => setFormCategory(e.target.value as any)}
                                             className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-holi-primary"
                                         >
                                             <option value="Avulso">Venda Avulsa</option>
@@ -606,8 +1005,8 @@ export default function TshirtOrdersAdmin() {
                                             Tamanho
                                         </label>
                                         <select
-                                            value={newSize}
-                                            onChange={e => setNewSize(e.target.value as any)}
+                                            value={formSize}
+                                            onChange={e => setFormSize(e.target.value as any)}
                                             className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-holi-primary font-mono font-bold"
                                         >
                                             {SIZES_ORDER.map(s => (
@@ -623,8 +1022,8 @@ export default function TshirtOrdersAdmin() {
                                             Status Pagamento
                                         </label>
                                         <select
-                                            value={newStatus}
-                                            onChange={e => setNewStatus(e.target.value as any)}
+                                            value={formStatus}
+                                            onChange={e => setFormStatus(e.target.value as any)}
                                             className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-holi-primary"
                                         >
                                             <option value="Pago">✅ Já Pago</option>
@@ -634,12 +1033,42 @@ export default function TshirtOrdersAdmin() {
 
                                     <div>
                                         <label className="block text-xs font-bold uppercase text-gray-400 mb-1">
+                                            Forma Pagamento
+                                        </label>
+                                        <select
+                                            value={formPaymentMethod}
+                                            onChange={e => setFormPaymentMethod(e.target.value)}
+                                            className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-holi-primary"
+                                        >
+                                            <option value="PIX">PIX</option>
+                                            <option value="Dinheiro">Dinheiro</option>
+                                            <option value="Cartão">Cartão</option>
+                                            <option value="Outro">Outro</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="block text-xs font-bold uppercase text-gray-400 mb-1">
+                                            Valor (R$)
+                                        </label>
+                                        <input
+                                            type="number"
+                                            value={formAmount}
+                                            onChange={e => setFormAmount(Number(e.target.value))}
+                                            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-holi-primary"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-xs font-bold uppercase text-gray-400 mb-1">
                                             Telefone (Opcional)
                                         </label>
                                         <input
                                             type="text"
-                                            value={newPhone}
-                                            onChange={e => setNewPhone(e.target.value)}
+                                            value={formPhone}
+                                            onChange={e => setFormPhone(e.target.value)}
                                             placeholder="(17) 99999-9999"
                                             className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-holi-primary"
                                         />
@@ -652,9 +1081,9 @@ export default function TshirtOrdersAdmin() {
                                     </label>
                                     <input
                                         type="text"
-                                        value={newNotes}
-                                        onChange={e => setNewNotes(e.target.value)}
-                                        placeholder="Ex: Pago em dinheiro / avulso"
+                                        value={formNotes}
+                                        onChange={e => setFormNotes(e.target.value)}
+                                        placeholder="Ex: Entregue em mãos / Pago para fulano"
                                         className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-holi-primary"
                                     />
                                 </div>
@@ -662,7 +1091,7 @@ export default function TshirtOrdersAdmin() {
                                 <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
                                     <button
                                         type="button"
-                                        onClick={() => setIsAddModalOpen(false)}
+                                        onClick={closeFormModal}
                                         className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs uppercase cursor-pointer"
                                     >
                                         Cancelar
@@ -671,7 +1100,7 @@ export default function TshirtOrdersAdmin() {
                                         type="submit"
                                         className="px-5 py-2.5 rounded-xl bg-holi-primary hover:bg-holi-primary/80 text-white font-black text-xs uppercase cursor-pointer shadow-lg shadow-holi-primary/30"
                                     >
-                                        Salvar Pedido
+                                        {editingItem ? 'Atualizar Pedido' : 'Salvar Pedido'}
                                     </button>
                                 </div>
                             </form>
