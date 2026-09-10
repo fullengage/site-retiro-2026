@@ -160,7 +160,11 @@ export async function fetchAllDetailedRegistrations(eventSlug?: string): Promise
                     id: rawPayment.id,
                     registration_id: reg.id,
                     amount: Number(rawPayment.amount) || 0,
-                    status: rawPayment.status || 'Pendente',
+                    status: (rawPayment.status === 'confirmed' || rawPayment.status === 'Pago' || reg.status === 'Confirmada')
+                        ? 'Pago'
+                        : (rawPayment.status === 'rejected' || rawPayment.status === 'Cancelado')
+                            ? 'Cancelado'
+                            : 'Pendente',
                     payment_method: rawPayment.payment_method || 'PIX',
                     payment_receipt_url: rawPayment.payment_receipt_url,
                     paid_at: rawPayment.paid_at
