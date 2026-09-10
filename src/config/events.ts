@@ -2,7 +2,7 @@ import { EventItem } from '../types/database'
 
 export const DEFAULT_EVENTS: EventItem[] = [
     {
-        id: 'carnaval-2026-default-id',
+        id: '51a7488d-740a-4237-b059-73093267c201',
         slug: 'carnaval-2026',
         name: 'Retiro de Carnaval 2026',
         year: 2026,
@@ -20,11 +20,11 @@ export const DEFAULT_EVENTS: EventItem[] = [
             keyType: 'CPF',
             receiver: 'Richard Wagner de Oliveira Portela',
             bank: 'Banco',
-            whatsappSupport: '5511955501090'
+            whatsappSupport: '5511934044167'
         }
     },
     {
-        id: 'adonai-2026-default-id',
+        id: '4e23a8cf-d780-4a4b-9676-9bbccad74035',
         slug: 'adonai-2026',
         name: 'Retiro ADONAI 2026',
         year: 2026,
@@ -52,11 +52,11 @@ export const DEFAULT_EVENTS: EventItem[] = [
             keyType: 'CPF',
             receiver: 'Richard Wagner de Oliveira Portela',
             bank: 'Banco',
-            whatsappSupport: '5511955501090'
+            whatsappSupport: '5511934044167'
         }
     },
     {
-        id: 'ato-2026-default-id',
+        id: 'b0c365e5-8128-4725-9e49-e80c5483c5c2',
         slug: 'ato-2026',
         name: 'Retiro ATO 2026',
         year: 2026,
@@ -72,7 +72,7 @@ export const DEFAULT_EVENTS: EventItem[] = [
             keyType: 'CPF',
             receiver: 'Richard Wagner de Oliveira Portela',
             bank: 'Banco',
-            whatsappSupport: '5511955501090'
+            whatsappSupport: '5511934044167'
         }
     }
 ]

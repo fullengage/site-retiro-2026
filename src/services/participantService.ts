@@ -7,19 +7,19 @@ export interface ParticipantSearchResult {
     isRegisteredInActiveEvent?: boolean
 }
 
-// Autocomplete por nome. Só traz nome/paróquia/histórico (sem contato) para não
-// expor e-mail/telefone de terceiros a quem apenas digitou um nome parecido.
-// O preenchimento completo dos dados sensíveis só acontece via findParticipantByIdentifier,
-// quando a própria pessoa digita seu e-mail/telefone/CPF.
+// Autocomplete e busca inteligente de participantes para inscrição expressa (1 clique).
+// Preenche todos os dados cadastrais previamente existentes de outros retiros (Carnaval, etc.)
+// e verifica se já possui inscrição no evento ativo atual.
 export async function searchParticipantsByName(
     nameQuery: string,
-    _activeEventId?: string
+    activeEventId?: string
 ): Promise<ParticipantSearchResult[]> {
     if (!nameQuery || nameQuery.trim().length < 2) return []
 
     try {
         const { data, error } = await supabase.rpc('search_participants_by_name', {
-            p_name: nameQuery.trim()
+            p_name: nameQuery.trim(),
+            p_event_id: activeEventId || null
         })
 
         if (error) {
@@ -31,10 +31,18 @@ export async function searchParticipantsByName(
             participant: {
                 id: item.id,
                 full_name: item.full_name,
-                parish: item.parish || ''
+                email: item.email || '',
+                phone: item.phone || '',
+                cpf: item.cpf || '',
+                birth_date: item.birth_date || null,
+                gender: item.gender || null,
+                address: item.address || '',
+                city: item.city || '',
+                parish: item.parish || '',
+                emergency_phone: item.emergency_phone || ''
             } as Participant,
             pastRetreats: item.pastRetreats || [],
-            isRegisteredInActiveEvent: false
+            isRegisteredInActiveEvent: !!item.alreadyRegisteredInEvent
         }))
     } catch (err) {
         console.error('Erro ao buscar participantes por nome:', err)

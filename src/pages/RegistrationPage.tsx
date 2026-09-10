@@ -135,16 +135,44 @@ const RegistrationPage = () => {
         return () => clearTimeout(timer)
     }, [formData.full_name, event?.id])
 
-    // Seleciona participante da lista de sugestões
+    // Reset do formulário para nova inscrição
+    const handleResetForm = () => {
+        setFoundParticipant(null)
+        setVerifiedParticipant(null)
+        setNameSuggestions([])
+        setShowSuggestions(false)
+        setFormData({
+            participantId: '',
+            full_name: '',
+            email: '',
+            phone: '',
+            cpf: '',
+            birth_date: '',
+            gender: '',
+            address: '',
+            city: '',
+            emergency_phone: '',
+            parish: '',
+            staying_on_site: false,
+            kit_option: event?.kit_options?.[0]?.name || '',
+            tshirt_size: '',
+            tshirt_size_2: '',
+            notes: ''
+        })
+        setError(null)
+    }
+
+    // Seleciona participante da lista de sugestões (Inscrição Expressa em 1 clique)
     const handleSelectParticipant = (result: ParticipantSearchResult) => {
         const p = result.participant
         setFoundParticipant(result)
+        setVerifiedParticipant(result)
         setShowSuggestions(false)
 
         setFormData(prev => ({
             ...prev,
             participantId: p.id,
-            full_name: p.full_name,
+            full_name: p.full_name || prev.full_name,
             email: p.email || prev.email,
             phone: p.phone || prev.phone,
             cpf: p.cpf || prev.cpf,
@@ -160,7 +188,7 @@ const RegistrationPage = () => {
     // Busca inteligente onBlur para email, telefone ou cpf
     const handleCheckIdentifier = async (field: 'email' | 'phone' | 'cpf', val: string) => {
         if (!val || val.length < 5) return
-        if (verifiedParticipant) return
+        if (verifiedParticipant?.participant?.id) return
 
         try {
             const found = await findParticipantByIdentifier({
@@ -168,7 +196,6 @@ const RegistrationPage = () => {
                 activeEventId: event?.id
             })
             if (found) {
-                setVerifiedParticipant(found)
                 handleSelectParticipant(found)
             }
         } catch (err) {
@@ -301,16 +328,25 @@ const RegistrationPage = () => {
                     <p className="text-gray-300 mb-6">
                         Olá, {verifiedParticipant.participant.full_name.split(' ')[0]}! Encontramos uma inscrição sua para o <strong className="text-white">{event.name}</strong>. Sua vaga já está garantida — não é necessário se inscrever novamente.
                     </p>
-                    {event.pix_info?.whatsappSupport && (
-                        <a
-                            href={`https://wa.me/${event.pix_info.whatsappSupport}`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="inline-block px-6 py-3 bg-holi-primary/20 hover:bg-holi-primary/30 text-white font-bold rounded-xl transition-colors"
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                        {event.pix_info?.whatsappSupport && (
+                            <a
+                                href={`https://wa.me/${event.pix_info.whatsappSupport}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="w-full sm:w-auto px-6 py-3 bg-holi-primary/20 hover:bg-holi-primary/30 text-white font-bold rounded-xl transition-colors text-center text-sm"
+                            >
+                                Dúvidas? Fale no WhatsApp
+                            </a>
+                        )}
+                        <button
+                            type="button"
+                            onClick={handleResetForm}
+                            className="w-full sm:w-auto px-6 py-3 bg-white/10 hover:bg-white/20 text-gray-200 font-bold rounded-xl transition-colors text-sm flex items-center justify-center gap-2"
                         >
-                            Dúvidas? Fale com o suporte no WhatsApp
-                        </a>
-                    )}
+                            <RefreshCw size={15} /> Inscrever outra pessoa
+                        </button>
+                    </div>
                 </div>
             </div>
         )
@@ -514,21 +550,30 @@ const RegistrationPage = () => {
                                     <HeartHandshake className="w-6 h-6 text-holi-accent" />
                                 </div>
                                 <div className="flex-1">
-                                    <div className="flex flex-wrap items-center gap-2 mb-1">
-                                        <h4 className="text-white font-black text-base">
-                                            Olá, {(verifiedParticipant || foundParticipant)!.participant.full_name}! ✨
-                                        </h4>
-                                        {(verifiedParticipant || foundParticipant)!.pastRetreats.length > 0 && (
-                                            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-white/10 text-holi-accent border border-holi-accent/30 flex items-center gap-1">
-                                                <History size={12} />
-                                                Já participou: {(verifiedParticipant || foundParticipant)!.pastRetreats.join(', ')}
-                                            </span>
-                                        )}
+                                    <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
+                                        <div className="flex flex-wrap items-center gap-2">
+                                            <h4 className="text-white font-black text-base">
+                                                Olá, {(verifiedParticipant || foundParticipant)!.participant.full_name}! ✨
+                                            </h4>
+                                            {(verifiedParticipant || foundParticipant)!.pastRetreats.length > 0 && (
+                                                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-white/10 text-holi-accent border border-holi-accent/30 flex items-center gap-1">
+                                                    <History size={12} />
+                                                    Já participou: {(verifiedParticipant || foundParticipant)!.pastRetreats.join(', ')}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={handleResetForm}
+                                            className="text-xs text-gray-400 hover:text-white underline flex items-center gap-1 transition-colors"
+                                        >
+                                            <RefreshCw size={12} /> Não sou eu / Limpar
+                                        </button>
                                     </div>
                                     <p className="text-xs text-gray-300 leading-relaxed">
-                                        {verifiedParticipant
-                                            ? <>Você já é da família! Seus dados foram preenchidos automaticamente abaixo — confira e confirme sua vaga no <strong>{event?.name}</strong> em poucos cliques.</>
-                                            : <>Encontramos alguém com esse nome. Digite seu e-mail, telefone ou CPF abaixo para recuperarmos seus dados automaticamente.</>
+                                        {(verifiedParticipant || foundParticipant)!.pastRetreats.length > 0
+                                            ? <>Encontramos seu cadastro de retiros anteriores! Seus dados foram preenchidos automaticamente com <strong>1 clique</strong>. Confira as informações, escolha seu kit e confirme sua vaga abaixo.</>
+                                            : <>Seus dados cadastrais foram recuperados com sucesso com <strong>1 clique</strong>! Escolha seu kit e confirme sua inscrição abaixo.</>
                                         }
                                     </p>
                                 </div>
@@ -546,9 +591,14 @@ const RegistrationPage = () => {
                     <form onSubmit={handleSubmit} className="space-y-8">
                         {/* SEÇÃO 1: DADOS PESSOAIS (com busca inteligente por Nome) */}
                         <div>
-                            <h3 className="text-xs font-black uppercase tracking-widest text-[#d946ef] mb-5 flex items-center gap-2">
-                                <User size={16} /> Dados Pessoais
-                            </h3>
+                            <div className="flex items-center justify-between mb-5">
+                                <h3 className="text-xs font-black uppercase tracking-widest text-[#d946ef] flex items-center gap-2">
+                                    <User size={16} /> Dados Pessoais
+                                </h3>
+                                <span className="text-[11px] text-gray-400 hidden sm:inline-flex items-center gap-1">
+                                    <Sparkles size={12} className="text-holi-accent" /> Digite seu nome para preencher em 1 clique
+                                </span>
+                            </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                 {/* Nome Completo (com autocomplete / sugestões em tempo real) */}
@@ -567,7 +617,7 @@ const RegistrationPage = () => {
                                             onFocus={() => {
                                                 if (nameSuggestions.length > 0) setShowSuggestions(true)
                                             }}
-                                            placeholder="Digite seu nome..."
+                                            placeholder="Digite seu nome para buscar seu pré-cadastro..."
                                             className="w-full pl-10 pr-10 py-3 bg-[#0d0714] border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:outline-none focus:border-holi-primary focus:ring-1 focus:ring-holi-primary text-sm transition-all"
                                         />
                                         {isSearchingName && (
@@ -584,9 +634,11 @@ const RegistrationPage = () => {
                                                 exit={{ opacity: 0, y: -5 }}
                                                 className="absolute left-0 right-0 top-full mt-2 bg-[#12071a] border border-holi-primary/40 rounded-2xl shadow-2xl z-50 overflow-hidden divide-y divide-white/5 backdrop-blur-xl"
                                             >
-                                                <div className="px-3 py-1.5 bg-black/40 text-[10px] uppercase font-bold text-gray-400 flex items-center justify-between">
-                                                    <span>Participantes encontrados</span>
-                                                    <span className="text-holi-primary font-normal">Clique para preencher</span>
+                                                <div className="px-3 py-2 bg-black/60 text-[10px] uppercase font-bold text-gray-300 flex items-center justify-between">
+                                                    <span className="flex items-center gap-1.5">
+                                                        <Sparkles size={12} className="text-holi-accent" /> Participantes encontrados
+                                                    </span>
+                                                    <span className="text-holi-accent font-semibold">Clique para preencher em 1 clique</span>
                                                 </div>
                                                 {nameSuggestions.map((item, idx) => (
                                                     <button
@@ -596,23 +648,33 @@ const RegistrationPage = () => {
                                                         className="w-full p-3 text-left hover:bg-holi-primary/20 transition-colors flex items-center justify-between gap-3 group"
                                                     >
                                                         <div className="flex items-center gap-3">
-                                                            <div className="w-8 h-8 rounded-full bg-holi-primary/20 border border-holi-primary/30 flex items-center justify-center text-white text-xs font-bold">
-                                                                {item.participant.full_name.charAt(0)}
+                                                            <div className="w-8 h-8 rounded-full bg-holi-primary/20 border border-holi-primary/30 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                                                                {item.participant.full_name?.charAt(0) || 'P'}
                                                             </div>
-                                                            <div>
-                                                                <span className="font-bold text-white text-sm block group-hover:text-holi-secondary transition-colors">
+                                                            <div className="min-w-0">
+                                                                <span className="font-bold text-white text-sm block truncate group-hover:text-holi-secondary transition-colors">
                                                                     {item.participant.full_name}
                                                                 </span>
-                                                                <span className="text-xs text-gray-400">
-                                                                    {item.participant.email || item.participant.phone || item.participant.parish || 'Participante anterior'}
+                                                                <span className="text-xs text-gray-400 block truncate">
+                                                                    {item.participant.phone || item.participant.email || item.participant.city || item.participant.parish || 'Participante anterior'}
                                                                 </span>
                                                             </div>
                                                         </div>
 
                                                         <div className="text-right shrink-0">
-                                                            <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/10 text-holi-accent border border-holi-accent/20">
-                                                                🎟️ {item.pastRetreats[0]}
-                                                            </span>
+                                                            {item.isRegisteredInActiveEvent ? (
+                                                                <span className="inline-block px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                                                                    Já inscrito no Adonai
+                                                                </span>
+                                                            ) : item.pastRetreats && item.pastRetreats.length > 0 ? (
+                                                                <span className="inline-block px-2.5 py-1 rounded-full text-[10px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                                                                    🎟️ {item.pastRetreats[0]}
+                                                                </span>
+                                                            ) : (
+                                                                <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/10 text-holi-accent border border-holi-accent/20">
+                                                                    Pré-cadastro
+                                                                </span>
+                                                            )}
                                                         </div>
                                                     </button>
                                                 ))}

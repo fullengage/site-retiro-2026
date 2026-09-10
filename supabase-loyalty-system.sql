@@ -448,9 +448,8 @@ BEGIN
 END;
 $$;
 
--- Autocomplete por nome: devolve só nome/paróquia/histórico (sem contato),
--- pra evitar expor e-mail/telefone de terceiros a quem só digitou um nome.
-CREATE OR REPLACE FUNCTION search_participants_by_name(p_name text)
+-- Autocomplete e busca inteligente por nome com suporte a preenchimento em 1 clique
+CREATE OR REPLACE FUNCTION search_participants_by_name(p_name text, p_event_id uuid DEFAULT NULL)
 RETURNS jsonb
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -468,12 +467,25 @@ BEGIN
         SELECT jsonb_build_object(
             'id', p.id,
             'full_name', p.full_name,
+            'email', p.email,
+            'phone', p.phone,
+            'cpf', p.cpf,
+            'birth_date', p.birth_date,
+            'gender', p.gender,
+            'address', p.address,
+            'city', p.city,
             'parish', p.parish,
+            'emergency_phone', p.emergency_phone,
             'pastRetreats', COALESCE((
                 SELECT array_agg(e.name ORDER BY e.start_date NULLS LAST, e.year)
                 FROM registrations r JOIN events e ON e.id = r.event_id
                 WHERE r.participant_id = p.id
-            ), ARRAY[]::text[])
+            ), ARRAY[]::text[]),
+            'alreadyRegisteredInEvent', CASE 
+                WHEN p_event_id IS NOT NULL THEN
+                    EXISTS (SELECT 1 FROM registrations WHERE participant_id = p.id AND event_id = p_event_id)
+                ELSE false
+            END
         ) AS row_data
         FROM participants p
         WHERE p.full_name ILIKE '%' || trim(p_name) || '%'
