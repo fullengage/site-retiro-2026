@@ -172,18 +172,22 @@ const RegistrationAdmin = () => {
 
     const uniqueAngels = Array.from(new Set(registrations.map(r => r.assigned_angel?.trim()).filter(Boolean))).sort()
 
+    const normalizeText = (str: string) =>
+        (str || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim()
+
     const filtered = registrations.filter(reg => {
-        const lowerSearch = (searchTerm || '').toLowerCase().trim()
-        const participantName = reg.participant?.full_name || ''
-        const participantEmail = reg.participant?.email || ''
-        const participantPhone = reg.participant?.phone || ''
-        const assignedAngel = reg.assigned_angel || ''
+        const lowerSearch = normalizeText(searchTerm)
+        const participantName = normalizeText(reg.participant?.full_name || '')
+        const participantEmail = normalizeText(reg.participant?.email || '')
+        const participantPhone = normalizeText(reg.participant?.phone || '')
+        const assignedAngel = normalizeText(reg.assigned_angel || '')
 
         const matchesSearch =
-            participantName.toLowerCase().includes(lowerSearch) ||
-            participantEmail.toLowerCase().includes(lowerSearch) ||
+            !lowerSearch ||
+            participantName.includes(lowerSearch) ||
+            participantEmail.includes(lowerSearch) ||
             participantPhone.includes(lowerSearch) ||
-            assignedAngel.toLowerCase().includes(lowerSearch)
+            assignedAngel.includes(lowerSearch)
 
         const matchesStatus = filterStatus === 'Todos' || (reg.payment?.status || 'Pendente') === filterStatus
 
