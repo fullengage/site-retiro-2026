@@ -5,10 +5,17 @@ import {
     Search, Download, Users, CheckCircle,
     Shirt, UserCheck, History,
     X, Trash2, ChevronRight, Package, Activity, Loader2, Upload, ChevronDown,
-    Calendar, CreditCard, Sparkles, Eye, Phone, Mail, MapPin, Check, AlertCircle, FileCheck
+    Calendar, CreditCard, Sparkles, Eye, Phone, Mail, MapPin, Check, AlertCircle, FileCheck,
+    UserPlus, Zap
 } from 'lucide-react'
 import { fetchEvents } from '../services/eventService'
-import { fetchAllDetailedRegistrations, updatePaymentAndRegistrationStatus, updateRegistrationAngel, deleteRegistrationCascade } from '../services/registrationService'
+import {
+    fetchAllDetailedRegistrations,
+    updatePaymentAndRegistrationStatus,
+    updateRegistrationAngel,
+    deleteRegistrationCascade,
+    adminEnrollParticipantInEvent
+} from '../services/registrationService'
 import { fetchParticipantHistory } from '../services/participantService'
 import { supabase } from '../lib/supabase'
 import { EventItem, RegistrationDetailed, ParticipantHistoryItem } from '../types/database'
@@ -37,6 +44,21 @@ const RegistrationAdmin = () => {
     const [historyModalParticipant, setHistoryModalParticipant] = useState<{ id: string; name: string; email?: string | null; phone?: string | null } | null>(null)
     const [participantHistory, setParticipantHistory] = useState<ParticipantHistoryItem[]>([])
     const [loadingHistory, setLoadingHistory] = useState(false)
+
+    // Modal de Inscrição Rápida em Outro Retiro (1 Clique)
+    const [enrollModalParticipant, setEnrollModalParticipant] = useState<{ id: string; name: string; email?: string | null; phone?: string | null } | null>(null)
+    const [enrollParticipantHistory, setEnrollParticipantHistory] = useState<ParticipantHistoryItem[]>([])
+    const [loadingEnrollHistory, setLoadingEnrollHistory] = useState(false)
+    const [enrollingEventId, setEnrollingEventId] = useState<string | null>(null)
+    const [enrollSuccessMessage, setEnrollSuccessMessage] = useState<string | null>(null)
+    const [enrollErrorMessage, setEnrollErrorMessage] = useState<string | null>(null)
+    const [enrollConfigs, setEnrollConfigs] = useState<Record<string, {
+        kitOption: string
+        paymentAmount: number
+        paymentStatus: 'Pago' | 'Pendente'
+        tshirtSize: string
+        stayingOnSite: boolean
+    }>>({})
 
     // Carregar eventos ao inicializar
     useEffect(() => {
@@ -79,6 +101,107 @@ const RegistrationAdmin = () => {
             console.error('Erro ao buscar histórico do participante:', err)
         } finally {
             setLoadingHistory(false)
+        }
+    }
+
+    const openEnrollModal = async (participant: { id: string; name: string; email?: string | null; phone?: string | null }) => {
+        setEnrollModalParticipant(participant)
+        setLoadingEnrollHistory(true)
+        setEnrollSuccessMessage(null)
+        setEnrollErrorMessage(null)
+
+        // Inicializa configurações padrão para cada evento existente
+        const initialConfigs: Record<string, {
+            kitOption: string
+            paymentAmount: number
+            paymentStatus: 'Pago' | 'Pendente'
+            tshirtSize: string
+            stayingOnSite: boolean
+        }> = {}
+
+        events.forEach(evt => {
+            const defaultKit = evt.kit_options?.[0]
+            initialConfigs[evt.id] = {
+                kitOption: defaultKit?.name || 'Inscrição Completa (Com Camiseta)',
+                paymentAmount: defaultKit?.price || 70,
+                paymentStatus: 'Pago',
+                tshirtSize: 'M',
+                stayingOnSite: false
+            }
+        })
+        setEnrollConfigs(initialConfigs)
+
+        try {
+            const history = await fetchParticipantHistory(participant.id)
+            setEnrollParticipantHistory(history)
+        } catch (err) {
+            console.error('Erro ao buscar histórico para inscrição:', err)
+        } finally {
+            setLoadingEnrollHistory(false)
+        }
+    }
+
+    const updateEnrollConfig = (eventId: string, partial: Partial<{
+        kitOption: string
+        paymentAmount: number
+        paymentStatus: 'Pago' | 'Pendente'
+        tshirtSize: string
+        stayingOnSite: boolean
+    }>) => {
+        setEnrollConfigs(prev => ({
+            ...prev,
+            [eventId]: {
+                ...(prev[eventId] || {
+                    kitOption: 'Inscrição Completa (Com Camiseta)',
+                    paymentAmount: 70,
+                    paymentStatus: 'Pago',
+                    tshirtSize: 'M',
+                    stayingOnSite: false
+                }),
+                ...partial
+            }
+        }))
+    }
+
+    const handleExecuteEnroll = async (eventId: string) => {
+        if (!enrollModalParticipant) return
+        setEnrollingEventId(eventId)
+        setEnrollErrorMessage(null)
+        setEnrollSuccessMessage(null)
+
+        const config = enrollConfigs[eventId] || {
+            kitOption: 'Inscrição Completa (Com Camiseta)',
+            paymentAmount: 70,
+            paymentStatus: 'Pago',
+            tshirtSize: 'M',
+            stayingOnSite: false
+        }
+
+        try {
+            await adminEnrollParticipantInEvent({
+                participantId: enrollModalParticipant.id,
+                eventId: eventId,
+                kitOption: config.kitOption,
+                paymentAmount: config.paymentAmount,
+                paymentStatus: config.paymentStatus,
+                tshirtSize: config.tshirtSize,
+                stayingOnSite: config.stayingOnSite
+            })
+
+            const targetEvent = events.find(e => e.id === eventId)
+            setEnrollSuccessMessage(`Participante inscrito com sucesso no ${targetEvent?.name || 'Retiro'}!`)
+
+            // Recarrega o histórico atualizado
+            const updatedHistory = await fetchParticipantHistory(enrollModalParticipant.id)
+            setEnrollParticipantHistory(updatedHistory)
+
+            // Recarrega as inscrições no painel
+            loadRegistrations()
+        } catch (err: any) {
+            console.error('Erro ao realizar inscrição:', err)
+            setEnrollErrorMessage(err?.message || 'Falha ao realizar inscrição no retiro.')
+        } finally {
+            setEnrollingEventId(null)
         }
     }
 
@@ -522,7 +645,7 @@ const RegistrationAdmin = () => {
                                                     <div>
                                                         <div className="font-bold text-white flex items-center gap-2">
                                                             {reg.participant?.full_name || 'Participante'}
-                                                            {/* Botão para abrir histórico do participante */}
+                                                            {/* Botão para histórico 360 */}
                                                             <button
                                                                 type="button"
                                                                 title="Ver Histórico 360° do Participante"
@@ -538,6 +661,23 @@ const RegistrationAdmin = () => {
                                                                 className="p-1 rounded-md bg-white/5 hover:bg-holi-primary/20 text-gray-400 hover:text-holi-accent transition-colors"
                                                             >
                                                                 <History size={14} />
+                                                            </button>
+                                                            {/* Botão para Inscrição em Outro Retiro com 1 Clique */}
+                                                            <button
+                                                                type="button"
+                                                                title="Inscrever em outro Retiro (1 Clique)"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation()
+                                                                    openEnrollModal({
+                                                                        id: reg.participant?.id || '',
+                                                                        name: reg.participant?.full_name || 'Participante',
+                                                                        email: reg.participant?.email || '',
+                                                                        phone: reg.participant?.phone || ''
+                                                                    })
+                                                                }}
+                                                                className="p-1 rounded-md bg-holi-secondary/15 hover:bg-holi-secondary/30 text-holi-secondary hover:text-white transition-colors"
+                                                            >
+                                                                <UserPlus size={14} />
                                                             </button>
                                                         </div>
                                                         <span className="text-xs text-gray-500">
@@ -614,7 +754,24 @@ const RegistrationAdmin = () => {
 
                                             {/* AÇÕES */}
                                             <td className="py-4 px-6 text-right">
-                                                <div className="flex items-center justify-end gap-2">
+                                                <div className="flex items-center justify-end gap-1.5">
+                                                    {/* Botão Rápido de Inscrição em Outro Retiro */}
+                                                    <button
+                                                        type="button"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation()
+                                                            openEnrollModal({
+                                                                id: reg.participant?.id || '',
+                                                                name: reg.participant?.full_name || 'Participante',
+                                                                email: reg.participant?.email || '',
+                                                                phone: reg.participant?.phone || ''
+                                                            })
+                                                        }}
+                                                        className="p-1.5 rounded-lg text-holi-secondary hover:text-white hover:bg-holi-secondary/20 transition-colors"
+                                                        title="Inscrever em outro Retiro (1 Clique)"
+                                                    >
+                                                        <UserPlus size={16} />
+                                                    </button>
                                                     <button
                                                         type="button"
                                                         onClick={(e) => handleDelete(reg.id, e)}
@@ -776,10 +933,23 @@ const RegistrationAdmin = () => {
                                 </div>
                             )}
 
-                            <div className="mt-6 pt-4 border-t border-white/10 text-right">
+                            <div className="mt-6 pt-4 border-t border-white/10 flex items-center justify-between">
+                                <button
+                                    onClick={() => {
+                                        if (historyModalParticipant) {
+                                            const p = { ...historyModalParticipant }
+                                            setHistoryModalParticipant(null)
+                                            openEnrollModal(p)
+                                        }
+                                    }}
+                                    className="px-4 py-2 rounded-xl bg-gradient-to-r from-holi-primary to-holi-secondary hover:opacity-90 text-white font-bold text-xs uppercase flex items-center gap-1.5 shadow-lg shadow-holi-primary/20 transition-all"
+                                >
+                                    <UserPlus size={14} />
+                                    Inscrever em outro Retiro
+                                </button>
                                 <button
                                     onClick={() => setHistoryModalParticipant(null)}
-                                    className="px-5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs uppercase"
+                                    className="px-5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs uppercase transition-colors"
                                 >
                                     Fechar
                                 </button>
@@ -816,7 +986,26 @@ const RegistrationAdmin = () => {
                             <div className="space-y-6">
                                 {/* DADOS DO PARTICIPANTE */}
                                 <div className="bg-black/40 border border-white/5 p-4 rounded-2xl space-y-3">
-                                    <h4 className="text-xs uppercase tracking-wider text-gray-400 font-bold">Participante</h4>
+                                    <div className="flex items-center justify-between">
+                                        <h4 className="text-xs uppercase tracking-wider text-gray-400 font-bold">Participante</h4>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                const p = {
+                                                    id: editingReg.participant.id,
+                                                    name: editingReg.participant.full_name,
+                                                    email: editingReg.participant.email,
+                                                    phone: editingReg.participant.phone
+                                                }
+                                                setEditingReg(null)
+                                                openEnrollModal(p)
+                                            }}
+                                            className="px-3 py-1 rounded-lg bg-holi-secondary/20 hover:bg-holi-secondary/30 text-holi-secondary text-xs font-bold flex items-center gap-1.5 transition-colors"
+                                        >
+                                            <UserPlus size={13} />
+                                            Inscrever em outro Retiro
+                                        </button>
+                                    </div>
                                     <div className="grid grid-cols-2 gap-3 text-sm">
                                         <div>
                                             <span className="text-gray-500 text-xs block">Nome</span>
@@ -888,7 +1077,7 @@ const RegistrationAdmin = () => {
                                 </div>
 
                                 {/* AÇÕES FINAIS */}
-                                <div className="flex justify-between items-center pt-4 border-t border-white/10">
+                                <div className="flex flex-wrap justify-between items-center gap-3 pt-4 border-t border-white/10">
                                     <button
                                         type="button"
                                         onClick={() => handleTogglePaymentStatus(editingReg)}
@@ -924,6 +1113,254 @@ const RegistrationAdmin = () => {
                                         </button>
                                     </div>
                                 </div>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* MODAL MULTI-RETIROS: INSCRIÇÃO EM OUTRO RETIRO COM 1 CLIQUE */}
+            <AnimatePresence>
+                {enrollModalParticipant && (
+                    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                            className="bg-holi-surface border border-white/15 rounded-3xl max-w-2xl w-full p-6 md:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto"
+                        >
+                            <button
+                                onClick={() => setEnrollModalParticipant(null)}
+                                className="absolute top-6 right-6 text-gray-400 hover:text-white p-1.5 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
+                            >
+                                <X size={20} />
+                            </button>
+
+                            {/* Header */}
+                            <div className="flex items-center gap-3.5 mb-6">
+                                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-holi-primary to-holi-secondary flex items-center justify-center text-white shadow-lg shadow-holi-primary/25">
+                                    <UserPlus size={24} />
+                                </div>
+                                <div>
+                                    <div className="flex items-center gap-2">
+                                        <h3 className="text-xl md:text-2xl font-black text-white uppercase tracking-tight">
+                                            Inscrever em Outro Retiro
+                                        </h3>
+                                        <span className="px-2.5 py-0.5 rounded-full bg-holi-accent/20 text-holi-accent border border-holi-accent/30 text-[10px] font-black uppercase">
+                                            1 Clique
+                                        </span>
+                                    </div>
+                                    <p className="text-sm text-gray-300">
+                                        Participante: <strong className="text-white">{enrollModalParticipant.name}</strong>
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Alertas */}
+                            {enrollSuccessMessage && (
+                                <div className="mb-5 p-4 rounded-2xl bg-green-500/20 border border-green-500/30 text-green-300 text-sm flex items-center gap-3">
+                                    <CheckCircle size={20} className="shrink-0 text-green-400" />
+                                    <span>{enrollSuccessMessage}</span>
+                                </div>
+                            )}
+
+                            {enrollErrorMessage && (
+                                <div className="mb-5 p-4 rounded-2xl bg-red-500/20 border border-red-500/30 text-red-300 text-sm flex items-center gap-3">
+                                    <AlertCircle size={20} className="shrink-0 text-red-400" />
+                                    <span>{enrollErrorMessage}</span>
+                                </div>
+                            )}
+
+                            {/* Lista de Retiros Disponíveis */}
+                            <div className="space-y-4">
+                                <h4 className="text-xs uppercase tracking-wider text-gray-400 font-bold flex items-center gap-2">
+                                    <Sparkles size={14} className="text-holi-primary" />
+                                    Retiros Cadastrados no Sistema
+                                </h4>
+
+                                {loadingEnrollHistory ? (
+                                    <div className="py-12 text-center">
+                                        <Loader2 className="w-8 h-8 animate-spin text-holi-primary mx-auto mb-2" />
+                                        <p className="text-xs text-gray-400">Verificando histórico do participante...</p>
+                                    </div>
+                                ) : (
+                                    events.map(evt => {
+                                        // Verifica se o participante já está registrado neste evento
+                                        const enrolledHistoryItem = enrollParticipantHistory.find(
+                                            h => h.eventId === evt.id || h.eventSlug === evt.slug
+                                        )
+                                        const isAlreadyEnrolled = !!enrolledHistoryItem
+                                        const config = enrollConfigs[evt.id] || {
+                                            kitOption: evt.kit_options?.[0]?.name || 'Inscrição Completa (Com Camiseta)',
+                                            paymentAmount: evt.kit_options?.[0]?.price || 70,
+                                            paymentStatus: 'Pago',
+                                            tshirtSize: 'M',
+                                            stayingOnSite: false
+                                        }
+                                        const isThisEnrolling = enrollingEventId === evt.id
+
+                                        return (
+                                            <div
+                                                key={evt.id}
+                                                className={`p-5 rounded-2xl border transition-all ${
+                                                    isAlreadyEnrolled
+                                                        ? 'bg-black/30 border-green-500/30'
+                                                        : 'bg-black/40 border-white/10 hover:border-holi-primary/50'
+                                                }`}
+                                            >
+                                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+                                                    <div>
+                                                        <div className="flex items-center gap-2.5">
+                                                            <h5 className="font-black text-white text-base">
+                                                                {evt.name}
+                                                            </h5>
+                                                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/10 text-gray-300 font-mono">
+                                                                {evt.year}
+                                                            </span>
+                                                            {evt.status === 'active' && (
+                                                                <span className="text-[10px] px-2 py-0.5 rounded-full bg-holi-primary/20 text-holi-primary font-bold uppercase">
+                                                                    Ativo
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        <p className="text-xs text-gray-400 mt-0.5">
+                                                            Slug: <code className="text-gray-300">{evt.slug}</code>
+                                                        </p>
+                                                    </div>
+
+                                                    {/* Status Badge */}
+                                                    {isAlreadyEnrolled ? (
+                                                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-500/20 text-green-400 border border-green-500/30 text-xs font-bold whitespace-nowrap self-start sm:self-center">
+                                                            <CheckCircle size={14} />
+                                                            Já Inscrito ({enrolledHistoryItem.payment?.status || 'Pendente'})
+                                                        </div>
+                                                    ) : (
+                                                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 text-xs font-bold whitespace-nowrap self-start sm:self-center">
+                                                            <Sparkles size={13} />
+                                                            Disponível para Inscrição
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                {/* Detalhes de quem já está inscrito */}
+                                                {isAlreadyEnrolled && (
+                                                    <div className="mt-3 pt-3 border-t border-white/5 flex flex-wrap items-center justify-between text-xs text-gray-400">
+                                                        <span>Kit: <strong className="text-gray-200">{enrolledHistoryItem.kitOption}</strong></span>
+                                                        {enrolledHistoryItem.tshirtSize && (
+                                                            <span>Camiseta: <strong className="text-holi-secondary">Tam {enrolledHistoryItem.tshirtSize}</strong></span>
+                                                        )}
+                                                        <span>Valor: <strong className="text-green-400">R$ {enrolledHistoryItem.payment?.amount || 0},00</strong></span>
+                                                    </div>
+                                                )}
+
+                                                {/* Formulário Rápido de 1 Clique (para quem NÃO está inscrito) */}
+                                                {!isAlreadyEnrolled && (
+                                                    <div className="mt-4 pt-4 border-t border-white/10 space-y-4">
+                                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                                            {/* Opção de Kit */}
+                                                            <div>
+                                                                <label className="block text-[11px] font-bold uppercase text-gray-400 mb-1">
+                                                                    Opção de Kit
+                                                                </label>
+                                                                <select
+                                                                    value={config.kitOption}
+                                                                    onChange={(e) => {
+                                                                        const selectedKitName = e.target.value
+                                                                        const foundKit = evt.kit_options?.find(k => k.name === selectedKitName)
+                                                                        const price = foundKit?.price || (selectedKitName.toLowerCase().includes('70') ? 70 : 50)
+                                                                        updateEnrollConfig(evt.id, {
+                                                                            kitOption: selectedKitName,
+                                                                            paymentAmount: price
+                                                                        })
+                                                                    }}
+                                                                    className="w-full px-3 py-2 bg-black/60 border border-white/15 rounded-xl text-xs text-white focus:outline-none focus:border-holi-primary"
+                                                                >
+                                                                    {evt.kit_options && evt.kit_options.length > 0 ? (
+                                                                        evt.kit_options.map(k => (
+                                                                            <option key={k.name} value={k.name}>
+                                                                                {k.name} (R$ {k.price},00)
+                                                                            </option>
+                                                                        ))
+                                                                    ) : (
+                                                                        <>
+                                                                            <option value="Inscrição Completa (Com Camiseta)">Com Camiseta (R$ 70,00)</option>
+                                                                            <option value="Inscrição Simples (Sem Camiseta)">Sem Camiseta (R$ 50,00)</option>
+                                                                        </>
+                                                                    )}
+                                                                </select>
+                                                            </div>
+
+                                                            {/* Tamanho da Camiseta */}
+                                                            <div>
+                                                                <label className="block text-[11px] font-bold uppercase text-gray-400 mb-1">
+                                                                    Camiseta
+                                                                </label>
+                                                                <select
+                                                                    value={config.tshirtSize}
+                                                                    onChange={(e) => updateEnrollConfig(evt.id, { tshirtSize: e.target.value })}
+                                                                    className="w-full px-3 py-2 bg-black/60 border border-white/15 rounded-xl text-xs text-white focus:outline-none focus:border-holi-primary"
+                                                                >
+                                                                    <option value="P">Tamanho P</option>
+                                                                    <option value="M">Tamanho M</option>
+                                                                    <option value="G">Tamanho G</option>
+                                                                    <option value="GG">Tamanho GG</option>
+                                                                    <option value="XG">Tamanho XG</option>
+                                                                </select>
+                                                            </div>
+
+                                                            {/* Status do Pagamento */}
+                                                            <div>
+                                                                <label className="block text-[11px] font-bold uppercase text-gray-400 mb-1">
+                                                                    Status Pagamento
+                                                                </label>
+                                                                <select
+                                                                    value={config.paymentStatus}
+                                                                    onChange={(e) => updateEnrollConfig(evt.id, { paymentStatus: e.target.value as 'Pago' | 'Pendente' })}
+                                                                    className="w-full px-3 py-2 bg-black/60 border border-white/15 rounded-xl text-xs text-white focus:outline-none focus:border-holi-primary"
+                                                                >
+                                                                    <option value="Pago">✅ Pago (Confirmado)</option>
+                                                                    <option value="Pendente">⏳ Pendente (Aguardando PIX)</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Botão de Ação 1 Clique */}
+                                                        <div className="flex justify-end pt-1">
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleExecuteEnroll(evt.id)}
+                                                                disabled={isThisEnrolling}
+                                                                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-holi-primary via-purple-600 to-holi-secondary text-white font-black text-xs uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-holi-primary/30 hover:opacity-95 active:scale-[0.98] transition-all disabled:opacity-50"
+                                                            >
+                                                                {isThisEnrolling ? (
+                                                                    <>
+                                                                        <Loader2 size={15} className="animate-spin" />
+                                                                        Inscrevendo...
+                                                                    </>
+                                                                ) : (
+                                                                    <>
+                                                                        <Zap size={15} className="text-yellow-300 fill-yellow-300" />
+                                                                        Inscrever em {evt.name.replace('Retiro ', '')} (1 Clique)
+                                                                    </>
+                                                                )}
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )
+                                    })
+                                )}
+                            </div>
+
+                            {/* Footer do Modal */}
+                            <div className="mt-8 pt-4 border-t border-white/10 flex justify-end">
+                                <button
+                                    onClick={() => setEnrollModalParticipant(null)}
+                                    className="px-6 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs uppercase transition-colors"
+                                >
+                                    Fechar
+                                </button>
                             </div>
                         </motion.div>
                     </div>

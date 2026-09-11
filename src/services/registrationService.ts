@@ -233,3 +233,74 @@ export async function deleteRegistrationCascade(registrationId: string) {
         throw error
     }
 }
+
+export interface AdminEnrollParticipantParams {
+    participantId: string
+    eventId: string
+    kitOption: string
+    paymentAmount: number
+    paymentStatus?: 'Pendente' | 'Pago'
+    stayingOnSite?: boolean
+    tshirtSize?: string
+    tshirtSize2?: string
+    assignedAngel?: string
+    notes?: string
+}
+
+export async function adminEnrollParticipantInEvent(params: AdminEnrollParticipantParams) {
+    // 1. Verifica se o participante já está no evento
+    const { data: existing } = await supabase
+        .from('registrations')
+        .select('id')
+        .eq('participant_id', params.participantId)
+        .eq('event_id', params.eventId)
+        .maybeSingle()
+
+    if (existing) {
+        throw new Error('Este participante já está inscrito neste retiro.')
+    }
+
+    const regStatus = params.paymentStatus === 'Pago' ? 'Confirmada' : 'Pendente'
+
+    // 2. Insere a inscrição
+    const { data: reg, error: regError } = await supabase
+        .from('registrations')
+        .insert({
+            participant_id: params.participantId,
+            event_id: params.eventId,
+            kit_option: params.kitOption,
+            tshirt_size: params.tshirtSize || null,
+            tshirt_size_2: params.tshirtSize2 || null,
+            staying_on_site: params.stayingOnSite || false,
+            assigned_angel: params.assignedAngel || null,
+            status: regStatus,
+            notes: params.notes || null
+        })
+        .select()
+        .single()
+
+    if (regError || !reg) {
+        console.error('Erro ao inscrever participante:', regError)
+        throw regError || new Error('Falha ao criar inscrição.')
+    }
+
+    // 3. Insere o pagamento
+    const { data: pay, error: payError } = await supabase
+        .from('payments')
+        .insert({
+            registration_id: reg.id,
+            amount: params.paymentAmount,
+            status: params.paymentStatus || 'Pendente',
+            payment_method: 'PIX',
+            paid_at: params.paymentStatus === 'Pago' ? new Date().toISOString() : null
+        })
+        .select()
+        .single()
+
+    if (payError) {
+        console.error('Erro ao criar pagamento da inscrição:', payError)
+    }
+
+    return { registration: reg, payment: pay }
+}
+
