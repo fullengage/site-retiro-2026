@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Check, Search, Filter, Plus, Save, X, PlusCircle, Trash2 } from 'lucide-react'
+import { Check, Search, Filter, Plus, Save, X, PlusCircle, Trash2, MessageSquare } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
+import DonationShareModal from '@/components/DonationShareModal'
 
 interface DonationItem {
     id: string
@@ -17,6 +18,9 @@ const DonationAdmin = () => {
     const [loading, setLoading] = useState(true)
     const [searchTerm, setSearchTerm] = useState('')
     const [filterCategory, setFilterCategory] = useState('Todas')
+
+    // Modal de Disparo WhatsApp / Exportação
+    const [isShareOpen, setIsShareOpen] = useState(false)
 
     // Partial Edit State
     const [editingPartial, setEditingPartial] = useState<DonationItem | null>(null)
@@ -177,13 +181,23 @@ const DonationAdmin = () => {
                         Gestão de <span className="text-holi-secondary">Doações</span>
                     </h1>
                 </div>
-                <button
-                    onClick={() => setIsAdding(true)}
-                    className="bg-holi-secondary hover:bg-white text-black font-bold px-6 py-4 rounded-xl flex items-center gap-2 transition-all shadow-lg hover:scale-105 uppercase tracking-wide text-sm"
-                >
-                    <PlusCircle size={20} />
-                    Novo Item
-                </button>
+                <div className="flex flex-wrap items-center gap-3">
+                    <button
+                        onClick={() => setIsShareOpen(true)}
+                        className="bg-green-500 hover:bg-green-400 text-black font-black px-6 py-4 rounded-xl flex items-center gap-2 transition-all shadow-lg hover:scale-105 uppercase tracking-wide text-sm"
+                        title="Gerar lista formatada para WhatsApp e HTML"
+                    >
+                        <MessageSquare size={20} />
+                        Gerar Lista WhatsApp
+                    </button>
+                    <button
+                        onClick={() => setIsAdding(true)}
+                        className="bg-holi-secondary hover:bg-white text-black font-bold px-6 py-4 rounded-xl flex items-center gap-2 transition-all shadow-lg hover:scale-105 uppercase tracking-wide text-sm"
+                    >
+                        <PlusCircle size={20} />
+                        Novo Item
+                    </button>
+                </div>
             </div>
 
             {/* Filters */}
@@ -435,6 +449,13 @@ const DonationAdmin = () => {
                     </div>
                 )}
             </AnimatePresence>
+
+            {/* Modal de Disparo WhatsApp e Exportação HTML */}
+            <DonationShareModal
+                isOpen={isShareOpen}
+                onClose={() => setIsShareOpen(false)}
+                items={items}
+            />
         </div>
     )
 }
