@@ -45,7 +45,7 @@ export interface LeadParticipant {
 type DatePreset = 'all' | 'today' | '7days' | '30days' | 'this_month' | 'custom'
 type SortOption = 'created_desc' | 'created_asc' | 'name_asc' | 'amount_desc'
 type CrmSegment = 'all' | 'first_time' | 'veteran'
-type InviteTemplate = 'friendly' | 'youth' | 'urgent'
+export type InviteTemplate = 'friendly' | 'youth' | 'urgent' | 'confirmation' | 'pix_reminder' | 'custom'
 type LeadContactStatus = 'pending' | 'contacted' | 'confirmed' | 'declined'
 
 const RegistrationAdmin = () => {
@@ -82,8 +82,24 @@ const RegistrationAdmin = () => {
     const [copiedLeadId, setCopiedLeadId] = useState<string | null>(null)
     const [copiedBroadcast, setCopiedBroadcast] = useState(false)
 
-    // Menu rápido de mensagens do WhatsApp
-    const [activeWaMenuRegId, setActiveWaMenuRegId] = useState<string | null>(null)
+    // Template Personalizado do Usuário
+    const [customMessageTemplate, setCustomMessageTemplate] = useState<string>(() => {
+        try {
+            return localStorage.getItem('crm_custom_wa_template') || 'Paz e bem, {nome}! 🙏✨ Passando para te convidar para o *{retiro}* da Comunidade Voz de Deus! Garanta sua vaga em {link}'
+        } catch {
+            return 'Paz e bem, {nome}! 🙏✨ Passando para te convidar para o *{retiro}* da Comunidade Voz de Deus! Garanta sua vaga em {link}'
+        }
+    })
+
+    // Modal de Mensagens WhatsApp com Templates e Preview ao Vivo
+    const [waModalData, setWaModalData] = useState<{
+        participant: Participant
+        reg?: RegistrationDetailed
+        targetEventSlug: string
+        template: InviteTemplate
+        messageDraft: string
+    } | null>(null)
+    const [copiedWaMessage, setCopiedWaMessage] = useState(false)
 
     // Pipeline de Contato dos Leads (armazenamento local por retiro)
     const [leadsContactStatuses, setLeadsContactStatuses] = useState<Record<string, LeadContactStatus>>({})
@@ -208,6 +224,14 @@ const RegistrationAdmin = () => {
         if (selectedEventSlug === 'all') return null
         return events.find(e => e.slug === selectedEventSlug) || null
     }, [events, selectedEventSlug])
+
+    // Próximo evento / evento ativo alvo para convites
+    const upcomingEvent = useMemo(() => {
+        const active = events.find(e => e.status === 'active')
+        if (active) return active
+        if (currentSelectedEvent) return currentSelectedEvent
+        return events[0] || null
+    }, [events, currentSelectedEvent])
 
     // Inscrições do evento selecionado enriquecidas com CRM
     const registrationsWithCRM = useMemo<RegistrationWithCRM[]>(() => {
@@ -655,43 +679,116 @@ const RegistrationAdmin = () => {
         return `${date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })} às ${date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`
     }
 
-    // Gerador de Mensagens de WhatsApp com 1 Clique (Vários tipos)
-    const generateMessage = (type: 'invite' | 'confirmation' | 'pix_reminder', participant: Participant, reg?: RegistrationDetailed) => {
+    // Gerador de Mensagens de WhatsApp com 1 Clique (Vários tipos e Templates)
+    const generateMessage = (
+        type: InviteTemplate,
+        participant: Participant,
+        options?: {
+            targetEvent?: EventItem | null
+            reg?: RegistrationDetailed
+            customTemplateText?: string
+        }
+    ) => {
         const firstName = (participant.full_name || 'Amigo(a)').split(' ')[0]
-        const eventName = reg?.event?.name || currentSelectedEvent?.name || 'nosso próximo Retiro'
-        const currentUrl = window.location.origin + '/inscricao'
+        const targetEvt = options?.targetEvent || (currentSelectedEvent && currentSelectedEvent.slug !== 'all' ? currentSelectedEvent : upcomingEvent)
+        const eventName = targetEvt?.name || 'Retiro ADONAI 2026'
+        const currentUrl = `${window.location.origin}/inscricao`
+        const amount = options?.reg?.payment?.amount ? `R$ ${options.reg.payment.amount},00` : 'o valor da sua inscrição'
 
         if (type === 'confirmation') {
-            return `Paz e bem, ${firstName}! ✨\n\nSua inscrição no *${eventName}* foi *CONFIRMADA com sucesso*! 🎉\n\nEstamos preparando tudo com muito amor e oração para te acolher. Qualquer dúvida, conte conosco!\n\nComunidade Voz de Deus 🙏`
+            const confirmEventName = options?.reg?.event?.name || eventName
+            return `Paz e bem, ${firstName}! ✨\n\nSua inscrição no *${confirmEventName}* foi *CONFIRMADA com sucesso*! 🎉\n\nEstamos preparando tudo com muito amor e oração para te acolher. Qualquer dúvida, conte conosco!\n\nComunidade Voz de Deus 🙏`
         }
 
         if (type === 'pix_reminder') {
-            const amount = reg?.payment?.amount ? `R$ ${reg.payment.amount},00` : 'o valor da sua inscrição'
-            return `Olá, ${firstName}! Tudo bem? 🙏\n\nVimos que sua inscrição para o *${eventName}* está pendente do comprovante de pagamento no valor de *${amount}*.\n\nPara garantir sua vaga e a confecção da sua camiseta, você pode nos enviar o comprovante por aqui mesmo!\n\nFicamos no aguardo! Deus abençoe! ✨`
+            const reminderEventName = options?.reg?.event?.name || eventName
+            return `Olá, ${firstName}! Tudo bem? 🙏\n\nVimos que sua inscrição para o *${reminderEventName}* está pendente do comprovante de pagamento no valor de *${amount}*.\n\nPara garantir sua vaga e a confecção da sua camiseta, você pode nos enviar o comprovante por aqui mesmo!\n\nFicamos no aguardo! Deus abençoe! ✨`
         }
 
-        // Convite (invite)
-        if (inviteTemplate === 'youth') {
-            return `E aí, ${firstName}! Tudo bem? 🔥\n\nBora viver algo sobrenatural? As inscrições para o *${eventName}* da Comunidade Voz de Deus já tão rolando a todo vapor! 🚀\n\nComo você já esteve com a gente antes, a sua presença faz toda a diferença nessa energia e unção! ✨\n\n👉 Clica aqui e garante sua vaga:\n${currentUrl}\n\nChama lá se tiver qualquer dúvida!`
+        if (type === 'youth') {
+            return `E aí, ${firstName}! Tudo bem? 🔥\n\nBora viver algo sobrenatural? As inscrições para o *${eventName}* da Comunidade Voz de Deus já tão rolando a todo vapor! 🚀\n\nComo você já esteve com a gente antes, a sua presença faz toda a diferença nessa energia e unção! ✨\n\n👉 Clica aqui e garante sua vaga:\n${currentUrl}\n\nTamo junto! Chama lá se tiver qualquer dúvida! 🙏`
         }
 
-        if (inviteTemplate === 'urgent') {
-            return `Olá, ${firstName}! Passando com um aviso super importante! ⏳\n\nAs vagas e lotes promocionais para o *${eventName}* já estão chegando ao final! 🏃‍♂️💨\n\nLembramos com muito carinho da sua participação anterior e não queremos que você fique de fora desta edição abençoada.\n\n👉 Garanta sua vaga agora mesmo no site:\n${currentUrl}\n\nDeus abençoe!`
+        if (type === 'urgent') {
+            return `Olá, ${firstName}! Passando com um aviso super importante! ⏳\n\nAs vagas e lotes promocionais para o *${eventName}* já estão chegando ao final! 🏃‍♂️💨\n\nLembramos com muito carinho da sua participação anterior e não queremos que você fique de fora desta edição abençoada.\n\n👉 Garanta sua vaga agora mesmo no site:\n${currentUrl}\n\nDeus abençoe! ✨`
         }
 
-        return `Olá, ${firstName}! Tudo bem com você? 🙏\n\nSentimos sua falta na comunidade! As inscrições para o *${eventName}* já estão abertas.\n\nComo você já participou com a gente em edições anteriores, gostaríamos muito de ter você conosco novamente vivendo esse momento inesquecível de graça e fé! ✨\n\n👉 Acesse o link para conferir os detalhes e garantir sua vaga:\n${currentUrl}\n\nFicamos à disposição caso precise de ajuda!`
+        if (type === 'custom') {
+            const templateText = options?.customTemplateText || customMessageTemplate || `Paz e bem, {nome}! 🙏✨ Passando para te convidar para o *{retiro}* da Comunidade Voz de Deus! Garanta sua vaga em {link}`
+            return templateText
+                .replace(/{nome}/gi, firstName)
+                .replace(/{nome_completo}/gi, participant.full_name || 'Amigo(a)')
+                .replace(/{retiro}/gi, eventName)
+                .replace(/{link}/gi, currentUrl)
+                .replace(/{valor}/gi, amount)
+        }
+
+        // Padrão: 'friendly' (Paz e Bem - Convite Fraterno para o próximo retiro)
+        return `Paz e bem, ${firstName}! 🙏✨\n\nPassando para te fazer um convite muito especial: as inscrições para o *${eventName}* da Comunidade Voz de Deus já estão abertas!\n\nComo você já esteve conosco anteriormente, gostaríamos muito de ter você vivendo mais esse momento inesquecível de graça, oração e bênçãos conosco! 🕊️❤️\n\n👉 Acesse o link para conferir os detalhes e garantir sua vaga:\n${currentUrl}\n\nQualquer dúvida, conte conosco! Deus te abençoe! 🙏`
     }
 
-    const getWhatsAppLink = (participant: Participant, type: 'invite' | 'confirmation' | 'pix_reminder' = 'invite', reg?: RegistrationDetailed) => {
+    const getWhatsAppLink = (
+        participant: Participant,
+        type: InviteTemplate = inviteTemplate,
+        reg?: RegistrationDetailed,
+        targetEvent?: EventItem | null
+    ) => {
         const phone = normalizeDigits(participant.phone || '')
         if (!phone) return null
         const cleanPhone = phone.startsWith('55') ? phone : `55${phone}`
-        const msg = generateMessage(type, participant, reg)
+        const msg = generateMessage(type, participant, { reg, targetEvent })
         return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`
     }
 
+    const openWhatsAppModal = (participant: Participant, reg?: RegistrationDetailed, initialTemplate?: InviteTemplate) => {
+        const defaultTemplate = initialTemplate || inviteTemplate || 'friendly'
+        const targetSlug = currentSelectedEvent && currentSelectedEvent.slug !== 'all'
+            ? currentSelectedEvent.slug
+            : (upcomingEvent?.slug || 'adonai-2026')
+        const targetEvt = events.find(e => e.slug === targetSlug) || upcomingEvent
+        const initialText = generateMessage(defaultTemplate, participant, {
+            reg,
+            targetEvent: targetEvt,
+            customTemplateText: customMessageTemplate
+        })
+
+        setWaModalData({
+            participant,
+            reg,
+            targetEventSlug: targetSlug,
+            template: defaultTemplate,
+            messageDraft: initialText
+        })
+    }
+
+    const changeWaModalTemplate = (newTemplate: InviteTemplate, newTargetSlug?: string) => {
+        if (!waModalData) return
+        const targetSlug = newTargetSlug || waModalData.targetEventSlug
+        const targetEvt = events.find(e => e.slug === targetSlug) || upcomingEvent
+        const newMsg = generateMessage(newTemplate, waModalData.participant, {
+            reg: waModalData.reg,
+            targetEvent: targetEvt,
+            customTemplateText: customMessageTemplate
+        })
+        setWaModalData({
+            ...waModalData,
+            template: newTemplate,
+            targetEventSlug: targetSlug,
+            messageDraft: newMsg
+        })
+    }
+
+    const saveCustomTemplate = (text: string) => {
+        setCustomMessageTemplate(text)
+        try {
+            localStorage.setItem('crm_custom_wa_template', text)
+        } catch (err) {
+            console.error('Erro ao salvar template personalizado:', err)
+        }
+    }
+
     const handleCopyInviteMessage = (lead: LeadParticipant) => {
-        const msg = generateMessage('invite', lead.participant)
+        const msg = generateMessage(inviteTemplate, lead.participant)
         navigator.clipboard.writeText(msg)
         setCopiedLeadId(lead.participant.id)
         if (!leadsContactStatuses[lead.participant.id]) {
@@ -1516,6 +1613,38 @@ const RegistrationAdmin = () => {
                                 </button>
                             )}
                         </div>
+
+                        {/* LINHA 4: Seletor Rápido do Template de Mensagem do WhatsApp */}
+                        <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-white/5 text-xs">
+                            <div className="flex flex-wrap items-center gap-2">
+                                <span className="text-green-400 font-bold uppercase text-[11px] flex items-center gap-1.5">
+                                    <MessageSquareText size={13} /> Template Ativo WhatsApp:
+                                </span>
+                                <div className="flex flex-wrap items-center gap-1.5">
+                                    {[
+                                        { id: 'friendly', label: '🕊️ Paz e Bem (Padrão)' },
+                                        { id: 'youth', label: '🔥 Jovens & Dinâmico' },
+                                        { id: 'urgent', label: '⏳ Últimas Vagas' },
+                                        { id: 'confirmation', label: '🎉 Confirmação' },
+                                        { id: 'pix_reminder', label: '💳 Lembrete PIX' },
+                                        { id: 'custom', label: '✍️ Personalizado' }
+                                    ].map(t => (
+                                        <button
+                                            key={t.id}
+                                            type="button"
+                                            onClick={() => setInviteTemplate(t.id as InviteTemplate)}
+                                            className={`px-2.5 py-1 rounded-xl text-xs font-bold transition-all ${
+                                                inviteTemplate === t.id
+                                                    ? 'bg-green-500/30 text-green-300 border border-green-500/50 shadow-sm'
+                                                    : 'bg-black/30 text-gray-400 hover:text-white border border-white/5'
+                                            }`}
+                                        >
+                                            {t.label}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     {/* ========================================================================= */}
@@ -1597,16 +1726,27 @@ const RegistrationAdmin = () => {
                                                 <ArrowRightLeft size={13} /> Mover / Transferir
                                             </button>
 
-                                            {/* WhatsApp Direto */}
+                                            {/* WhatsApp com Modal ou 1-Clique */}
                                             {cm.participant.phone && (
-                                                <a
-                                                    href={getWhatsAppLink(cm.participant, 'invite', cm) || '#'}
-                                                    target="_blank"
-                                                    rel="noreferrer"
-                                                    className="px-3 py-1.5 bg-green-500/20 hover:bg-green-500/30 text-green-300 border border-green-500/40 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5"
-                                                >
-                                                    <MessageCircle size={13} /> WhatsApp
-                                                </a>
+                                                <div className="flex items-center gap-1">
+                                                    <a
+                                                        href={getWhatsAppLink(cm.participant, inviteTemplate, cm) || '#'}
+                                                        target="_blank"
+                                                        rel="noreferrer"
+                                                        title="Enviar WhatsApp Imediato com Modelo Ativo"
+                                                        className="px-3 py-1.5 bg-green-500/20 hover:bg-green-500/30 text-green-300 border border-green-500/40 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5"
+                                                    >
+                                                        <MessageCircle size={13} /> Convidar WhatsApp
+                                                    </a>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => openWhatsAppModal(cm.participant, cm)}
+                                                        title="Personalizar ou Trocar Template"
+                                                        className="p-1.5 bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white rounded-xl border border-white/10 transition-colors"
+                                                    >
+                                                        <MessageSquareText size={13} />
+                                                    </button>
+                                                </div>
                                             )}
                                         </div>
                                     </div>
@@ -1704,21 +1844,32 @@ const RegistrationAdmin = () => {
                                                     </span>
                                                 </td>
 
-                                                {/* CONTATO & BOTÃO WHATSAPP 1 CLIQUE */}
+                                                {/* CONTATO & BOTÃO WHATSAPP 1 CLIQUE / MODAL */}
                                                 <td className="py-4 px-3">
                                                     {reg.participant.phone ? (
                                                         <div className="flex items-center gap-1.5">
                                                             <a
-                                                                href={getWhatsAppLink(reg.participant, reg.payment?.status === 'Pago' ? 'confirmation' : 'pix_reminder', reg) || '#'}
+                                                                href={getWhatsAppLink(reg.participant, inviteTemplate, reg) || '#'}
                                                                 target="_blank"
                                                                 rel="noreferrer"
                                                                 onClick={(e) => e.stopPropagation()}
-                                                                title="Enviar Mensagem com 1 Clique no WhatsApp"
+                                                                title="Enviar Mensagem com 1 Clique no WhatsApp (Template Ativo)"
                                                                 className="px-2.5 py-1 bg-green-500/20 hover:bg-green-500/30 text-green-300 border border-green-500/40 rounded-xl text-xs font-mono font-bold flex items-center gap-1 transition-all shadow-sm"
                                                             >
                                                                 <MessageCircle size={13} className="text-green-400" />
                                                                 {reg.participant.phone}
                                                             </a>
+                                                            <button
+                                                                type="button"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation()
+                                                                    openWhatsAppModal(reg.participant, reg)
+                                                                }}
+                                                                title="Escolher Template ou Personalizar Mensagem"
+                                                                className="p-1 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white border border-white/10 transition-colors"
+                                                            >
+                                                                <MessageSquareText size={12} />
+                                                            </button>
                                                         </div>
                                                     ) : (
                                                         <span className="text-xs text-gray-500 italic">Sem telefone</span>
@@ -1780,6 +1931,21 @@ const RegistrationAdmin = () => {
                                                 {/* AÇÕES CRM */}
                                                 <td className="py-4 px-6 text-right">
                                                     <div className="flex items-center justify-end gap-1">
+                                                        {/* WhatsApp Modal */}
+                                                        {reg.participant.phone && (
+                                                            <button
+                                                                type="button"
+                                                                title="Mensagem / Convite WhatsApp"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation()
+                                                                    openWhatsAppModal(reg.participant, reg)
+                                                                }}
+                                                                className="p-1.5 rounded-lg text-green-400 hover:text-white hover:bg-green-500/20 transition-colors"
+                                                            >
+                                                                <MessageCircle size={15} />
+                                                            </button>
+                                                        )}
+
                                                         {/* Mover / Transferir Retiro */}
                                                         <button
                                                             type="button"
@@ -1886,41 +2052,30 @@ const RegistrationAdmin = () => {
                         </div>
 
                         {/* SELETOR DE TEMPLATES DE CONVITE WHATSAPP */}
-                        <div className="flex flex-wrap items-center gap-3 pt-3 border-t border-white/10">
-                            <span className="text-xs text-rose-300 font-bold flex items-center gap-1.5">
-                                <MessageSquareText size={14} /> Modelo da Mensagem de Convite:
-                            </span>
+                        <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-white/10">
                             <div className="flex flex-wrap items-center gap-2">
-                                <button
-                                    onClick={() => setInviteTemplate('friendly')}
-                                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                                        inviteTemplate === 'friendly'
-                                            ? 'bg-rose-500 text-white shadow-md'
-                                            : 'bg-black/40 text-gray-300 hover:text-white border border-white/10'
-                                    }`}
-                                >
-                                    🕊️ Acolhedor & Espiritual (Padrão)
-                                </button>
-                                <button
-                                    onClick={() => setInviteTemplate('youth')}
-                                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                                        inviteTemplate === 'youth'
-                                            ? 'bg-gradient-to-r from-amber-500 to-rose-500 text-white shadow-md'
-                                            : 'bg-black/40 text-gray-300 hover:text-white border border-white/10'
-                                    }`}
-                                >
-                                    🔥 Jovens & Dinâmico
-                                </button>
-                                <button
-                                    onClick={() => setInviteTemplate('urgent')}
-                                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                                        inviteTemplate === 'urgent'
-                                            ? 'bg-gradient-to-r from-red-600 to-orange-600 text-white shadow-md'
-                                            : 'bg-black/40 text-gray-300 hover:text-white border border-white/10'
-                                    }`}
-                                >
-                                    ⏳ Últimas Vagas / Reta Final
-                                </button>
+                                <span className="text-xs text-rose-300 font-bold flex items-center gap-1.5 mr-1">
+                                    <MessageSquareText size={14} /> Modelo da Mensagem de Convite:
+                                </span>
+                                {[
+                                    { id: 'friendly', label: '🕊️ Paz e Bem (Padrão)' },
+                                    { id: 'youth', label: '🔥 Jovens & Dinâmico' },
+                                    { id: 'urgent', label: '⏳ Últimas Vagas' },
+                                    { id: 'custom', label: '✍️ Personalizado' }
+                                ].map(t => (
+                                    <button
+                                        key={t.id}
+                                        type="button"
+                                        onClick={() => setInviteTemplate(t.id as InviteTemplate)}
+                                        className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                                            inviteTemplate === t.id
+                                                ? 'bg-rose-500 text-white shadow-md'
+                                                : 'bg-black/40 text-gray-300 hover:text-white border border-white/10'
+                                        }`}
+                                    >
+                                        {t.label}
+                                    </button>
+                                ))}
                             </div>
                         </div>
                     </div>
@@ -2079,22 +2234,32 @@ const RegistrationAdmin = () => {
                                                     {/* AÇÕES DE CONVITE */}
                                                     <td className="py-4 px-6 text-right">
                                                         <div className="flex items-center justify-end gap-2">
-                                                            {/* Botão WhatsApp com mensagem pré-montada */}
+                                                            {/* Botão WhatsApp com mensagem pré-montada ou Modal */}
                                                             {waLink ? (
-                                                                <a
-                                                                    href={waLink}
-                                                                    target="_blank"
-                                                                    rel="noreferrer"
-                                                                    onClick={() => {
-                                                                        if (contactStatus === 'pending') {
-                                                                            setLeadStatus(lead.participant.id, 'contacted')
-                                                                        }
-                                                                    }}
-                                                                    title="Enviar Convite no WhatsApp"
-                                                                    className="px-3 py-1.5 bg-green-500/20 hover:bg-green-500/30 text-green-400 border border-green-500/40 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm"
-                                                                >
-                                                                    <MessageCircle size={14} /> Convidar WhatsApp
-                                                                </a>
+                                                                <div className="flex items-center gap-1">
+                                                                    <a
+                                                                        href={waLink}
+                                                                        target="_blank"
+                                                                        rel="noreferrer"
+                                                                        onClick={() => {
+                                                                            if (contactStatus === 'pending') {
+                                                                                setLeadStatus(lead.participant.id, 'contacted')
+                                                                            }
+                                                                        }}
+                                                                        title="Enviar Convite no WhatsApp com Template Ativo"
+                                                                        className="px-3 py-1.5 bg-green-500/20 hover:bg-green-500/30 text-green-400 border border-green-500/40 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm"
+                                                                    >
+                                                                        <MessageCircle size={14} /> Convidar WhatsApp
+                                                                    </a>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => openWhatsAppModal(lead.participant)}
+                                                                        title="Escolher Template ou Personalizar Mensagem"
+                                                                        className="p-1.5 bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white rounded-xl border border-white/10 transition-colors"
+                                                                    >
+                                                                        <MessageSquareText size={13} />
+                                                                    </button>
+                                                                </div>
                                                             ) : null}
 
                                                             {/* Copiar mensagem */}
@@ -2461,6 +2626,21 @@ const RegistrationAdmin = () => {
                                     <div className="flex flex-wrap items-center justify-between gap-2">
                                         <h4 className="text-xs uppercase tracking-wider text-gray-400 font-bold">Participante</h4>
                                         <div className="flex items-center gap-2">
+                                            {editingReg.participant.phone && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        const p = editingReg.participant
+                                                        const reg = editingReg
+                                                        setEditingReg(null)
+                                                        openWhatsAppModal(p, reg)
+                                                    }}
+                                                    className="px-3 py-1 rounded-lg bg-green-500/20 hover:bg-green-500/30 text-green-300 text-xs font-bold flex items-center gap-1.5 transition-colors border border-green-500/30"
+                                                >
+                                                    <MessageCircle size={13} />
+                                                    WhatsApp
+                                                </button>
+                                            )}
                                             <button
                                                 type="button"
                                                 onClick={() => {
@@ -2780,6 +2960,236 @@ const RegistrationAdmin = () => {
                                 >
                                     Fechar
                                 </button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* ========================================================================= */}
+            {/* MODAL DE MENSAGENS WHATSAPP COM TEMPLATES E PREVIEW AO VIVO              */}
+            {/* ========================================================================= */}
+            <AnimatePresence>
+                {waModalData && (
+                    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            className="bg-holi-surface border border-white/10 rounded-3xl max-w-2xl w-full p-6 md:p-8 shadow-2xl relative space-y-5"
+                        >
+                            <button
+                                onClick={() => setWaModalData(null)}
+                                className="absolute top-6 right-6 text-gray-400 hover:text-white p-1 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                            >
+                                <X size={20} />
+                            </button>
+
+                            {/* CABEÇALHO */}
+                            <div className="flex items-center gap-3.5">
+                                <div className="w-12 h-12 rounded-2xl bg-green-500/20 border border-green-500/30 flex items-center justify-center text-green-400">
+                                    <MessageCircle size={26} />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-black text-white flex items-center gap-2">
+                                        Mensagens & Convite WhatsApp
+                                    </h3>
+                                    <p className="text-xs text-gray-400 flex items-center gap-2 mt-0.5">
+                                        <span className="font-bold text-gray-200">{waModalData.participant.full_name}</span>
+                                        {waModalData.participant.phone && (
+                                            <span className="text-green-400 font-mono">({waModalData.participant.phone})</span>
+                                        )}
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* SELEÇÃO DO RETIRO ALVO */}
+                            <div className="bg-black/40 border border-white/10 p-3.5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                                <div>
+                                    <span className="text-xs font-bold text-gray-300 block">Retiro Alvo do Convite:</span>
+                                    <span className="text-[11px] text-gray-500">O texto da mensagem citará o nome deste retiro e o link oficial.</span>
+                                </div>
+                                <select
+                                    value={waModalData.targetEventSlug}
+                                    onChange={(e) => changeWaModalTemplate(waModalData.template, e.target.value)}
+                                    className="bg-black/60 border border-white/15 text-white rounded-xl px-3 py-1.5 text-xs font-bold focus:outline-none focus:border-green-400"
+                                >
+                                    {events.map(evt => (
+                                        <option key={evt.slug} value={evt.slug}>
+                                            {evt.name} {evt.status === 'active' ? '(Ativo)' : ''}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            {/* GRADE DE SELEÇÃO DE TEMPLATES */}
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <label className="text-xs font-bold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
+                                        <MessageSquareText size={13} className="text-green-400" /> Escolha o Template:
+                                    </label>
+                                    <span className="text-[11px] text-gray-400">Clique para aplicar o modelo ao vivo</span>
+                                </div>
+
+                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => changeWaModalTemplate('friendly')}
+                                        className={`p-2.5 rounded-xl border text-xs font-bold text-left transition-all ${
+                                            waModalData.template === 'friendly'
+                                                ? 'bg-green-500/20 text-green-300 border-green-500/60 shadow-md ring-1 ring-green-500/30'
+                                                : 'bg-black/30 text-gray-300 border-white/10 hover:border-white/20'
+                                        }`}
+                                    >
+                                        <span className="block text-sm mb-0.5">🕊️ Paz e Bem</span>
+                                        <span className="text-[10px] text-gray-400 block font-normal leading-tight">Convite Fraterno (Padrão)</span>
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        onClick={() => changeWaModalTemplate('youth')}
+                                        className={`p-2.5 rounded-xl border text-xs font-bold text-left transition-all ${
+                                            waModalData.template === 'youth'
+                                                ? 'bg-amber-500/20 text-amber-300 border-amber-500/60 shadow-md ring-1 ring-amber-500/30'
+                                                : 'bg-black/30 text-gray-300 border-white/10 hover:border-white/20'
+                                        }`}
+                                    >
+                                        <span className="block text-sm mb-0.5">🔥 Jovens</span>
+                                        <span className="text-[10px] text-gray-400 block font-normal leading-tight">Dinâmico & Energia</span>
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        onClick={() => changeWaModalTemplate('urgent')}
+                                        className={`p-2.5 rounded-xl border text-xs font-bold text-left transition-all ${
+                                            waModalData.template === 'urgent'
+                                                ? 'bg-rose-500/20 text-rose-300 border-rose-500/60 shadow-md ring-1 ring-rose-500/30'
+                                                : 'bg-black/30 text-gray-300 border-white/10 hover:border-white/20'
+                                        }`}
+                                    >
+                                        <span className="block text-sm mb-0.5">⏳ Últimas Vagas</span>
+                                        <span className="text-[10px] text-gray-400 block font-normal leading-tight">Urgência / Reta Final</span>
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        onClick={() => changeWaModalTemplate('confirmation')}
+                                        className={`p-2.5 rounded-xl border text-xs font-bold text-left transition-all ${
+                                            waModalData.template === 'confirmation'
+                                                ? 'bg-purple-500/20 text-purple-300 border-purple-500/60 shadow-md ring-1 ring-purple-500/30'
+                                                : 'bg-black/30 text-gray-300 border-white/10 hover:border-white/20'
+                                        }`}
+                                    >
+                                        <span className="block text-sm mb-0.5">🎉 Confirmação</span>
+                                        <span className="text-[10px] text-gray-400 block font-normal leading-tight">Inscrição Confirmada</span>
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        onClick={() => changeWaModalTemplate('pix_reminder')}
+                                        className={`p-2.5 rounded-xl border text-xs font-bold text-left transition-all ${
+                                            waModalData.template === 'pix_reminder'
+                                                ? 'bg-blue-500/20 text-blue-300 border-blue-500/60 shadow-md ring-1 ring-blue-500/30'
+                                                : 'bg-black/30 text-gray-300 border-white/10 hover:border-white/20'
+                                        }`}
+                                    >
+                                        <span className="block text-sm mb-0.5">💳 Lembrete PIX</span>
+                                        <span className="text-[10px] text-gray-400 block font-normal leading-tight">Cobrança / Comprovante</span>
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        onClick={() => changeWaModalTemplate('custom')}
+                                        className={`p-2.5 rounded-xl border text-xs font-bold text-left transition-all ${
+                                            waModalData.template === 'custom'
+                                                ? 'bg-pink-500/20 text-pink-300 border-pink-500/60 shadow-md ring-1 ring-pink-500/30'
+                                                : 'bg-black/30 text-gray-300 border-white/10 hover:border-white/20'
+                                        }`}
+                                    >
+                                        <span className="block text-sm mb-0.5">✍️ Personalizado</span>
+                                        <span className="text-[10px] text-gray-400 block font-normal leading-tight">Seu texto com tags</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* PREVIEW E EDIÇÃO DIRETA DO TEXTO DA MENSAGEM */}
+                            <div className="space-y-1.5">
+                                <div className="flex items-center justify-between">
+                                    <label className="text-xs font-bold text-gray-300">
+                                        Prévia da Mensagem (Você pode editar antes de enviar):
+                                    </label>
+                                    {waModalData.template === 'custom' && (
+                                        <button
+                                            type="button"
+                                            onClick={() => saveCustomTemplate(waModalData.messageDraft)}
+                                            className="text-[11px] text-pink-300 hover:underline font-bold"
+                                        >
+                                            💾 Salvar este texto como Template Padrão
+                                        </button>
+                                    )}
+                                </div>
+                                <textarea
+                                    rows={6}
+                                    value={waModalData.messageDraft}
+                                    onChange={(e) => setWaModalData({ ...waModalData, messageDraft: e.target.value })}
+                                    className="w-full bg-black/60 border border-white/15 rounded-2xl p-4 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:border-green-400 font-sans leading-relaxed resize-none shadow-inner"
+                                />
+                                {waModalData.template === 'custom' && (
+                                    <p className="text-[11px] text-gray-500">
+                                        Tags disponíveis: <code className="text-pink-300 font-mono">{'{nome}'}</code>, <code className="text-pink-300 font-mono">{'{retiro}'}</code>, <code className="text-pink-300 font-mono">{'{link}'}</code>, <code className="text-pink-300 font-mono">{'{valor}'}</code>
+                                    </p>
+                                )}
+                            </div>
+
+                            {/* BOTÕES DE AÇÃO */}
+                            <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-white/10">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(waModalData.messageDraft)
+                                        setCopiedWaMessage(true)
+                                        setTimeout(() => setCopiedWaMessage(false), 3000)
+                                    }}
+                                    className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-200 border border-white/10 text-xs font-bold flex items-center justify-center gap-2 transition-all"
+                                >
+                                    {copiedWaMessage ? <Check size={15} className="text-green-400" /> : <Copy size={15} />}
+                                    {copiedWaMessage ? 'Mensagem Copiada!' : 'Copiar Texto'}
+                                </button>
+
+                                <div className="flex items-center gap-2 w-full sm:w-auto">
+                                    <button
+                                        type="button"
+                                        onClick={() => setWaModalData(null)}
+                                        className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white text-xs font-bold transition-colors"
+                                    >
+                                        Cancelar
+                                    </button>
+
+                                    {waModalData.participant.phone ? (
+                                        <a
+                                            href={`https://wa.me/${normalizeDigits(waModalData.participant.phone).startsWith('55') ? normalizeDigits(waModalData.participant.phone) : `55${normalizeDigits(waModalData.participant.phone)}`}?text=${encodeURIComponent(waModalData.messageDraft)}`}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            onClick={() => {
+                                                if (waModalData.participant.id) {
+                                                    setLeadStatus(waModalData.participant.id, 'contacted')
+                                                }
+                                                setWaModalData(null)
+                                            }}
+                                            className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-white text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-green-500/20 transition-all"
+                                        >
+                                            <Send size={15} />
+                                            Enviar no WhatsApp
+                                        </a>
+                                    ) : (
+                                        <button
+                                            disabled
+                                            className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gray-700/50 text-gray-400 text-xs font-bold cursor-not-allowed"
+                                        >
+                                            Sem WhatsApp cadastrado
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                         </motion.div>
                     </div>
