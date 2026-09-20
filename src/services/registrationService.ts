@@ -248,59 +248,86 @@ export interface AdminEnrollParticipantParams {
 }
 
 export async function adminEnrollParticipantInEvent(params: AdminEnrollParticipantParams) {
-    // 1. Verifica se o participante já está no evento
-    const { data: existing } = await supabase
-        .from('registrations')
-        .select('id')
-        .eq('participant_id', params.participantId)
-        .eq('event_id', params.eventId)
-        .maybeSingle()
+    try {
+        // 1. Verifica se o participante já está no evento
+        const { data: existing } = await supabase
+            .from('registrations')
+            .select('id')
+            .eq('participant_id', params.participantId)
+            .eq('event_id', params.eventId)
+            .maybeSingle()
 
-    if (existing) {
-        throw new Error('Este participante já está inscrito neste retiro.')
+        if (existing) {
+            throw new Error('Este participante já está inscrito neste retiro.')
+        }
+
+        const regStatus = params.paymentStatus === 'Pago' ? 'Confirmada' : 'Pendente'
+
+        // 2. Insere a inscrição
+        const { data: reg, error: regError } = await supabase
+            .from('registrations')
+            .insert({
+                participant_id: params.participantId,
+                event_id: params.eventId,
+                kit_option: params.kitOption,
+                tshirt_size: params.tshirtSize || null,
+                tshirt_size_2: params.tshirtSize2 || null,
+                staying_on_site: params.stayingOnSite || false,
+                assigned_angel: params.assignedAngel || null,
+                status: regStatus,
+                notes: params.notes || null
+            })
+            .select()
+            .single()
+
+        if (regError || !reg) {
+            console.error('Erro ao inscrever participante:', regError)
+            throw regError || new Error('Falha ao criar inscrição.')
+        }
+
+        // 3. Insere o pagamento
+        const { data: pay, error: payError } = await supabase
+            .from('payments')
+            .insert({
+                registration_id: reg.id,
+                amount: params.paymentAmount,
+                status: params.paymentStatus || 'Pendente',
+                payment_method: 'PIX',
+                paid_at: params.paymentStatus === 'Pago' ? new Date().toISOString() : null
+            })
+            .select()
+            .single()
+
+        if (payError) {
+            console.error('Erro ao criar pagamento da inscrição:', payError)
+        }
+
+        return { registration: reg, payment: pay }
+    } catch (err) {
+        console.error('Erro ao inscrever participante:', err)
+        throw err
     }
-
-    const regStatus = params.paymentStatus === 'Pago' ? 'Confirmada' : 'Pendente'
-
-    // 2. Insere a inscrição
-    const { data: reg, error: regError } = await supabase
-        .from('registrations')
-        .insert({
-            participant_id: params.participantId,
-            event_id: params.eventId,
-            kit_option: params.kitOption,
-            tshirt_size: params.tshirtSize || null,
-            tshirt_size_2: params.tshirtSize2 || null,
-            staying_on_site: params.stayingOnSite || false,
-            assigned_angel: params.assignedAngel || null,
-            status: regStatus,
-            notes: params.notes || null
-        })
-        .select()
-        .single()
-
-    if (regError || !reg) {
-        console.error('Erro ao inscrever participante:', regError)
-        throw regError || new Error('Falha ao criar inscrição.')
-    }
-
-    // 3. Insere o pagamento
-    const { data: pay, error: payError } = await supabase
-        .from('payments')
-        .insert({
-            registration_id: reg.id,
-            amount: params.paymentAmount,
-            status: params.paymentStatus || 'Pendente',
-            payment_method: 'PIX',
-            paid_at: params.paymentStatus === 'Pago' ? new Date().toISOString() : null
-        })
-        .select()
-        .single()
-
-    if (payError) {
-        console.error('Erro ao criar pagamento da inscrição:', payError)
-    }
-
-    return { registration: reg, payment: pay }
 }
 
+export async function transferRegistrationEvent(params: {
+    registrationId: string
+    targetEventId: string
+    kitOption?: string
+}) {
+    const { data, error } = await supabase
+        .from('registrations')
+        .update({
+            event_id: params.targetEventId,
+            ...(params.kitOption ? { kit_option: params.kitOption } : {})
+        })
+        .eq('id', params.registrationId)
+        .select('*, event:events(*)')
+        .single()
+
+    if (error) {
+        console.error('Erro ao transferir inscrição de evento:', error)
+        throw error
+    }
+
+    return data
+}
