@@ -209,7 +209,7 @@ export async function updatePaymentAndRegistrationStatus(params: {
 export async function updateRegistrationAngel(registrationId: string, angelName: string | null) {
     const { data, error } = await supabase
         .from('registrations')
-        .update({ assigned_angel: angelName })
+        .update({ assigned_angel: angelName ? angelName.trim() : null })
         .eq('id', registrationId)
         .select()
         .single()
@@ -220,6 +220,108 @@ export async function updateRegistrationAngel(registrationId: string, angelName:
     }
 
     return data
+}
+
+export async function updateBulkRegistrationAngel(registrationIds: string[], angelName: string | null) {
+    if (!registrationIds || registrationIds.length === 0) return
+
+    const { data, error } = await supabase
+        .from('registrations')
+        .update({ assigned_angel: angelName ? angelName.trim() : null })
+        .in('id', registrationIds)
+
+    if (error) {
+        console.error('Erro ao atribuir anjo em lote:', error)
+        throw error
+    }
+
+    return data
+}
+
+export async function fetchRegisteredAngels(): Promise<string[]> {
+    try {
+        const { data } = await supabase
+            .from('settings')
+            .select('value')
+            .eq('key', 'registered_angels')
+            .maybeSingle()
+
+        if (data?.value) {
+            try {
+                const parsed = typeof data.value === 'string' ? JSON.parse(data.value) : data.value
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    return parsed.filter(Boolean).sort()
+                }
+            } catch {
+                // fallback
+            }
+        }
+
+        // Fallback: busca de todas as inscrições existentes
+        const { data: regAngels } = await supabase
+            .from('registrations')
+            .select('assigned_angel')
+
+        const unique = Array.from(
+            new Set((regAngels || []).map(r => r.assigned_angel?.trim()).filter(Boolean))
+        ).sort() as string[]
+
+        return unique.length > 0 ? unique : [
+            'Cassiano', 'Duda', 'Eduardo', 'Felipe', 'Gabi', 'Gabriel',
+            'Isa', 'Izabella', 'João V', 'Julia', 'Léo', 'Mabel',
+            'Maria Fernanda', 'Maria Laura', 'Marie', 'Marina', 'Matheus',
+            'Rabachin', 'Rafa', 'Sophia', 'Varini', 'Vini'
+        ]
+    } catch (err) {
+        console.error('Erro ao buscar lista de anjos:', err)
+        return []
+    }
+}
+
+export async function saveRegisteredAngels(angels: string[]): Promise<boolean> {
+    try {
+        const cleanList = Array.from(new Set(angels.map(a => a.trim()).filter(Boolean))).sort()
+        const { error } = await supabase
+            .from('settings')
+            .upsert({
+                key: 'registered_angels',
+                value: JSON.stringify(cleanList),
+                updated_at: new Date().toISOString()
+            })
+
+        if (error) throw error
+        return true
+    } catch (err) {
+        console.error('Erro ao salvar anjos:', err)
+        return false
+    }
+}
+
+export async function renameAngel(oldName: string, newName: string, eventId?: string) {
+    const trimmedOld = oldName.trim()
+    const trimmedNew = newName.trim()
+    if (!trimmedOld || !trimmedNew || trimmedOld === trimmedNew) return
+
+    // 1. Atualiza registros no banco
+    let query = supabase
+        .from('registrations')
+        .update({ assigned_angel: trimmedNew })
+        .eq('assigned_angel', trimmedOld)
+
+    if (eventId) {
+        query = query.eq('event_id', eventId)
+    }
+
+    const { error } = await query
+    if (error) throw error
+
+    // 2. Atualiza a lista em settings
+    const angels = await fetchRegisteredAngels()
+    const updated = angels.map(a => (a === trimmedOld ? trimmedNew : a))
+    if (!updated.includes(trimmedNew)) {
+        updated.push(trimmedNew)
+    }
+    await saveRegisteredAngels(updated)
 }
 
 export async function deleteRegistrationCascade(registrationId: string) {
