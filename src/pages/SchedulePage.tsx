@@ -247,9 +247,9 @@ export const SchedulePage: React.FC = () => {
                         <div className="w-12 h-12 rounded-2xl bg-holi-secondary/20 flex items-center justify-center text-holi-secondary mb-4">
                             <Church size={24} />
                         </div>
-                        <h4 className="text-lg font-bold text-white uppercase mb-2">Missa com Dom José</h4>
+                        <h4 className="text-lg font-bold text-white uppercase mb-2">Santa Missa</h4>
                         <p className="text-sm text-gray-400 leading-relaxed">
-                            No domingo às 15h00 teremos a Santa Missa solene com nosso Bispo Dom José. Momento de profunda graça!
+                            No domingo às 07h00 teremos a Santa Missa na Igreja Matriz São José. Momento sagrado de comunhão e profunda graça!
                         </p>
                     </div>
 
@@ -259,7 +259,7 @@ export const SchedulePage: React.FC = () => {
                         </div>
                         <h4 className="text-lg font-bold text-white uppercase mb-2">O que levar?</h4>
                         <p className="text-sm text-gray-400 leading-relaxed">
-                            Bíblia, terço, itens de higiene pessoal, roupas confortáveis, colchão/barraca (se optar por camping) e muita fé!
+                            Bíblia, terço, itens de higiene pessoal, roupas confortáveis (para água e pó Holi), fantasia para a sexta-feira e muita fé!
                         </p>
                     </div>
                 </div>
