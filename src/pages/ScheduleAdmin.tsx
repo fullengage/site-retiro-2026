@@ -276,6 +276,22 @@ export const ScheduleAdmin: React.FC = () => {
         })
     }
 
+    const handleSyncOfficial = async () => {
+        if (!window.confirm('Deseja restaurar e sincronizar todas as atividades com o Cronograma Oficial do Google Docs? Isso atualizará o Supabase com todos os 52 itens do retiro.')) {
+            return
+        }
+
+        setActionLoading(true)
+        const { success, error } = await scheduleService.syncOfficialSchedule()
+        if (success) {
+            showFeedback('success', 'Cronograma oficial sincronizado com sucesso!')
+            loadSchedule()
+        } else {
+            showFeedback('error', 'Erro ao sincronizar: ' + (error?.message || 'Tente novamente.'))
+        }
+        setActionLoading(false)
+    }
+
     const handleSaveDay = async (e: React.FormEvent) => {
         e.preventDefault()
         if (!editingDay) return
@@ -335,6 +351,16 @@ export const ScheduleAdmin: React.FC = () => {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3">
+                    <button
+                        onClick={handleSyncOfficial}
+                        disabled={actionLoading || loading}
+                        className="inline-flex items-center gap-2 px-4 py-3 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 rounded-2xl text-xs font-bold uppercase tracking-wider transition-all"
+                        title="Restaura os dados originais do cronograma oficial"
+                    >
+                        <Sparkles size={16} />
+                        <span>Sincronizar Oficial</span>
+                    </button>
+
                     <button
                         onClick={loadSchedule}
                         disabled={loading}

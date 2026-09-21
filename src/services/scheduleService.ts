@@ -233,5 +233,47 @@ export const scheduleService = {
         } catch (err: any) {
             return { data: null, error: err instanceof Error ? err : new Error(String(err)) }
         }
+    },
+
+    /**
+     * Restaura o cronograma oficial padrão no Supabase
+     */
+    async syncOfficialSchedule(): Promise<{ success: boolean; error: Error | null }> {
+        try {
+            // Atualiza os dias
+            for (const day of FALLBACK_SCHEDULE) {
+                await supabase.from('schedule_days').upsert({
+                    id: day.id,
+                    day_name: day.day_name,
+                    date_text: day.date_text,
+                    subtitle: day.subtitle,
+                    tag: day.tag,
+                    color: day.color,
+                    order_num: day.order_num
+                })
+            }
+
+            // Remove itens antigos
+            await supabase.from('schedule_items').delete().neq('id', '00000000-0000-0000-0000-000000000000')
+
+            // Insere todos os itens oficiais
+            const allItems = FALLBACK_SCHEDULE.flatMap(day =>
+                day.events.map((ev, index) => ({
+                    day_id: day.id,
+                    time: ev.time,
+                    title: ev.title,
+                    category: ev.category,
+                    highlight: ev.highlight,
+                    order_num: index + 1
+                }))
+            )
+
+            const { error: insertError } = await supabase.from('schedule_items').insert(allItems)
+            if (insertError) throw insertError
+
+            return { success: true, error: null }
+        } catch (err: any) {
+            return { success: false, error: err instanceof Error ? err : new Error(String(err)) }
+        }
     }
 }
