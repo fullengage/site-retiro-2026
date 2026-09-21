@@ -8,7 +8,7 @@ import {
     Copy, Check, AlertCircle, RefreshCw, HeartHandshake, Search, History
 } from 'lucide-react'
 import { fetchActiveEvent } from '../services/eventService'
-import { searchParticipantsByName, findParticipantByIdentifier, ParticipantSearchResult } from '../services/participantService'
+import { searchParticipantsByName, findParticipantByIdentifier, fetchParticipantHistory, ParticipantSearchResult } from '../services/participantService'
 import { createEventRegistration, uploadReceiptAndLinkPayment } from '../services/registrationService'
 import { EventItem, Participant } from '../types/database'
 
@@ -163,11 +163,23 @@ const RegistrationPage = () => {
     }
 
     // Seleciona participante da lista de sugestões (Inscrição Expressa em 1 clique)
-    const handleSelectParticipant = (result: ParticipantSearchResult) => {
+    const handleSelectParticipant = async (result: ParticipantSearchResult) => {
         const p = result.participant
         setFoundParticipant(result)
         setVerifiedParticipant(result)
         setShowSuggestions(false)
+
+        let previousTshirt = ''
+        try {
+            if (p.id) {
+                const history = await fetchParticipantHistory(p.id)
+                if (history && history.length > 0 && history[0].tshirtSize) {
+                    previousTshirt = history[0].tshirtSize
+                }
+            }
+        } catch (e) {
+            console.error('Erro ao buscar tamanho de camiseta anterior:', e)
+        }
 
         setFormData(prev => ({
             ...prev,
@@ -181,7 +193,8 @@ const RegistrationPage = () => {
             address: p.address || prev.address,
             city: p.city || prev.city,
             parish: p.parish || prev.parish,
-            emergency_phone: p.emergency_phone || prev.emergency_phone
+            emergency_phone: p.emergency_phone || prev.emergency_phone,
+            tshirt_size: previousTshirt || prev.tshirt_size
         }))
     }
 
@@ -196,7 +209,7 @@ const RegistrationPage = () => {
                 activeEventId: event?.id
             })
             if (found) {
-                handleSelectParticipant(found)
+                await handleSelectParticipant(found)
             }
         } catch (err) {
             console.error('Erro no auto-preenchimento:', err)
