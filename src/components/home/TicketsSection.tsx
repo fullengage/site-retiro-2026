@@ -37,96 +37,58 @@ export const TicketsSection: React.FC = () => {
                 </div>
             </div>
 
-            {/* RACK DE 2 CANAIS DE PASSAPORTE */}
-            <div className="adonai-tickets-grid soundboard-rack-grid">
-                {/* CANAL 01: ADONAI INSCRIÇÃO INDIVIDUAL (R$ 50) */}
-                <div className="sziget-pass-card rack-channel-card featured">
+            {/* RACK DE PASSAPORTE ATIVO */}
+            <div className="max-w-xl mx-auto soundboard-rack-grid">
+                {/* CANAL ÚNICO: ADONAI INSCRIÇÃO INDIVIDUAL (R$ 50) */}
+                <div className="sziget-pass-card rack-channel-card featured w-full">
                     <div className="rack-channel-header">
-                        <div className="channel-id">CH-01 • PASSAPORTE OFICIAL</div>
+                        <div className="channel-id">CH-01 • PASSAPORTE OFICIAL RETIRO ADONAI</div>
                         <span className="pilot-led-green active-pulse" title="Lote Disponível" />
                     </div>
 
                     <div className="pass-card-header">
-                        <span className="pass-badge">🎟️ INSCRIÇÃO ADONAI</span>
-                        <span className="pass-urgency-tag">🔥 DISPONÍVEL</span>
+                        <span className="pass-badge">🎟️ INSCRIÇÃO (SEM CAMISETA)</span>
+                        <span className="pass-urgency-tag">🔥 VAGAS ABERTAS</span>
                     </div>
 
                     <h3 className="pass-card-title">ADONAI — INSCRIÇÃO INDIVIDUAL</h3>
                     <p className="pass-card-subtitle">
-                        Acesso completo aos 3 dias de retiro, alimentação completa, alojamento, shows e louvor com o melhor custo-benefício.
+                        Acesso completo aos 3 dias de festival, louvor, transformação, shows, alimentação completa e alojamento.
                     </p>
 
                     <div className="pass-highlight-box single-box">
-                        🎒 <strong>EXPERIÊNCIA COMPLETA</strong>: Acesso a todos os dias, alimentação, kit Holi e shows!
+                        🎒 <strong>EXPERIÊNCIA COMPLETA</strong>: Acesso total aos 3 dias, alimentação completa, kit Holi e todos os shows!
                     </div>
 
                     <div className="pass-price-box rack-price-box">
                         <div className="pass-price-val">R$ 50</div>
-                        <div className="pass-price-label">INSCRIÇÃO INDIVIDUAL COMPLETA</div>
+                        <div className="pass-price-label">INSCRIÇÃO INDIVIDUAL (SEM CAMISETA)</div>
                     </div>
 
                     <div className="pass-features-summary">
                         <div className="pass-summary-item">✅ Vaga individual nos 3 dias de festival</div>
                         <div className="pass-summary-item">✅ Alimentação Completa e Alojamento no FAF</div>
                         <div className="pass-summary-item">✅ 1 Kit Holi (Festa das Cores) + Shows</div>
-                        <div className="pass-summary-item">ℹ️ Sem camiseta oficial (lote de camisetas encerrado)</div>
+                        <div className="pass-summary-item">⚠️ Sem camiseta oficial (lote de encomendas à fábrica encerrado)</div>
                     </div>
 
                     <Link to="/inscricao" className="btn-sziget-primary stompbox-btn">
-                        GARANTIR MINHA VAGA POR R$ 50
-                    </Link>
-                </div>
-
-                {/* CANAL 02: ADONAI COM CAMISETA (ENCERRADO) */}
-                <div className="sziget-pass-card rack-channel-card opacity-70">
-                    <div className="rack-channel-header">
-                        <div className="channel-id">CH-02 • COM CAMISETA</div>
-                        <span className="pilot-led-red" title="Lote Encerrado" />
-                    </div>
-
-                    <div className="pass-card-header">
-                        <span className="pass-badge" style={{ background: 'rgba(239, 68, 68, 0.2)', color: '#f87171', borderColor: 'rgba(239, 68, 68, 0.4)' }}>
-                            ⛔ LOTE ENCERRADO
-                        </span>
-                        <span className="pass-stock-tag">PRAZO ESGOTADO</span>
-                    </div>
-
-                    <h3 className="pass-card-title">ADONAI COM CAMISETA</h3>
-                    <p className="pass-card-subtitle">
-                        Pacote que incluía a Camiseta Oficial 2026. Prazo final de encomendas finalizado para confecção.
-                    </p>
-
-                    <div className="pass-highlight-box duo-box" style={{ background: 'rgba(239, 68, 68, 0.08)', borderColor: 'rgba(239, 68, 68, 0.2)' }}>
-                        ⚠️ <strong>PRAZO ENCERRADO</strong>: As camisetas já foram enviadas para confecção e estampagem.
-                    </div>
-
-                    <div className="pass-price-box rack-price-box">
-                        <div className="pass-price-val" style={{ color: '#9ca3af' }}>R$ 70</div>
-                        <div className="pass-price-label">LOTE DE CAMISETAS ENCERRADO</div>
-                    </div>
-
-                    <div className="pass-features-summary">
-                        <div className="pass-summary-item">🔒 Pedidos enviados para a confecção</div>
-                        <div className="pass-summary-item">✅ Inscrições sem camiseta continuam abertas</div>
-                    </div>
-
-                    <Link to="/inscricao" className="btn-sziget-primary stompbox-btn" style={{ opacity: 0.8 }}>
-                        INSCREVER SEM CAMISETA (R$ 50)
+                        GARANTIR INSCRIÇÃO POR R$ 50
                     </Link>
                 </div>
             </div>
 
-            {/* AVISO IMPORTANTE DE VIRADA DE LOTE */}
-            <div className="turma-adonai-box rack-accent-box" style={{ marginTop: '24px' }}>
+            {/* AVISO IMPORTANTE */}
+            <div className="max-w-xl mx-auto turma-adonai-box rack-accent-box" style={{ marginTop: '24px' }}>
                 <span className="turma-adonai-badge">
-                    📢 COMUNICADO DE INSCRIÇÕES
+                    📢 COMUNICADO OFICIAL
                 </span>
                 <h3 className="turma-adonai-title">
-                    Venda de Camisetas Encerrada
+                    Inscrições Abertas (Sem Camiseta)
                 </h3>
                 <p className="turma-adonai-desc">
-                    O lote promocional que incluía a camiseta oficial do retiro foi <strong>encerrado</strong> para envio à produção da fábrica. <br />
-                    As <strong>inscrições individuais (R$ 50,00) continuam abertas normalmente</strong> incluindo acesso completo a todos os dias, alimentação, kit Holi e shows!
+                    O lote promocional com encomenda de camisetas oficiais foi <strong>encerrado</strong> para envio à confecção. <br />
+                    As <strong>inscrições individuais (Sem Camiseta) por R$ 50,00</strong> continuam disponíveis com todas as refeições e programação inclusas!
                 </p>
             </div>
         </section>
