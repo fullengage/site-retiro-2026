@@ -876,9 +876,18 @@ const RegistrationPage = () => {
 
                         {/* SEÇÃO 3: ESCOLHA DO KIT / INGRESSO */}
                         <div className="pt-4 border-t border-white/10">
-                            <h3 className="text-xs font-black uppercase tracking-widest text-holi-accent mb-4 flex items-center gap-2">
+                            <h3 className="text-xs font-black uppercase tracking-widest text-holi-accent mb-3 flex items-center gap-2">
                                 <Package size={16} /> Opções de Inscrição & Kit ({event?.name})
                             </h3>
+
+                            {/* Aviso de encerramento das camisetas */}
+                            <div className="mb-4 p-3.5 bg-amber-500/10 border border-amber-500/30 rounded-2xl flex items-center gap-3 text-xs text-amber-200">
+                                <Shirt className="w-5 h-5 text-amber-400 shrink-0" />
+                                <div>
+                                    <strong className="font-bold text-amber-300 block">Venda de camisetas oficiais encerrada!</strong>
+                                    As inscrições continuam normalmente (R$ 50,00) com acesso completo a todos os 3 dias, alimentação, kit Holi e shows.
+                                </div>
+                            </div>
 
                             <div className="space-y-3">
                                 {event?.kit_options.map(kit => (

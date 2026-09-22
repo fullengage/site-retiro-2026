@@ -35,16 +35,9 @@ export const DEFAULT_EVENTS: EventItem[] = [
         kit_options: [
             {
                 id: 'adonai_sem_camiseta_50',
-                name: 'ADONAI — SEM CAMISETA (R$ 50,00)',
+                name: 'ADONAI — INSCRIÇÃO (SEM CAMISETA) (R$ 50,00)',
                 price: 50,
                 includesTshirt: false,
-            },
-            {
-                id: 'adonai_com_camiseta_70',
-                name: 'ADONAI — COM CAMISETA (Promocional até 10/09) (R$ 70,00)',
-                price: 70,
-                includesTshirt: true,
-                tshirtCount: 1,
             }
         ],
         pix_info: {
