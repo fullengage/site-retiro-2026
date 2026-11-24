@@ -141,6 +141,7 @@ VALUES (
         "description": "Dois dias de serviço, comunhão e fé: preparamos juntos a cozinha, celebramos a Santa Missa na Matriz e partilhamos a mesa.",
         "min_age": 18,
         "overnight": false,
+        "playlist_url": "https://open.spotify.com/playlist/1c2UOuqkuQOy1sMDSRbKj0\nhttps://open.spotify.com/intl-pt/artist/5S9z6eKVsdf3fZbTIRpbxI",
         "kids_area": {
             "enabled": true,
             "description": "Teremos uma área especial para as crianças. Cadastre seus filhos na sua inscrição — eles não pagam."
@@ -163,3 +164,7 @@ ON CONFLICT (slug) DO UPDATE SET
     status = EXCLUDED.status,
     kit_options = EXCLUDED.kit_options,
     content = EXCLUDED.content;
+
+-- 6. Playlist da vitrola (rodar sozinho se o passo 5 já foi aplicado)
+UPDATE events SET content = content || '{"playlist_url": "https://open.spotify.com/playlist/1c2UOuqkuQOy1sMDSRbKj0\nhttps://open.spotify.com/intl-pt/artist/5S9z6eKVsdf3fZbTIRpbxI"}'::jsonb
+WHERE slug = 'dna-2026';

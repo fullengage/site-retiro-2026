@@ -1,0 +1,77 @@
+/* Tema claro café/creme (#2B1B14 #5A3B2E #8B6A55 #C9B19C #F3E7D6).
+   Ativado com .theme-cream na raiz das páginas públicas de evento (ver App.tsx).
+   ponytail: remapeia as classes escuras já usadas nas páginas (text-white, bg-black/x, border-white/x...)
+   em vez de reescrever cada componente; se o site inteiro virar claro, trocar as classes na fonte. */
+
+.theme-cream {
+    --background: 35 57% 92%;
+    --foreground: 18 36% 12%;
+    --card: 36 60% 97%;
+    --card-foreground: 18 36% 12%;
+    --primary: 18 32% 27%;
+    --primary-foreground: 36 60% 97%;
+    --secondary: 23 24% 44%;
+    --secondary-foreground: 36 60% 97%;
+    --accent: 23 24% 40%;
+    --accent-foreground: 36 60% 97%;
+    --muted: 28 32% 85%;
+    --muted-foreground: 23 24% 40%;
+    --border: 28 32% 80%;
+    --input: 28 32% 80%;
+    --ring: 18 32% 27%;
+    color-scheme: light;
+    color: #2B1B14;
+}
+
+/* Texto */
+.theme-cream .text-white:not([class*="bg-gradient"]):not([class*="bg-holi-primary"]):not([class*="bg-green"]),
+.theme-cream .text-gray-100,
+.theme-cream .text-gray-200 { color: #2B1B14; }
+.theme-cream .text-gray-300,
+.theme-cream .text-gray-400 { color: #5A3B2E; }
+.theme-cream .text-gray-500,
+.theme-cream .text-gray-600 { color: #8B6A55; }
+.theme-cream ::placeholder { color: #8B6A55; opacity: .7; }
+.theme-cream .text-holi-accent,
+.theme-cream .text-\[\#d946ef\],
+.theme-cream .text-\[\#06b6d4\],
+.theme-cream .text-purple-300 { color: #8B6A55; }
+
+/* Superfícies */
+.theme-cream .bg-\[\#0d0714\] { background-color: #fff; }
+.theme-cream .bg-black\/30,
+.theme-cream .bg-black\/40,
+.theme-cream .bg-black\/50 { background-color: rgba(255, 255, 255, .65); }
+.theme-cream .bg-white\/5 { background-color: rgba(90, 59, 46, .05); }
+.theme-cream .bg-white\/10 { background-color: rgba(90, 59, 46, .09); }
+.theme-cream .hover\:bg-white\/10:hover,
+.theme-cream .hover\:bg-white\/20:hover { background-color: rgba(90, 59, 46, .14); }
+.theme-cream .bg-holi-surface { box-shadow: 0 1px 2px rgba(43, 27, 20, .06), 0 8px 24px rgba(43, 27, 20, .06); }
+
+/* Bordas */
+.theme-cream .border-white\/5,
+.theme-cream .border-white\/10 { border-color: rgba(90, 59, 46, .15); }
+.theme-cream .border-white\/20,
+.theme-cream .hover\:border-white\/20:hover,
+.theme-cream .hover\:border-white\/30:hover { border-color: rgba(90, 59, 46, .3); }
+
+/* Gradientes com roxo fixo viram café */
+.theme-cream .via-purple-600,
+.theme-cream .via-purple-900\/30 { --tw-gradient-stops: var(--tw-gradient-from), #6E4B3B, var(--tw-gradient-to); }
+.theme-cream .to-purple-600 { --tw-gradient-to: #6E4B3B; }
+
+/* Sem brilhos neon */
+.theme-cream .blur-3xl { display: none; }
+.theme-cream [class*="shadow-holi"],
+.theme-cream [class*="shadow-[0_0"]:not([class*="drop-shadow"]) { box-shadow: 0 6px 18px rgba(43, 27, 20, .15); }
+
+/* A própria raiz tem text-gray-100; e o logo usa brilho branco */
+.theme-cream.text-gray-100 { color: #2B1B14; }
+.theme-cream [class*="drop-shadow"] { filter: none; }
+:root:has(.theme-cream) { scrollbar-color: #8B6A55 #F3E7D6; }
+
+/* Sol nascendo na janela em arco (EventPage) */
+@keyframes dna-sunrise { from { transform: translateY(40px); opacity: .4; } to { transform: translateY(0); opacity: 1; } }
+.dna-sun { animation: dna-sunrise 2.4s cubic-bezier(.2, .7, .2, 1) both; }
+@media (prefers-reduced-motion: reduce) { .dna-sun { animation: none; } }
+@keyframes dna-swing { 0%, 100% { transform: translateX(-50%) rotate(-4deg); } 50% { transform: translateX(-50%) rotate(4deg); } }

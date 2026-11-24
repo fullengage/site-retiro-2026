@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation, Link, Navigate } f
 import { useEffect } from 'react'
 import Navbar from './components/Navbar'
 import Background from './components/Background'
+import './styles/theme-cream.css'
 import HomePage, { AdonaiLandingPage } from './pages/HomePage'
 import EventPage from './pages/EventPage'
 import EventsAdmin from './pages/EventsAdmin'
@@ -34,10 +35,12 @@ function AppContent() {
     const { pathname } = useLocation()
     const isAdmin = pathname.startsWith('/admin')
     const isComingSoon = pathname === '/em-breve'
+    // Tema claro café/creme nas páginas de evento (home, /evento/*, /inscricao)
+    const isCream = pathname === '/' || pathname.startsWith('/evento/') || pathname === '/inscricao'
 
     return (
-        <div className="min-h-screen bg-holi-dark text-gray-100 font-display selection:bg-holi-primary selection:text-white overflow-x-hidden">
-            {!isComingSoon && <Background />}
+        <div className={`min-h-screen bg-holi-dark text-gray-100 font-display ${isCream ? 'theme-cream' : ''} selection:bg-holi-primary selection:text-white overflow-x-clip`}>
+            {!isComingSoon && !isCream && <Background />}
             {!isAdmin && !isComingSoon && <Navbar />}
 
             <Routes>

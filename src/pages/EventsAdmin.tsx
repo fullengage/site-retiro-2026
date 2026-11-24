@@ -24,6 +24,7 @@ type Form = {
     tagline: string
     description: string
     hero_image: string
+    playlist_url: string
     min_age: string
     overnight: boolean
     registration_notice: string
@@ -45,6 +46,7 @@ const toForm = (e?: EventItem, fallbackPix?: EventItem['pix_info']): Form => ({
     tagline: e?.content?.tagline || '',
     description: e?.content?.description || '',
     hero_image: e?.content?.hero_image || '',
+    playlist_url: e?.content?.playlist_url || '',
     min_age: e?.content?.min_age ? String(e.content.min_age) : '',
     overnight: e?.content?.overnight ?? !e,
     registration_notice: e?.content?.registration_notice || '',
@@ -99,6 +101,7 @@ export const EventsAdmin = () => {
                     tagline: form.tagline || undefined,
                     description: form.description || undefined,
                     hero_image: form.hero_image || undefined,
+                    playlist_url: form.playlist_url.trim() || undefined,
                     min_age: form.min_age ? Number(form.min_age) : undefined,
                     overnight: form.overnight,
                     registration_notice: form.registration_notice || undefined,
@@ -186,6 +189,11 @@ export const EventsAdmin = () => {
                     <div>
                         <label className={label}>Imagem de capa (URL)</label>
                         <input className={input} value={form.hero_image} onChange={e => set('hero_image', e.target.value)} />
+                    </div>
+                    <div>
+                        <label className={label}>Músicas do Spotify — um link por linha (playlist, álbum ou artista)</label>
+                        <textarea rows={3} className={`${input} font-mono`} value={form.playlist_url} placeholder="https://open.spotify.com/playlist/..." onChange={e => set('playlist_url', e.target.value)} />
+                        <p className="text-xs text-gray-500 mt-1">Aparece na vitrola da sala e no mini player da página do evento.</p>
                     </div>
 
                     <div>

@@ -60,6 +60,7 @@ export interface EventContent {
     overnight?: boolean
     registration_notice?: string
     kids_area?: { enabled: boolean; description?: string }
+    playlist_url?: string
     schedule?: EventScheduleDay[]
 }
 

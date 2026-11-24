@@ -38,6 +38,14 @@ export default {
                     foreground: "hsl(var(--card-foreground))",
                 },
                 paper: "#fdfbf7",
+                // Paleta café/creme (Retiro DNA)
+                cafe: {
+                    900: "#2B1B14",
+                    700: "#5A3B2E",
+                    500: "#8B6A55",
+                    300: "#C9B19C",
+                    100: "#F3E7D6",
+                },
                 adonai: {
                     orange: "#F7942D",
                     sand: "#F5D29C",
