@@ -944,21 +944,6 @@ const RegistrationPage = () => {
                                             />
                                             <div>
                                                 <span className="text-white font-bold block text-sm">{kit.name}</span>
-                                                {kit.price === 50 && (
-                                                    <span className="inline-block bg-emerald-500/20 text-emerald-300 text-[11px] font-bold px-2 py-0.5 rounded border border-emerald-500/30 mt-1">
-                                                        🎟️ Inscrição Completa (Sem Camiseta)
-                                                    </span>
-                                                )}
-                                                {kit.price === 70 && kit.includesTshirt && (
-                                                    <span className="inline-block bg-amber-500/20 text-amber-300 text-[11px] font-bold px-2 py-0.5 rounded border border-amber-500/30 mt-1">
-                                                        ⏰ Promocional até 10/09 com Camiseta inclusa! (Após 10/09: R$ 70 sem camiseta)
-                                                    </span>
-                                                )}
-                                                {kit.price === 70 && !kit.includesTshirt && (
-                                                    <span className="inline-block bg-blue-500/20 text-blue-300 text-[11px] font-bold px-2 py-0.5 rounded border border-blue-500/30 mt-1">
-                                                        🎟️ Inscrição Completa (Sem Camiseta)
-                                                    </span>
-                                                )}
                                                 {kit.includesTshirt && (
                                                     <span className="text-xs text-gray-400 flex items-center gap-1 mt-1">
                                                         <Shirt size={12} className="text-holi-secondary" />
