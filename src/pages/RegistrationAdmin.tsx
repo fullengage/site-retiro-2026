@@ -1063,6 +1063,7 @@ const RegistrationAdmin = () => {
             'Camiseta 1',
             'Camiseta 2',
             'Pernoite',
+            'Filhos',
             'Status Pagamento',
             'Valor (R$)',
             'Anjo Responsável',
@@ -1088,6 +1089,7 @@ const RegistrationAdmin = () => {
             `"${r.tshirt_size || ''}"`,
             `"${r.tshirt_size_2 || ''}"`,
             `"${r.staying_on_site ? 'Sim' : 'Não'}"`,
+            `"${(r.children || []).map(c => `${c.name} (${c.age})`).join('; ')}"`,
             `"${r.payment?.status || 'Pendente'}"`,
             `"${r.payment?.amount || 0}"`,
             `"${r.assigned_angel || 'Não atribuído'}"`,
@@ -1886,6 +1888,11 @@ const RegistrationAdmin = () => {
                                                             <span className="text-holi-secondary font-mono text-[11px] flex items-center gap-1 mt-0.5">
                                                                 <Shirt size={12} />
                                                                 {reg.tshirt_size} {reg.tshirt_size_2 ? `+ ${reg.tshirt_size_2}` : ''}
+                                                            </span>
+                                                        )}
+                                                        {!!reg.children?.length && (
+                                                            <span className="text-holi-accent text-[11px] block mt-0.5" title={reg.children.map(c => `${c.name} (${c.age})`).join(', ')}>
+                                                                👶 {reg.children.length} filho(s): {reg.children.map(c => `${c.name} (${c.age})`).join(', ')}
                                                             </span>
                                                         )}
                                                     </div>

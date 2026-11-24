@@ -184,6 +184,7 @@ export default function AdminLayout() {
     // Authenticated Layout
     const menuItems = [
         { path: '/admin', icon: <LayoutDashboard size={20} />, label: 'Painel / Notícias', exact: true },
+        { path: '/admin/eventos', icon: <Calendar size={20} />, label: 'Eventos / Retiros' },
         { path: '/admin/cronograma', icon: <Calendar size={20} />, label: 'Cronograma' },
         { path: '/admin/inscricoes', icon: <Users size={20} />, label: 'Inscrições' },
         { path: '/admin/camisetas', icon: <Shirt size={20} />, label: 'Camisetas' },

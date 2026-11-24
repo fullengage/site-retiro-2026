@@ -2,7 +2,9 @@ import { BrowserRouter as Router, Routes, Route, useLocation, Link, Navigate } f
 import { useEffect } from 'react'
 import Navbar from './components/Navbar'
 import Background from './components/Background'
-import HomePage from './pages/HomePage'
+import HomePage, { AdonaiLandingPage } from './pages/HomePage'
+import EventPage from './pages/EventPage'
+import EventsAdmin from './pages/EventsAdmin'
 import GalleryPage from './pages/GalleryPage'
 import DonationPage from './pages/DonationPage'
 import SchedulePage from './pages/SchedulePage'
@@ -40,6 +42,8 @@ function AppContent() {
 
             <Routes>
                 <Route path="/" element={<HomePage />} />
+                <Route path="/adonai" element={<AdonaiLandingPage />} />
+                <Route path="/evento/:slug" element={<EventPage />} />
                 <Route path="/galeria" element={<GalleryPage />} />
                 <Route path="/doacoes" element={<DonationPage />} />
                 <Route path="/cronograma" element={<SchedulePage />} />
@@ -49,6 +53,7 @@ function AppContent() {
                     <Route index element={<NewsAdmin />} />
                     <Route path="dashboard" element={<Navigate to="/admin" replace />} />
                     <Route path="noticias" element={<NewsAdmin />} />
+                    <Route path="eventos" element={<EventsAdmin />} />
                     <Route path="cronograma" element={<ScheduleAdmin />} />
                     <Route path="inscricoes" element={<RegistrationAdmin />} />
                     <Route path="camisetas" element={<TshirtOrdersAdmin />} />

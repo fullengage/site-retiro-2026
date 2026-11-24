@@ -41,7 +41,31 @@ export interface EventItem {
     status: 'active' | 'upcoming' | 'completed' | 'cancelled'
     kit_options: EventKitOption[]
     pix_info: EventPixInfo
+    content?: EventContent
     created_at?: string
+}
+
+export interface EventScheduleDay {
+    title: string
+    hours?: string
+    items: string[]
+}
+
+// Conteúdo editável da página do evento (coluna events.content)
+export interface EventContent {
+    tagline?: string
+    description?: string
+    hero_image?: string
+    min_age?: number
+    overnight?: boolean
+    registration_notice?: string
+    kids_area?: { enabled: boolean; description?: string }
+    schedule?: EventScheduleDay[]
+}
+
+export interface RegistrationChild {
+    name: string
+    age: number
 }
 
 export interface Registration {
@@ -82,6 +106,7 @@ export interface RegistrationDetailed {
     assigned_angel?: string | null
     status: 'Pendente' | 'Confirmada' | 'Cancelada' | 'Presente'
     notes?: string | null
+    children?: RegistrationChild[] | null
     participant: Participant
     event: EventItem
     payment?: Payment | null

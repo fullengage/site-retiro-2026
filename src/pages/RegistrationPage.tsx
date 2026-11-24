@@ -5,12 +5,12 @@ import {
     User, Mail, Calendar, Phone, MapPin,
     Home, CheckCircle, Package, Shirt,
     ArrowRight, Loader2, Sparkles, CreditCard, Upload, FileCheck,
-    Copy, Check, AlertCircle, RefreshCw, HeartHandshake, Search, History
+    Copy, Check, AlertCircle, RefreshCw, HeartHandshake, Search, History, Baby, Plus, Trash2
 } from 'lucide-react'
-import { fetchActiveEvent } from '../services/eventService'
+import { fetchActiveEvent, fetchEventBySlug } from '../services/eventService'
 import { searchParticipantsByName, findParticipantByIdentifier, fetchParticipantHistory, ParticipantSearchResult } from '../services/participantService'
 import { createEventRegistration, uploadReceiptAndLinkPayment } from '../services/registrationService'
-import { EventItem, Participant } from '../types/database'
+import { EventItem, Participant, RegistrationChild } from '../types/database'
 
 const TSHIRT_SIZES = ['P', 'M', 'G', 'GG', 'XG']
 const PARISHES = [
@@ -44,6 +44,7 @@ const RegistrationPage = () => {
     const [receiptFile, setReceiptFile] = useState<File | null>(null)
     const [uploadingReceipt, setUploadingReceipt] = useState(false)
     const [receiptUploaded, setReceiptUploaded] = useState(false)
+    const [children, setChildren] = useState<RegistrationChild[]>([])
 
     const suggestionsRef = useRef<HTMLDivElement>(null)
 
@@ -81,7 +82,9 @@ const RegistrationPage = () => {
     useEffect(() => {
         const loadEvent = async () => {
             setLoadingEvent(true)
-            const activeEvent = await fetchActiveEvent()
+            // ?evento=slug escolhe o evento; sem parâmetro usa o evento ativo
+            const slugParam = new URLSearchParams(location.search).get('evento')
+            const activeEvent = (slugParam && await fetchEventBySlug(slugParam)) || await fetchActiveEvent()
             setEvent(activeEvent)
             if (activeEvent?.kit_options?.length > 0) {
                 const searchParams = new URLSearchParams(location.search)
@@ -139,6 +142,7 @@ const RegistrationPage = () => {
     const handleResetForm = () => {
         setFoundParticipant(null)
         setVerifiedParticipant(null)
+        setChildren([])
         setNameSuggestions([])
         setShowSuggestions(false)
         setFormData({
@@ -241,6 +245,22 @@ const RegistrationPage = () => {
             return
         }
 
+        const minAge = event.content?.min_age
+        if (minAge) {
+            if (!formData.birth_date) {
+                setError('Por favor, informe sua data de nascimento.')
+                return
+            }
+            const limit = new Date((event.start_date || new Date().toISOString().slice(0, 10)) + 'T12:00:00')
+            limit.setFullYear(limit.getFullYear() - minAge)
+            if (new Date(formData.birth_date + 'T12:00:00') > limit) {
+                setError(`A inscrição é para maiores de ${minAge} anos. Crianças entram como filhos na inscrição do responsável.`)
+                return
+            }
+        }
+
+        const validChildren = children.filter(c => c.name.trim()).map(c => ({ name: c.name.trim(), age: Number(c.age) || 0 }))
+
         if (needsTshirt1 && !formData.tshirt_size) {
             setError('Por favor, selecione o tamanho da camiseta.')
             return
@@ -270,7 +290,8 @@ const RegistrationPage = () => {
                 tshirtSize2: formData.tshirt_size_2,
                 stayingOnSite: formData.staying_on_site,
                 paymentAmount,
-                notes: formData.notes
+                notes: formData.notes,
+                children: validChildren
             })
 
             setCreatedRegistrationId(result.registration.id)
@@ -530,7 +551,7 @@ const RegistrationPage = () => {
                         transition={{ delay: 0.1 }}
                         className="text-4xl md:text-6xl font-black uppercase tracking-tight text-white mb-4"
                     >
-                        {event?.name || 'Retiro ADONAI 2026'}
+                        {event?.name || 'Inscrição'}
                     </motion.h1>
 
                     <motion.p
@@ -880,14 +901,13 @@ const RegistrationPage = () => {
                                 <Package size={16} /> Opções de Inscrição & Kit ({event?.name})
                             </h3>
 
-                            {/* Aviso de encerramento das camisetas */}
-                            <div className="mb-4 p-3.5 bg-amber-500/10 border border-amber-500/30 rounded-2xl flex items-center gap-3 text-xs text-amber-200">
-                                <Shirt className="w-5 h-5 text-amber-400 shrink-0" />
-                                <div>
-                                    <strong className="font-bold text-amber-300 block">Venda de camisetas oficiais encerrada!</strong>
-                                    As inscrições continuam normalmente (R$ 50,00) com acesso completo a todos os 3 dias, alimentação, kit Holi e shows.
+                            {/* Aviso do evento (editável em /admin/eventos) */}
+                            {event?.content?.registration_notice && (
+                                <div className="mb-4 p-3.5 bg-amber-500/10 border border-amber-500/30 rounded-2xl flex items-center gap-3 text-xs text-amber-200">
+                                    <AlertCircle className="w-5 h-5 text-amber-400 shrink-0" />
+                                    <div>{event.content.registration_notice}</div>
                                 </div>
-                            </div>
+                            )}
 
                             <div className="space-y-3">
                                 {event?.kit_options.map(kit => (
@@ -992,6 +1012,7 @@ const RegistrationPage = () => {
                             )}
 
                             {/* Pernoite / Acomodação */}
+                            {event?.content?.overnight !== false && (
                             <div className="mt-4">
                                 <label className="flex items-start gap-3 p-4 bg-black/30 border border-white/10 rounded-2xl cursor-pointer hover:border-white/20 transition-colors">
                                     <input
@@ -1011,7 +1032,58 @@ const RegistrationPage = () => {
                                     </div>
                                 </label>
                             </div>
+                            )}
                         </div>
+
+                        {/* FILHOS / ÁREA KIDS */}
+                        {event?.content?.kids_area?.enabled && (
+                            <div className="pt-4 border-t border-white/10">
+                                <h3 className="text-xs font-black uppercase tracking-widest text-holi-accent mb-2 flex items-center gap-2">
+                                    <Baby size={16} /> Filhos (área para crianças)
+                                </h3>
+                                <p className="text-xs text-gray-400 mb-4">
+                                    {event.content.kids_area.description || 'Vai levar seus filhos? Cadastre-os aqui.'}
+                                </p>
+                                <div className="space-y-3">
+                                    {children.map((child, i) => (
+                                        <div key={i} className="flex gap-3">
+                                            <input
+                                                aria-label={`Nome do filho ${i + 1}`}
+                                                placeholder="Nome da criança"
+                                                value={child.name}
+                                                onChange={e => setChildren(prev => prev.map((c, j) => j === i ? { ...c, name: e.target.value } : c))}
+                                                className="flex-1 min-w-0 px-4 py-3 bg-[#0d0714] border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:outline-none focus:border-holi-primary text-sm"
+                                            />
+                                            <input
+                                                aria-label={`Idade do filho ${i + 1}`}
+                                                type="number"
+                                                min={0}
+                                                max={17}
+                                                placeholder="Idade"
+                                                value={child.age || ''}
+                                                onChange={e => setChildren(prev => prev.map((c, j) => j === i ? { ...c, age: Number(e.target.value) } : c))}
+                                                className="w-24 px-4 py-3 bg-[#0d0714] border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:outline-none focus:border-holi-primary text-sm"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => setChildren(prev => prev.filter((_, j) => j !== i))}
+                                                className="p-3 text-gray-400 hover:text-red-400"
+                                                aria-label="Remover criança"
+                                            >
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </div>
+                                    ))}
+                                    <button
+                                        type="button"
+                                        onClick={() => setChildren(prev => [...prev, { name: '', age: 0 }])}
+                                        className="inline-flex items-center gap-2 px-4 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-sm font-bold text-white"
+                                    >
+                                        <Plus size={14} /> Adicionar filho
+                                    </button>
+                                </div>
+                            </div>
+                        )}
 
                         {/* SUBMIT BUTTON */}
                         <div className="pt-6 border-t border-white/10">

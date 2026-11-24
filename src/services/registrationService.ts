@@ -1,5 +1,5 @@
 import { supabase } from '../lib/supabase'
-import { Participant, RegistrationDetailed } from '../types/database'
+import { Participant, RegistrationChild, RegistrationDetailed } from '../types/database'
 
 export interface SubmitRegistrationParams {
     participantData: Partial<Participant>
@@ -10,6 +10,7 @@ export interface SubmitRegistrationParams {
     stayingOnSite?: boolean
     paymentAmount: number
     notes?: string
+    children?: RegistrationChild[]
 }
 
 export async function createEventRegistration(params: SubmitRegistrationParams) {
@@ -31,7 +32,9 @@ export async function createEventRegistration(params: SubmitRegistrationParams) 
         p_tshirt_size: params.tshirtSize || null,
         p_tshirt_size_2: params.tshirtSize2 || null,
         p_staying_on_site: params.stayingOnSite || false,
-        p_payment_amount: params.paymentAmount
+        p_payment_amount: params.paymentAmount,
+        p_notes: params.notes || null,
+        p_children: params.children || []
     })
 
     if (error) {
@@ -47,7 +50,7 @@ export async function createEventRegistration(params: SubmitRegistrationParams) 
             phone: params.participantData.phone
         },
         registration: { id: data.registration_id },
-        payment: { id: data.payment_id, amount: params.paymentAmount, status: 'Pendente' }
+        payment: { id: data.payment_id, amount: data.amount ?? params.paymentAmount, status: 'Pendente' }
     }
 }
 

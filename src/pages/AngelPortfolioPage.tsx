@@ -72,9 +72,8 @@ export const AngelPortfolioPage = () => {
             setEvents(evts)
             setRegisteredAngels(angels)
 
-            // Define evento ativo (adonai-2026 como preferencial se existir)
-            const adonai = evts.find(e => e.slug === 'adonai-2026')
-            const activeEvt = adonai || evts.find(e => e.status === 'active') || evts[0]
+            // Abre no evento ativo
+            const activeEvt = evts.find(e => e.status === 'active') || evts[0]
             if (activeEvt) {
                 setSelectedEventSlug(activeEvt.slug)
             } else {

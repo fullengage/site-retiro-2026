@@ -20,7 +20,7 @@ const Navbar = () => {
                         <div className="flex items-center space-x-1 mr-4">
                             <a href="/#sobre" className="px-3 py-2 text-gray-300 hover:text-holi-primary transition-colors font-semibold uppercase tracking-wider text-[11px] xl:text-[13px]">Sobre</a>
                             <a href="/#informacoes" className="px-3 py-2 text-gray-300 hover:text-holi-secondary transition-colors font-semibold uppercase tracking-wider text-[11px] xl:text-[13px]">Informações</a>
-                            <Link to="/cronograma" className="px-3 py-2 text-gray-300 hover:text-holi-accent transition-colors font-semibold uppercase tracking-wider text-[11px] xl:text-[13px]">Cronograma</Link>
+                            <a href="/#informacoes" className="px-3 py-2 text-gray-300 hover:text-holi-accent transition-colors font-semibold uppercase tracking-wider text-[11px] xl:text-[13px]">Cronograma</a>
                             <Link
                                 to="/galeria"
                                 className={`px-3 py-2 transition-colors font-semibold uppercase tracking-wider text-[11px] xl:text-[13px] ${
@@ -54,7 +54,7 @@ const Navbar = () => {
                 <div className="lg:hidden bg-holi-dark/95 backdrop-blur-xl border-b border-white/10 p-6 space-y-4 shadow-2xl">
                     <a href="/#sobre" className="block text-gray-300 hover:text-white font-medium py-1" onClick={() => setIsMenuOpen(false)}>Sobre</a>
                     <a href="/#informacoes" className="block text-gray-300 hover:text-white font-medium py-1" onClick={() => setIsMenuOpen(false)}>Informações</a>
-                    <Link to="/cronograma" className="block text-gray-300 hover:text-white font-medium py-1" onClick={() => setIsMenuOpen(false)}>Cronograma</Link>
+                    <a href="/#informacoes" className="block text-gray-300 hover:text-white font-medium py-1" onClick={() => setIsMenuOpen(false)}>Cronograma</a>
                     <Link
                         to="/galeria"
                         className="block text-holi-primary font-bold text-lg py-1 flex items-center justify-between"
