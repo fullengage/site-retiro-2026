@@ -1064,6 +1064,7 @@ const RegistrationAdmin = () => {
             'Camiseta 2',
             'Pernoite',
             'Filhos',
+            'Observações',
             'Status Pagamento',
             'Valor (R$)',
             'Anjo Responsável',
@@ -1090,6 +1091,7 @@ const RegistrationAdmin = () => {
             `"${r.tshirt_size_2 || ''}"`,
             `"${r.staying_on_site ? 'Sim' : 'Não'}"`,
             `"${(r.children || []).map(c => `${c.name} (${c.age})`).join('; ')}"`,
+            `"${(r.notes || '').replace(/"/g, "'").replace(/\n/g, ' | ')}"`,
             `"${r.payment?.status || 'Pendente'}"`,
             `"${r.payment?.amount || 0}"`,
             `"${r.assigned_angel || 'Não atribuído'}"`,
@@ -1889,6 +1891,9 @@ const RegistrationAdmin = () => {
                                                                 <Shirt size={12} />
                                                                 {reg.tshirt_size} {reg.tshirt_size_2 ? `+ ${reg.tshirt_size_2}` : ''}
                                                             </span>
+                                                        )}
+                                                        {reg.notes && (
+                                                            <span className="text-gray-400 text-[11px] block mt-0.5 whitespace-pre-line">{reg.notes}</span>
                                                         )}
                                                         {!!reg.children?.length && (
                                                             <span className="text-holi-accent text-[11px] block mt-0.5" title={reg.children.map(c => `${c.name} (${c.age})`).join(', ')}>

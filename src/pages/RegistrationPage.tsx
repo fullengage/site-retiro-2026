@@ -45,6 +45,7 @@ const RegistrationPage = () => {
     const [uploadingReceipt, setUploadingReceipt] = useState(false)
     const [receiptUploaded, setReceiptUploaded] = useState(false)
     const [children, setChildren] = useState<RegistrationChild[]>([])
+    const [spouse, setSpouse] = useState({ name: '', birth_date: '' })
 
     const suggestionsRef = useRef<HTMLDivElement>(null)
 
@@ -143,6 +144,7 @@ const RegistrationPage = () => {
         setFoundParticipant(null)
         setVerifiedParticipant(null)
         setChildren([])
+        setSpouse({ name: '', birth_date: '' })
         setNameSuggestions([])
         setShowSuggestions(false)
         setFormData({
@@ -235,6 +237,8 @@ const RegistrationPage = () => {
     const paymentAmount = selectedKit?.price || 50
     const needsTshirt1 = selectedKit?.includesTshirt || (selectedKit?.tshirtCount && selectedKit.tshirtCount >= 1) || formData.kit_option.includes('Camiseta')
     const needsTshirt2 = (selectedKit?.tshirtCount && selectedKit.tshirtCount >= 2) || formData.kit_option.includes('2 Camisetas')
+    // ponytail: kit de casal detectado pelo nome ("casal"), dá pra virar flag no kit se surgir outro tipo
+    const isCoupleKit = /casal/i.test(selectedKit?.name || '')
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -242,6 +246,11 @@ const RegistrationPage = () => {
 
         if (!formData.full_name || !formData.email || !formData.phone) {
             setError('Por favor, preencha todos os campos obrigatórios (Nome, E-mail e Telefone).')
+            return
+        }
+
+        if (isCoupleKit && (!spouse.name.trim() || !spouse.birth_date)) {
+            setError('Inscrição de casal: informe o nome e a data de nascimento do cônjuge.')
             return
         }
 
@@ -253,11 +262,16 @@ const RegistrationPage = () => {
             }
             const limit = new Date((event.start_date || new Date().toISOString().slice(0, 10)) + 'T12:00:00')
             limit.setFullYear(limit.getFullYear() - minAge)
-            if (new Date(formData.birth_date + 'T12:00:00') > limit) {
+            const tooYoung = (d: string) => new Date(d + 'T12:00:00') > limit
+            if (tooYoung(formData.birth_date) || (isCoupleKit && tooYoung(spouse.birth_date))) {
                 setError(`A inscrição é para maiores de ${minAge} anos. Crianças entram como filhos na inscrição do responsável.`)
                 return
             }
         }
+
+        const coupleNote = isCoupleKit
+            ? `Casal — cônjuge: ${spouse.name.trim()} (nasc. ${spouse.birth_date.split('-').reverse().join('/')})`
+            : ''
 
         const validChildren = children.filter(c => c.name.trim()).map(c => ({ name: c.name.trim(), age: Number(c.age) || 0 }))
 
@@ -290,7 +304,7 @@ const RegistrationPage = () => {
                 tshirtSize2: formData.tshirt_size_2,
                 stayingOnSite: formData.staying_on_site,
                 paymentAmount,
-                notes: formData.notes,
+                notes: [coupleNote, formData.notes].filter(Boolean).join('\n'),
                 children: validChildren
             })
 
@@ -1007,6 +1021,35 @@ const RegistrationPage = () => {
                                                 {size}
                                             </button>
                                         ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Cônjuge (kit de casal) */}
+                            {isCoupleKit && (
+                                <div className="mt-4 p-4 bg-black/40 border border-white/10 rounded-2xl grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label htmlFor="spouse_name" className="block text-[11px] uppercase tracking-wider text-gray-400 font-bold mb-2">
+                                            Nome do cônjuge *
+                                        </label>
+                                        <input
+                                            id="spouse_name"
+                                            value={spouse.name}
+                                            onChange={e => setSpouse(prev => ({ ...prev, name: e.target.value }))}
+                                            className="w-full px-4 py-3 bg-[#0d0714] border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:outline-none focus:border-holi-primary text-sm"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="spouse_birth" className="block text-[11px] uppercase tracking-wider text-gray-400 font-bold mb-2">
+                                            Nascimento do cônjuge *
+                                        </label>
+                                        <input
+                                            id="spouse_birth"
+                                            type="date"
+                                            value={spouse.birth_date}
+                                            onChange={e => setSpouse(prev => ({ ...prev, birth_date: e.target.value }))}
+                                            className="w-full px-4 py-3 bg-[#0d0714] border border-white/10 rounded-2xl text-white focus:outline-none focus:border-holi-primary text-sm"
+                                        />
                                     </div>
                                 </div>
                             )}

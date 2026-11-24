@@ -133,7 +133,8 @@ VALUES (
     '2026-12-13',
     'Comunidade Voz de Deus - NH/SP',
     'active',
-    '[{"id": "dna_adulto_30", "name": "DNA — Inscrição adulto (R$ 30,00)", "price": 30, "includesTshirt": false}]'::jsonb,
+    '[{"id": "dna_adulto_30", "name": "DNA — Inscrição adulto (R$ 30,00)", "price": 30, "includesTshirt": false},
+      {"id": "dna_casal_50", "name": "DNA — Inscrição casal (R$ 50,00)", "price": 50, "includesTshirt": false}]'::jsonb,
     (SELECT pix_info FROM events WHERE slug = 'adonai-2026'),
     '{
         "tagline": "12 e 13 de dezembro",

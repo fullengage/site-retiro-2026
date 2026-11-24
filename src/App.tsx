@@ -75,7 +75,7 @@ function AppContent() {
                             <Link to="/galeria" className="hover:text-holi-primary transition-colors">Galeria</Link>
                             <Link to="/doacoes" className="hover:text-holi-secondary transition-colors">Doações</Link>
                             <Link to="/noticias" className="hover:text-holi-accent transition-colors">Notícias</Link>
-                            <Link to="/cronograma" className="hover:text-white transition-colors">Cronograma</Link>
+                            <a href="/#informacoes" className="hover:text-white transition-colors">Cronograma</a>
                             <a href="/#sobre" className="hover:text-white transition-colors">Sobre Nós</a>
                         </div>
 

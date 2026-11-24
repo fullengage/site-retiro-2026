@@ -12,7 +12,7 @@ const Navbar = () => {
                 <div className="flex justify-between items-center h-16">
                     <Link to="/" className="flex-shrink-0 flex items-center group cursor-pointer">
                         <span className="font-marker text-lg md:text-xl lg:text-2xl tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-holi-primary via-holi-accent to-holi-secondary group-hover:animate-pulse">
-                            RETIRO <span className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">ADONAI</span> 2026
+                            RETIROS <span className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">VOZ DE DEUS</span>
                         </span>
                     </Link>
 
