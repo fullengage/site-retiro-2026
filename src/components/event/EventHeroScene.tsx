@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence, useMotionValue, useScroll, useSpring, useTransform, type MotionValue } from 'framer-motion'
 import { ArrowRight, Music2, X } from 'lucide-react'
@@ -7,6 +7,20 @@ import { ArrowRight, Music2, X } from 'lucide-react'
 // e revela uma sala 3D (CSS 3D, sem three.js) decorada com fotos, quadro de avisos e vitrola.
 // As palavras nas paredes abrem painéis com o conteúdo do evento.
 // ponytail: sala montada com planos CSS + SVG; se quiser objetos arrastáveis/modelos, aí sim three.js
+
+// Cena WebGL (three.js) carregada sob demanda só na home
+const Experience3D = lazy(() => import('./scene3d/Experience3D'))
+
+// WebGL disponível e sem "reduzir movimento" -> cena 3D; senão, a sala em CSS
+const canUse3D = () => {
+    if (typeof window === 'undefined' || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false
+    try {
+        const c = document.createElement('canvas')
+        return !!(c.getContext('webgl2') || c.getContext('webgl'))
+    } catch {
+        return false
+    }
+}
 
 export type ScenePanel = { id: string; label: string; title: ReactNode; subtitle?: string; content: ReactNode }
 export type ScenePhoto = { url: string; label?: string | null }
@@ -243,15 +257,14 @@ const Panel = ({ panels, openId, onOpen, onClose }: { panels: ScenePanel[]; open
                 transition={{ type: 'spring', stiffness: 120, damping: 22 }}
             >
                 {/* Trilho de abas */}
-                <nav className="hidden md:flex flex-col gap-1 m-6 mr-0 p-2 w-14 rounded-2xl border border-cafe-100/15 overflow-y-auto">
+                <nav className="hidden md:flex flex-col gap-1 m-6 mr-0 p-2 w-14 rounded-2xl border border-cafe-100/15 overflow-y-auto [scrollbar-width:none]">
                     {panels.map((p, i) => (
                         <button
                             key={p.id}
                             type="button"
                             onClick={() => onOpen(p.id)}
-                            className={`flex flex-col items-center gap-3 py-4 rounded-xl text-[10px] tracking-[0.3em] uppercase transition-colors ${p.id === openId ? 'bg-cafe-100 text-cafe-900' : 'text-cafe-300 hover:text-cafe-100'}`}
+                            className={`flex flex-col items-center gap-2 py-3 rounded-xl text-[10px] tracking-[0.25em] uppercase transition-colors ${p.id === openId ? 'bg-cafe-100 text-cafe-900' : 'text-cafe-300 hover:text-cafe-100'}`}
                         >
-                            <span>{String(i + 1).padStart(2, '0')}</span>
                             <span className="[writing-mode:vertical-rl] rotate-180">{p.label}</span>
                         </button>
                     ))}
@@ -273,7 +286,6 @@ const Panel = ({ panels, openId, onOpen, onClose }: { panels: ScenePanel[]; open
 
                     <AnimatePresence mode="wait">
                         <motion.div key={panel.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.35 }}>
-                            <div className="text-[10px] tracking-[0.35em] uppercase text-cafe-300 mb-2">{String(idx + 1).padStart(2, '0')} · {panel.label}</div>
                             <h2 className="font-display text-4xl md:text-6xl font-light text-cafe-100">{panel.title}</h2>
                             {panel.subtitle && <p className="font-news italic text-xl text-cafe-300 mt-2">{panel.subtitle}</p>}
                             <div className="h-px bg-cafe-100/15 my-8" />
@@ -311,6 +323,7 @@ export const EventHeroScene = (p: Props) => {
     const [openId, setOpenId] = useState<string | null>(null)
     const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end end'] })
     const hasMusic = p.hasPlaylist
+    const [use3D] = useState(canUse3D)
 
     // Mouse -> inclinação 3D (suavizada)
     const mxRaw = useMotionValue(0)
@@ -326,7 +339,11 @@ export const EventHeroScene = (p: Props) => {
     const archScale = useTransform(scrollYProgress, [0, 0.38], [1, 9])
     const archRotY = useTransform(mx, m => m * 12)
     const archRotX = useTransform(my, m => -m * 8)
-    const fadeOut = useTransform(scrollYProgress, [0, 0.18], [1, 0])
+    const fadeOut = useTransform(scrollYProgress, use3D ? [0, 0.5] : [0, 0.18], [1, 0])
+    // eco/fantasma do título (só na cena 3D): cópia deslocada em outra cor
+    const echoX = useTransform(scrollYProgress, [0, 0.5], [0, 28])
+    const echoOpacity = useTransform(scrollYProgress, [0, 0.08, 0.5], [0, 0.55, 0])
+    const overlayEvents = useTransform(scrollYProgress, v => (v > 0.45 ? 'none' : 'auto'))
     const titleY = useTransform(scrollYProgress, [0, 0.25], [0, -160])
     const titleSpread = useTransform(scrollYProgress, [0, 0.25], ['-0.01em', '0.25em'])
     const sunFill = useTransform(scrollYProgress, [0.28, 0.4], [0, 1])
@@ -336,6 +353,16 @@ export const EventHeroScene = (p: Props) => {
     return (
         <section id="sobre" ref={ref} className="relative h-[320vh]" onMouseMove={onMove}>
             <div className="sticky top-0 h-screen overflow-hidden pt-24 px-5 md:px-12">
+                {use3D && (
+                    <Suspense fallback={null}>
+                        <Experience3D
+                            progress={scrollYProgress}
+                            labels={p.panels.map(x => ({ id: x.id, label: x.label }))}
+                            photos={p.photos}
+                            onOpen={setOpenId}
+                        />
+                    </Suspense>
+                )}
                 <motion.div style={{ opacity: fadeOut }} className="flex justify-between text-[11px] tracking-[0.3em] uppercase text-cafe-500 mb-4">
                     <span className="hidden md:inline">Comunidade Voz de Deus</span>
                     <span className="md:text-right">
@@ -344,6 +371,15 @@ export const EventHeroScene = (p: Props) => {
                     </span>
                 </motion.div>
 
+                {use3D && (
+                    <motion.div
+                        aria-hidden="true"
+                        style={{ x: echoX, y: titleY, opacity: echoOpacity }}
+                        className="absolute left-5 md:left-12 top-[8.5rem] font-display font-thin uppercase text-cafe-300 leading-[0.85] text-[17vw] md:text-[10.5vw] pointer-events-none"
+                    >
+                        {p.titleMain}
+                    </motion.div>
+                )}
                 <motion.h1
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -353,11 +389,11 @@ export const EventHeroScene = (p: Props) => {
                 >
                     <motion.span style={{ opacity: fadeOut }}>
                         {p.titleMain}
-                        {p.titleYear && <span className="font-news italic normal-case font-normal tracking-normal text-cafe-500 text-[0.45em] align-top ml-3">{p.titleYear}</span>}
+                        {p.titleYear && <span className="text-cafe-500 text-[0.45em] align-top ml-3">{p.titleYear}</span>}
                     </motion.span>
                 </motion.h1>
 
-                <div className="relative grid md:grid-cols-[1fr_auto_1fr] items-end gap-6 mt-4 md:-mt-[1.5vw]">
+                <motion.div style={use3D ? { pointerEvents: overlayEvents } : undefined} className="relative grid md:grid-cols-[1fr_auto_1fr] items-end gap-6 mt-4 md:-mt-[1.5vw]">
                     <motion.div style={{ opacity: fadeOut }} className="order-2 md:order-1 md:pb-10 space-y-3">
                         {p.tagline && <p className="font-news text-3xl md:text-4xl text-cafe-900">{p.tagline}</p>}
                         {p.datesText && <p className="text-sm tracking-[0.2em] uppercase text-cafe-500">{p.datesText}</p>}
@@ -365,19 +401,24 @@ export const EventHeroScene = (p: Props) => {
                     </motion.div>
 
                     <div className="order-1 md:order-2 relative mx-auto [perspective:900px]" style={{ width: 'min(62vw, 340px, 44vh)' }}>
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.96 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 1.2, delay: p.delay + 0.2 }}
-                        >
-                            {/* origem no sol: o zoom termina dentro dele */}
+                        {use3D ? (
+                            // a porta de verdade está na cena 3D; aqui só reserva o espaço
+                            <div className="aspect-[200/260]" />
+                        ) : (
                             <motion.div
-                                className="aspect-[200/260] will-change-transform"
-                                style={{ scale: archScale, rotateY: archRotY, rotateX: archRotX, transformOrigin: '50% 73%' }}
+                                initial={{ opacity: 0, scale: 0.96 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ duration: 1.2, delay: p.delay + 0.2 }}
                             >
-                                <ArchWindow image={p.image} alt={p.eventName} />
+                                {/* origem no sol: o zoom termina dentro dele */}
+                                <motion.div
+                                    className="aspect-[200/260] will-change-transform"
+                                    style={{ scale: archScale, rotateY: archRotY, rotateX: archRotX, transformOrigin: '50% 73%' }}
+                                >
+                                    <ArchWindow image={p.image} alt={p.eventName} />
+                                </motion.div>
                             </motion.div>
-                        </motion.div>
+                        )}
                         {p.registerUrl && (
                             <motion.div style={{ opacity: fadeOut }} className="absolute -right-10 md:-right-16 bottom-6 z-10">
                                 <SpinBadge to={p.registerUrl} label={p.badgeLabel} />
@@ -388,23 +429,27 @@ export const EventHeroScene = (p: Props) => {
                     <motion.div style={{ opacity: fadeOut }} className="hidden md:block order-3 md:pb-10 md:text-right">
                         {p.description && <p className="text-cafe-700 text-lg leading-relaxed max-w-sm md:ml-auto">{p.description}</p>}
                     </motion.div>
-                </div>
-
-                <motion.div style={{ opacity: fadeOut }} className="hidden md:flex absolute bottom-6 left-12 text-[11px] tracking-[0.35em] uppercase text-cafe-500 items-center gap-3 [writing-mode:vertical-rl] rotate-180">
-                    role para entrar
-                    <span className="w-px h-8 bg-cafe-500/60 animate-pulse" />
                 </motion.div>
 
-                {/* O sol toma a tela */}
-                <motion.div style={{ opacity: sunFill }} className="absolute inset-0 bg-cafe-100 pointer-events-none" />
 
-                {/* A sala */}
-                <motion.div style={{ opacity: roomOpacity, pointerEvents: roomEvents }} className="absolute inset-0">
-                    <Room mx={mx} my={my} progress={scrollYProgress} panels={p.panels} photos={p.photos} info={p.info} onOpen={setOpenId} />
-                    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-[11px] tracking-[0.35em] uppercase text-cafe-900/70 text-center">
-                        bem-vindo à casa · toque numa parede ou num quadro
-                    </div>
-                </motion.div>
+                {use3D ? (
+                    <motion.div style={{ opacity: roomOpacity }} className="absolute bottom-6 left-1/2 -translate-x-1/2 text-[11px] tracking-[0.35em] uppercase text-cafe-900/70 text-center pointer-events-none">
+                        Toque numa palavra, num quadro ou na vitrola
+                    </motion.div>
+                ) : (
+                    <>
+                        {/* O sol toma a tela */}
+                        <motion.div style={{ opacity: sunFill }} className="absolute inset-0 bg-cafe-100 pointer-events-none" />
+
+                        {/* A sala */}
+                        <motion.div style={{ opacity: roomOpacity, pointerEvents: roomEvents }} className="absolute inset-0">
+                            <Room mx={mx} my={my} progress={scrollYProgress} panels={p.panels} photos={p.photos} info={p.info} onOpen={setOpenId} />
+                            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-[11px] tracking-[0.35em] uppercase text-cafe-900/70 text-center">
+                                Toque numa parede ou num quadro
+                            </div>
+                        </motion.div>
+                    </>
+                )}
             </div>
 
             {/* Mini player (como o da referência): abre o painel de músicas */}

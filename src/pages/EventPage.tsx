@@ -7,7 +7,16 @@ import { EventHeroScene, type ScenePanel, type ScenePhoto } from '../components/
 import { supabase } from '../lib/supabase'
 import { EventItem } from '../types/database'
 
-// Link do Spotify (playlist/álbum) -> URL do player embutido
+// Texto do banco sem travessão (— ou –): vira hífen simples
+const noDash = (t?: string) => (t || '').replace(/\s*[\u2014\u2013]\s*/g, ' - ')
+
+// Músicas da comunidade (Tribus da Cruz): tocam quando o evento não tem links próprios no admin
+const COMMUNITY_MUSIC = [
+    'https://open.spotify.com/intl-pt/album/59DDsSybNWUZ8nGBGXrqsj',
+    'https://open.spotify.com/intl-pt/artist/5S9z6eKVsdf3fZbTIRpbxI'
+].join(' ')
+
+// Link do Spotify (playlist/álbum/artista) -> URL do player embutido
 export const spotifyEmbed = (url?: string) => {
     const m = url?.match(/open\.spotify\.com\/(?:intl-[a-z]+\/)?(playlist|album|track|artist)\/([A-Za-z0-9]+)/)
     return m ? `https://open.spotify.com/embed/${m[1]}/${m[2]}?theme=0` : null
@@ -27,7 +36,7 @@ const MusicShelf = ({ embeds }: { embeds: string[] }) => {
                             onClick={() => setCurrent(i)}
                             className={`px-5 py-2.5 rounded-full text-xs uppercase tracking-[0.2em] transition-colors ${i === current ? 'bg-cafe-100 text-cafe-900' : 'border border-cafe-100/25 text-cafe-300 hover:text-cafe-100'}`}
                         >
-                            {String(i + 1).padStart(2, '0')} · {url.includes('/artist/') ? 'Artista' : url.includes('/album/') ? 'Álbum' : 'Playlist'}
+                            {url.includes('/artist/') ? 'Artista' : url.includes('/album/') ? 'Álbum' : 'Playlist'}
                         </button>
                     ))}
                 </div>
@@ -90,24 +99,17 @@ const Intro = ({ title, phrases, onDone }: { title: string; phrases: string[]; o
     )
 }
 
-const SectionHead = ({ n, total, title, kicker }: { n: number; total: number; title: string; kicker: ReactNode }) => (
-    <div className="grid md:grid-cols-[auto_1fr] gap-4 md:gap-10 items-end mb-10">
-        <div className="font-news text-cafe-700 leading-none [perspective:600px]">
-            <motion.span
-                className="inline-block text-7xl md:text-8xl origin-bottom"
-                initial={{ rotateX: 90, opacity: 0 }}
-                whileInView={{ rotateX: 0, opacity: 1 }}
-                viewport={{ once: true, amount: 0.8 }}
-                transition={{ duration: 0.9, ease: [0.2, 0.7, 0.2, 1] }}
-            >
-                {String(n).padStart(2, '0')}
-            </motion.span>
-            <span className="text-2xl md:text-3xl text-cafe-500"> / {String(total).padStart(2, '0')}</span>
-        </div>
-        <div className="border-b border-cafe-700/20 pb-3">
-            <div className="text-[11px] tracking-[0.35em] uppercase text-cafe-500 mb-1">{title}</div>
-            <h2 className="font-news text-3xl md:text-5xl text-cafe-900">{kicker}</h2>
-        </div>
+const SectionHead = ({ kicker }: { n?: number; total?: number; title?: string; kicker: ReactNode }) => (
+    <div className="mb-10 border-b border-cafe-700/20 pb-4 [perspective:700px]">
+        <motion.h2
+            className="font-news text-4xl md:text-6xl leading-[1.1] pb-1 text-cafe-900 origin-bottom"
+            initial={{ rotateX: 75, opacity: 0 }}
+            whileInView={{ rotateX: 0, opacity: 1 }}
+            viewport={{ once: true, amount: 0.8 }}
+            transition={{ duration: 0.9, ease: [0.2, 0.7, 0.2, 1] }}
+        >
+            {kicker}
+        </motion.h2>
     </div>
 )
 
@@ -180,26 +182,26 @@ export const EventPage = ({ event: initial }: { event?: EventItem }) => {
     // Quadro de avisos na parede
     const info = [
         dates.join(' e '),
-        ...schedule.map(d => [d.title, d.hours].filter(Boolean).join(' · ')),
+        ...schedule.map(d => [noDash(d.title), d.hours].filter(Boolean).join(', ')),
         event.location || '',
         minPrice !== null ? `A partir de R$ ${minPrice}` : ''
     ].filter(Boolean)
 
-    const playlists = (c.playlist_url || '').split(/\s+/).map(spotifyEmbed).filter(Boolean) as string[]
+    const playlists = (c.playlist_url || COMMUNITY_MUSIC).split(/\s+/).map(spotifyEmbed).filter(Boolean) as string[]
 
     // Painéis abertos pelas palavras da sala
     const panels: ScenePanel[] = [
         schedule.length > 0 && {
             id: 'informacoes',
             label: 'Programação',
-            title: <>Dois dias, <em className="font-news">uma casa</em></>,
-            subtitle: dates.join(' e ') + (event.location ? ` · ${event.location}` : ''),
+            title: <>Dois dias, <em className="not-italic text-cafe-300">uma casa</em></>,
+            subtitle: dates.join(' e ') + (event.location ? `, ${event.location}` : ''),
             content: (
                 <div className="divide-y divide-cafe-100/10">
                     {schedule.map(day => (
                         <div key={day.title} className="grid md:grid-cols-[16rem_1fr] gap-4 py-6">
                             <div>
-                                <h3 className="font-news text-3xl">{day.title}</h3>
+                                <h3 className="font-news text-3xl">{noDash(day.title)}</h3>
                                 {day.hours && <p className="text-[11px] tracking-[0.3em] uppercase text-cafe-300 mt-2">{day.hours}</p>}
                             </div>
                             <ul className="space-y-3">
@@ -217,10 +219,10 @@ export const EventPage = ({ event: initial }: { event?: EventItem }) => {
         c.kids_area?.enabled && {
             id: 'criancas',
             label: 'Crianças',
-            title: <>Um espaço para os <em className="font-news">pequenos</em></>,
+            title: <>Um espaço para os <em className="not-italic text-cafe-300">pequenos</em></>,
             content: (
                 <div className="grid md:grid-cols-2 gap-8 items-start">
-                    <p className="text-xl leading-relaxed text-cafe-100/90">{c.kids_area.description || 'Teremos uma área especial para os filhos dos participantes.'}</p>
+                    <p className="text-xl leading-relaxed text-cafe-100/90">{noDash(c.kids_area.description) || 'Teremos uma área especial para os filhos dos participantes.'}</p>
                     {canRegister && (
                         <Link to={registerUrl} className="inline-flex items-center gap-2 self-start px-6 py-3 rounded-full bg-cafe-100 text-cafe-900 font-bold uppercase tracking-[0.2em] text-xs">
                             Cadastrar meus filhos na inscrição <ArrowRight size={16} />
@@ -232,14 +234,14 @@ export const EventPage = ({ event: initial }: { event?: EventItem }) => {
         canRegister && event.kit_options.length > 0 && {
             id: 'inscricao',
             label: 'Inscrição',
-            title: <>Garanta <em className="font-news">sua vaga</em></>,
+            title: <>Garanta <em className="not-italic text-cafe-300">sua vaga</em></>,
             subtitle: c.min_age ? `Inscrição para maiores de ${c.min_age} anos` : undefined,
             content: (
                 <>
                     <div className="divide-y divide-cafe-100/10 border-y border-cafe-100/10 mb-10">
                         {event.kit_options.map(kit => (
                             <Link key={kit.id} to={registerUrl} className="group flex items-center justify-between gap-6 py-6 px-2 hover:bg-cafe-100/5">
-                                <span className="text-lg">{kit.name.replace(/\s*\(R\$[^)]*\)/, '')}</span>
+                                <span className="text-lg">{noDash(kit.name.replace(/\s*\(R\$[^)]*\)/, ''))}</span>
                                 <span className="flex items-center gap-4">
                                     <span className="font-news text-4xl">R$ {kit.price}</span>
                                     <ArrowRight className="text-cafe-300 transition-transform group-hover:translate-x-1" />
@@ -265,7 +267,6 @@ export const EventPage = ({ event: initial }: { event?: EventItem }) => {
                             <figure key={ph.url}>
                                 <img src={ph.url} alt={ph.label || `Foto ${i + 1}`} loading="lazy" className="w-full aspect-[4/5] object-cover rounded-sm" />
                                 <figcaption className="mt-2">
-                                    <span className="block text-[10px] tracking-[0.3em] uppercase text-cafe-500">{String(i + 1).padStart(2, '0')}</span>
                                     <span className="text-sm text-cafe-100/90">{ph.label}</span>
                                 </figcaption>
                             </figure>
@@ -278,12 +279,12 @@ export const EventPage = ({ event: initial }: { event?: EventItem }) => {
         {
             id: 'musicas',
             label: 'Músicas',
-            title: <>Na <em className="font-news">vitrola</em></>,
-            subtitle: 'A playlist do retiro — ouça antes de chegar.',
+            title: <>Na <em className="not-italic text-cafe-300">vitrola</em></>,
+            subtitle: 'Ouça antes de chegar.',
             content: playlists.length ? (
                 <MusicShelf embeds={playlists} />
             ) : (
-                <p className="font-news italic text-2xl text-cafe-300">A playlist do retiro chega em breve. 🎶</p>
+                <p className="font-news italic text-2xl text-cafe-300">A playlist do retiro chega em breve.</p>
             )
         }
     ].filter(Boolean) as ScenePanel[]
@@ -298,7 +299,7 @@ export const EventPage = ({ event: initial }: { event?: EventItem }) => {
                 titleMain={titleMain}
                 titleYear={titleYear}
                 tagline={c.tagline && <>{c.tagline.split(' ').slice(0, -1).join(' ')} <em className="text-cafe-500">{c.tagline.split(' ').slice(-1)}</em></>}
-                datesText={!c.tagline && dates.length ? dates.join(' · ') : undefined}
+                datesText={!c.tagline && dates.length ? dates.join(' e ') : undefined}
                 minAge={c.min_age}
                 description={c.description}
                 location={event.location}
@@ -306,7 +307,7 @@ export const EventPage = ({ event: initial }: { event?: EventItem }) => {
                 image={c.hero_image}
                 eventName={event.name}
                 registerUrl={canRegister ? registerUrl : undefined}
-                badgeLabel={minPrice !== null ? `Inscreva-se · R$ ${minPrice}` : 'Inscreva-se'}
+                badgeLabel={minPrice !== null ? `Inscreva-se por R$ ${minPrice}` : 'Inscreva-se'}
                 panels={panels}
                 photos={photos}
                 info={info}
@@ -331,7 +332,7 @@ export const EventPage = ({ event: initial }: { event?: EventItem }) => {
                                     transition={{ duration: 0.8, delay: i * 0.12 }}
                                 >
                                     <div>
-                                        <h3 className="font-news text-3xl text-cafe-900">{day.title}</h3>
+                                        <h3 className="font-news text-3xl text-cafe-900">{noDash(day.title)}</h3>
                                         {day.hours && <p className="text-[11px] tracking-[0.3em] uppercase text-cafe-500 mt-2">{day.hours}</p>}
                                     </div>
                                     <ul className="space-y-3">
@@ -353,7 +354,7 @@ export const EventPage = ({ event: initial }: { event?: EventItem }) => {
                     <section id="criancas" className="scroll-mt-32">
                         <SectionHead n={num('criancas')} total={sections.length} title="Crianças" kicker={<>Um espaço para os <em className="text-cafe-500">pequenos</em></>} />
                         <p className="text-xl text-cafe-700 max-w-2xl leading-relaxed">
-                            {c.kids_area?.description || 'Teremos uma área especial para os filhos dos participantes.'}
+                            {noDash(c.kids_area?.description) || 'Teremos uma área especial para os filhos dos participantes.'}
                         </p>
                     </section>
                 )}
@@ -365,7 +366,7 @@ export const EventPage = ({ event: initial }: { event?: EventItem }) => {
                         <div className="divide-y divide-cafe-700/15 border-y border-cafe-700/15 mb-12">
                             {event.kit_options.map(kit => (
                                 <Link key={kit.id} to={registerUrl} className="group flex items-center justify-between gap-6 py-6 hover:bg-cafe-300/15 transition-colors px-2">
-                                    <span className="text-lg text-cafe-900">{kit.name.replace(/\s*\(R\$[^)]*\)/, '')}</span>
+                                    <span className="text-lg text-cafe-900">{noDash(kit.name.replace(/\s*\(R\$[^)]*\)/, ''))}</span>
                                     <span className="flex items-center gap-4">
                                         <span className="font-news text-4xl text-cafe-700">R$ {kit.price}</span>
                                         <ArrowRight className="text-cafe-500 transition-transform group-hover:translate-x-1" />
