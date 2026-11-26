@@ -21,8 +21,8 @@ const smooth = (t: number) => t * t * (3 - 2 * t)
 
 const DESKTOP_PRESETS: Record<Exclude<FocusTargetId, 'overview'>, CameraPose> = {
     informacoes: {
-        position: [-2.85, 2.75, -6.2],
-        target: [-3.05, 2.85, -9.9],
+        position: [-3.35, 2.75, -6.2],
+        target: [-3.55, 2.85, -9.9],
         fov: 38,
     },
     fotos: {
@@ -49,8 +49,8 @@ const DESKTOP_PRESETS: Record<Exclude<FocusTargetId, 'overview'>, CameraPose> = 
 
 const MOBILE_PRESETS: Record<Exclude<FocusTargetId, 'overview'>, CameraPose> = {
     informacoes: {
-        position: [-2.75, 2.75, -5.6],
-        target: [-3.05, 2.85, -9.9],
+        position: [-3.25, 2.75, -5.6],
+        target: [-3.55, 2.85, -9.9],
         fov: 46,
     },
     fotos: {
@@ -95,11 +95,11 @@ export function CameraRig({
     const P1Look = useMemo(() => new THREE.Vector3(0, 1.85, -6.5), [])
 
     const overviewPos = useMemo(
-        () => new THREE.Vector3(isMobile ? 0.55 : 1.05, isMobile ? 2.25 : 2.35, isMobile ? -0.95 : -0.45),
+        () => new THREE.Vector3(isMobile ? 0.65 : 0.95, isMobile ? 2.3 : 2.35, isMobile ? -0.85 : -0.45),
         [isMobile]
     )
     const overviewLook = useMemo(
-        () => new THREE.Vector3(isMobile ? -0.1 : 0.25, isMobile ? 1.88 : 1.92, isMobile ? -7.2 : -6.8),
+        () => new THREE.Vector3(isMobile ? 0.35 : 0.2, isMobile ? 2.15 : 2.05, isMobile ? -7.4 : -7.0),
         [isMobile]
     )
 

@@ -4,6 +4,7 @@ import {
     createNoticeBoardTexture,
     getWalnutTextures,
     useCommunityLogoTexture,
+    useCroppedImageTexture,
 } from './materials'
 import { PALETTE, type FocusTargetId } from './types'
 
@@ -14,6 +15,8 @@ interface SanctuaryWallProps {
     onFocusTarget: (target: FocusTargetId, openPanel?: boolean) => void
 }
 
+const YESHUA_CROP = { sx: 0.015, sy: 0.01, sw: 0.97, sh: 0.935 }
+
 export function SanctuaryWall({
     info,
     hasSchedule,
@@ -23,6 +26,13 @@ export function SanctuaryWall({
     const walnut = useMemo(() => getWalnutTextures(), [])
     const noticeTex = useMemo(() => createNoticeBoardTexture(info), [info])
     const logoTex = useCommunityLogoTexture('/images/logo-comunidade-emblema.png', '#F5E6CC')
+    const altarTex = useCroppedImageTexture(
+        '/images/quadro-yeshua.jpg',
+        YESHUA_CROP,
+        768,
+        1344,
+        '#F6EDE0'
+    )
     const [boardHovered, setBoardHovered] = useState(false)
 
     const slats = useMemo(() => {
@@ -35,8 +45,8 @@ export function SanctuaryWall({
 
     return (
         <group>
-            {/* Nicho santuario central em madeira ripada + retroiluminacao dourada */}
-            <group position={[0.2, 0, -9.94]}>
+            {/* Nicho santuario central em madeira ripada + foto de Jesus e Nossa Senhora */}
+            <group position={[-0.25, 0, -9.94]}>
                 {/* Painel traseiro escuro quente */}
                 <mesh position={[0, 2.85, 0.02]} receiveShadow>
                     <boxGeometry args={[2.86, 5.5, 0.05]} />
@@ -67,7 +77,38 @@ export function SanctuaryWall({
                     </mesh>
                 ))}
 
-                {/* Aparador / altar baixo aos pes da cruz com velas e Biblia */}
+                {/* Quadro principal com Jesus Crucificado e Nossa Senhora no lugar da cruz */}
+                <group position={[0, 2.98, 0.1]}>
+                    {/* Moldura em nogueira */}
+                    <mesh castShadow>
+                        <boxGeometry args={[2.32, 3.86, 0.07]} />
+                        <meshStandardMaterial map={walnut.map} roughness={0.44} />
+                    </mesh>
+                    {/* Filete interno em latao */}
+                    <mesh position={[0, 0, 0.026]}>
+                        <boxGeometry args={[2.16, 3.7, 0.03]} />
+                        <meshStandardMaterial color={PALETTE.brass} metalness={0.84} roughness={0.26} />
+                    </mesh>
+                    {/* Fotografia recortada de Jesus e Nossa Senhora */}
+                    <mesh position={[0, 0, 0.044]}>
+                        <planeGeometry args={[2.08, 3.62]} />
+                        <meshStandardMaterial
+                            key={altarTex?.uuid ?? 'altar-loading'}
+                            map={altarTex}
+                            color={altarTex ? '#FFFFFF' : '#E8D8C3'}
+                            roughness={0.52}
+                            emissive="#FFE1AE"
+                            emissiveIntensity={0.08}
+                        />
+                    </mesh>
+                    {/* Luminaria de quadro em latao no topo */}
+                    <mesh position={[0, 2.02, 0.14]} rotation={[0, 0, Math.PI / 2]}>
+                        <cylinderGeometry args={[0.024, 0.024, 0.92, 12]} />
+                        <meshStandardMaterial color={PALETTE.brass} metalness={0.86} roughness={0.24} />
+                    </mesh>
+                </group>
+
+                {/* Aparador / altar baixo aos pes do quadro com velas */}
                 <mesh position={[0, 0.42, 0.22]} castShadow receiveShadow>
                     <boxGeometry args={[2.3, 0.14, 0.44]} />
                     <meshStandardMaterial
@@ -104,93 +145,55 @@ export function SanctuaryWall({
                         </group>
                     )
                 })}
+            </group>
 
-                {/* Medalhao oficial com Logo da Comunidade Voz de Deus no topo do nicho */}
-                <group position={[0, 4.48, 0.12]}>
-                    <mesh rotation={[Math.PI / 2, 0, 0]} castShadow>
-                        <cylinderGeometry args={[0.56, 0.58, 0.06, 40]} />
-                        <meshStandardMaterial color={PALETTE.espresso} roughness={0.38} />
-                    </mesh>
-                    <mesh position={[0, 0, 0.032]}>
-                        <torusGeometry args={[0.55, 0.028, 14, 48]} />
+            {/* Logo da Comunidade Voz de Deus posicionado ao lado direito do nicho */}
+            <group position={[2.38, 3.18, -9.92]}>
+                <mesh rotation={[Math.PI / 2, 0, 0]} castShadow>
+                    <cylinderGeometry args={[0.64, 0.66, 0.06, 44]} />
+                    <meshStandardMaterial color={PALETTE.espresso} roughness={0.38} />
+                </mesh>
+                <mesh position={[0, 0, 0.034]}>
+                    <torusGeometry args={[0.63, 0.03, 14, 48]} />
+                    <meshStandardMaterial
+                        color={PALETTE.brass}
+                        metalness={0.88}
+                        roughness={0.22}
+                    />
+                </mesh>
+                {logoTex && (
+                    <mesh position={[0, 0, 0.04]}>
+                        <planeGeometry args={[0.94, 0.94]} />
                         <meshStandardMaterial
-                            color={PALETTE.brass}
-                            metalness={0.88}
-                            roughness={0.22}
+                            map={logoTex}
+                            transparent
+                            emissive="#FFE1AE"
+                            emissiveIntensity={0.45}
+                            roughness={0.3}
                         />
                     </mesh>
-                    {logoTex && (
-                        <mesh position={[0, 0, 0.038]}>
-                            <planeGeometry args={[0.84, 0.84]} />
-                            <meshStandardMaterial
-                                map={logoTex}
-                                transparent
-                                emissive="#FFE1AE"
-                                emissiveIntensity={0.45}
-                                roughness={0.3}
-                            />
-                        </mesh>
-                    )}
-                    <Text
-                        position={[0, -0.74, 0.03]}
-                        fontSize={0.125}
-                        letterSpacing={0.2}
-                        color={PALETTE.cream}
-                        anchorX="center"
-                        anchorY="middle"
-                    >
-                        COMUNIDADE VOZ DE DEUS
-                    </Text>
-                </group>
-
-                {/* Cruz esculpida em madeira nogueira com filete em latao e halo quente */}
-                <group position={[0, 2.28, 0.14]}>
-                    {/* Halo traseiro suave */}
-                    <mesh position={[0, 0.25, -0.04]}>
-                        <circleGeometry args={[0.72, 36]} />
-                        <meshBasicMaterial color="#FFD696" transparent opacity={0.14} />
-                    </mesh>
-                    {/* Haste vertical */}
-                    <mesh castShadow>
-                        <boxGeometry args={[0.16, 2.15, 0.1]} />
-                        <meshStandardMaterial
-                            map={walnut.map}
-                            roughness={0.42}
-                            color="#6E4735"
-                        />
-                    </mesh>
-                    <mesh position={[0, 0, 0.055]}>
-                        <boxGeometry args={[0.045, 2.02, 0.015]} />
-                        <meshStandardMaterial
-                            color={PALETTE.brass}
-                            metalness={0.88}
-                            roughness={0.22}
-                        />
-                    </mesh>
-                    {/* Travessa horizontal */}
-                    <mesh position={[0, 0.44, 0]} castShadow>
-                        <boxGeometry args={[1.32, 0.16, 0.1]} />
-                        <meshStandardMaterial
-                            map={walnut.map}
-                            roughness={0.42}
-                            color="#6E4735"
-                        />
-                    </mesh>
-                    <mesh position={[0, 0.44, 0.055]}>
-                        <boxGeometry args={[1.22, 0.045, 0.015]} />
-                        <meshStandardMaterial
-                            color={PALETTE.brass}
-                            metalness={0.88}
-                            roughness={0.22}
-                        />
-                    </mesh>
-                </group>
+                )}
+                <Text
+                    position={[0, -0.86, 0.02]}
+                    fontSize={0.115}
+                    letterSpacing={0.18}
+                    color={PALETTE.espresso}
+                    anchorX="center"
+                    anchorY="middle"
+                >
+                    COMUNIDADE VOZ DE DEUS
+                </Text>
+                {/* Pequena luminaria de destaque em latao acima do medalhao */}
+                <mesh position={[0, 0.84, 0.14]} rotation={[0, 0, Math.PI / 2]}>
+                    <cylinderGeometry args={[0.02, 0.02, 0.56, 12]} />
+                    <meshStandardMaterial color={PALETTE.brass} metalness={0.86} roughness={0.24} />
+                </mesh>
             </group>
 
             {/* Quadro interativo de Programacao & Avisos a esquerda do nicho */}
             {hasSchedule && (
                 <group
-                    position={[-3.05, 2.85, -9.92]}
+                    position={[-3.55, 2.85, -9.92]}
                     scale={boardHovered || isInfoFocused ? 1.03 : 1}
                     onClick={e => {
                         e.stopPropagation()
@@ -209,10 +212,7 @@ export function SanctuaryWall({
                     {/* Moldura de nogueira */}
                     <mesh castShadow>
                         <boxGeometry args={[1.82, 2.22, 0.07]} />
-                        <meshStandardMaterial
-                            map={walnut.map}
-                            roughness={0.46}
-                        />
+                        <meshStandardMaterial map={walnut.map} roughness={0.46} />
                     </mesh>
                     {/* Filete interno em latao */}
                     <mesh position={[0, 0, 0.025]}>

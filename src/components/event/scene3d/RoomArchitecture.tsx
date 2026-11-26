@@ -323,9 +323,9 @@ export function RoomArchitecture({
                 </mesh>
             </group>
 
-            {/* Arandelas verticais na parede do fundo */}
-            <WallSconce position={[-1.65, 2.75, -9.96]} />
-            <WallSconce position={[2.05, 2.75, -9.96]} />
+            {/* Arandelas verticais flanqueando o nicho na parede do fundo */}
+            <WallSconce position={[-1.98, 2.75, -9.96]} />
+            <WallSconce position={[1.45, 2.75, -9.96]} />
         </group>
     )
 }

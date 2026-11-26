@@ -565,3 +565,58 @@ export function useCommunityLogoTexture(
 
     return tex
 }
+
+const croppedImageCache = new Map<string, THREE.CanvasTexture>()
+
+/**
+ * Carrega uma fotografia e realiza recorte proporcional em alta definicao para quadros 3D.
+ */
+export function useCroppedImageTexture(
+    url: string,
+    crop: { sx: number; sy: number; sw: number; sh: number },
+    outWidth = 768,
+    outHeight = 1344,
+    paperTint?: string
+): THREE.CanvasTexture | null {
+    const cacheKey = `${url}:${crop.sx}:${crop.sy}:${crop.sw}:${crop.sh}:${outWidth}x${outHeight}:${paperTint ?? ''}`
+    const [tex, setTex] = useState<THREE.CanvasTexture | null>(() => croppedImageCache.get(cacheKey) || null)
+
+    useEffect(() => {
+        if (croppedImageCache.has(cacheKey)) {
+            setTex(croppedImageCache.get(cacheKey)!)
+            return
+        }
+        let cancelled = false
+        const img = new Image()
+        img.crossOrigin = 'anonymous'
+        img.onload = () => {
+            if (cancelled) return
+            const [canvas, g] = makeCanvas(outWidth, outHeight)
+            const sx = Math.round(img.naturalWidth * crop.sx)
+            const sy = Math.round(img.naturalHeight * crop.sy)
+            const sw = Math.round(img.naturalWidth * crop.sw)
+            const sh = Math.round(img.naturalHeight * crop.sh)
+            g.drawImage(img, sx, sy, sw, sh, 0, 0, outWidth, outHeight)
+
+            if (paperTint) {
+                g.globalCompositeOperation = 'multiply'
+                g.fillStyle = paperTint
+                g.fillRect(0, 0, outWidth, outHeight)
+                g.globalCompositeOperation = 'source-over'
+            }
+
+            const out = new THREE.CanvasTexture(canvas)
+            out.colorSpace = THREE.SRGBColorSpace
+            out.anisotropy = 8
+            out.needsUpdate = true
+            croppedImageCache.set(cacheKey, out)
+            setTex(out)
+        }
+        img.src = url
+        return () => {
+            cancelled = true
+        }
+    }, [cacheKey, crop.sh, crop.sw, crop.sx, crop.sy, outHeight, outWidth, paperTint, url])
+
+    return tex
+}

@@ -165,11 +165,11 @@ export function LightingAndAtmosphere({
                 color="#FFD9A3"
             />
 
-            {/* Destaque no nicho da Cruz + Logo da Comunidade */}
+            {/* Destaque no nicho de Jesus e Nossa Senhora + Logo da Comunidade ao lado */}
             <pointLight
-                position={[0, 3.8, -8.8]}
-                intensity={12}
-                distance={9}
+                position={[0.45, 4.0, -8.5]}
+                intensity={13}
+                distance={10}
                 decay={1.8}
                 color="#FFE0AE"
             />

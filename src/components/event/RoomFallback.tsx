@@ -14,10 +14,10 @@ interface RoomFallbackProps {
 }
 
 const FALLBACK_PHOTOS: ScenePhoto[] = [
+    { url: '/images/comunidade-matriz.jpg', label: 'Comunidade Voz de Deus na Matriz' },
     { url: '/images/tendadoração2025.jpg', label: 'Oração em comunidade' },
     { url: '/images/ensaiohoje.jpeg', label: 'Partilha e acolhimento' },
     { url: '/images/ensaiohoje2.jpeg', label: 'Música e comunhão' },
-    { url: '/images/bastidores_2025.png', label: 'Serviço e bastidores' },
 ]
 
 /**
@@ -35,7 +35,7 @@ export function RoomFallback({
     onTogglePlay,
 }: RoomFallbackProps) {
     const has = (id: string) => panels.some(p => p.id === id)
-    const displayPhotos = (photos.length >= 4 ? photos : [...photos, ...FALLBACK_PHOTOS]).slice(0, 4)
+    const displayPhotos = [FALLBACK_PHOTOS[0], ...(photos.length ? photos : FALLBACK_PHOTOS.slice(1))].slice(0, 4)
 
     return (
         <div

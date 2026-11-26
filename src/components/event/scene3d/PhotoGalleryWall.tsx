@@ -7,8 +7,7 @@ const COMMUNITY_FALLBACK_PHOTOS: Scene3DPhoto[] = [
     { url: '/images/tendadoração2025.jpg', label: 'Oração em comunidade' },
     { url: '/images/ensaiohoje.jpeg', label: 'Partilha e acolhimento' },
     { url: '/images/ensaiohoje2.jpeg', label: 'Música e comunhão na sala' },
-    { url: '/images/bastidores_2025.png', label: 'Serviço e bastidores' },
-    { url: '/images/quadro-retiro.webp', label: 'Retiro em unidade' },
+    { url: '/images/comunidade-matriz.jpg', label: 'Comunidade Voz de Deus na Matriz' },
 ]
 
 export const PHOTO_SLOTS: {
@@ -19,28 +18,28 @@ export const PHOTO_SLOTS: {
 }[] = [
     // Parede esquerda (proximo a entrada, apos a janela — luz lateral quente)
     {
-        position: [-5.94, 2.95, -2.95],
+        position: [-5.94, 2.95, -3.28],
         rotation: [0, Math.PI / 2, 0],
-        size: [1.18, 1.48],
+        size: [1.06, 1.36],
         camOffset: [2.25, 0.0, 0.0],
     },
     {
-        position: [-5.94, 3.05, -1.35],
+        position: [-5.94, 3.05, -1.78],
         rotation: [0, Math.PI / 2, 0],
-        size: [1.28, 0.98],
+        size: [1.14, 0.9],
         camOffset: [2.25, 0.0, 0.0],
     },
-    // Parede do fundo, direita do nicho santuario
     {
-        position: [2.85, 3.15, -9.93],
-        rotation: [0, 0, 0],
-        size: [1.32, 1.02],
-        camOffset: [0.0, 0.0, 2.3],
+        position: [-5.94, 2.9, -0.45],
+        rotation: [0, Math.PI / 2, 0],
+        size: [0.9, 1.18],
+        camOffset: [2.25, 0.0, 0.0],
     },
+    // Parede do fundo, extremidade direita (ao lado do logo da Comunidade — proporcao 4:3)
     {
-        position: [4.55, 2.95, -9.93],
+        position: [4.42, 3.08, -9.93],
         rotation: [0, 0, 0],
-        size: [1.08, 1.38],
+        size: [1.62, 1.22],
         camOffset: [0.0, 0.0, 2.3],
     },
 ]
@@ -155,11 +154,13 @@ function FramedCommunityPhoto({
 
 export function getResolvedPhotos(photos: Scene3DPhoto[]): Scene3DPhoto[] {
     const valid = photos.filter(p => Boolean(p?.url))
-    const merged: Scene3DPhoto[] = []
-    for (let i = 0; i < PHOTO_SLOTS.length; i++) {
-        merged.push(valid[i] || COMMUNITY_FALLBACK_PHOTOS[i % COMMUNITY_FALLBACK_PHOTOS.length])
-    }
-    return merged
+    return [
+        valid[0] || COMMUNITY_FALLBACK_PHOTOS[0],
+        valid[1] || COMMUNITY_FALLBACK_PHOTOS[1],
+        valid[2] || COMMUNITY_FALLBACK_PHOTOS[2],
+        // Quadro em destaque na parede do fundo ao lado do logo: foto oficial da comunidade na Matriz
+        COMMUNITY_FALLBACK_PHOTOS[3],
+    ]
 }
 
 export function PhotoGalleryWall({
