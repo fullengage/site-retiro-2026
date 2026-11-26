@@ -10,4 +10,16 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    chunkSizeWarningLimit: 850,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'three-core': ['three'],
+          'r3f-drei': ['@react-three/fiber', '@react-three/drei'],
+          'motion-vendor': ['framer-motion'],
+        },
+      },
+    },
+  },
 })

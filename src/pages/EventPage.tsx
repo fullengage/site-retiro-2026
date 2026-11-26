@@ -312,6 +312,7 @@ export const EventPage = ({ event: initial }: { event?: EventItem }) => {
                 photos={photos}
                 info={info}
                 hasPlaylist={playlists.length > 0}
+                playlistEmbeds={playlists}
                 delay={showIntro ? 2.2 : 0}
             />
 
