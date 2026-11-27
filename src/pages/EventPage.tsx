@@ -190,12 +190,18 @@ export const EventPage = ({ event: initial }: { event?: EventItem }) => {
     const playlists = (c.playlist_url || COMMUNITY_MUSIC).split(/\s+/).map(spotifyEmbed).filter(Boolean) as string[]
 
     // Painéis abertos pelas palavras da sala
+    const scheduleSubtitle = [
+        event.location,
+        dates.length ? `${dates.join(' e ')} de ${event.year}` : '',
+        'Comunidade Voz de Deus - Novo Horizonte/SP',
+    ].filter(Boolean).join(' • ')
+
     const panels: ScenePanel[] = [
         schedule.length > 0 && {
             id: 'informacoes',
             label: 'Programação',
-            title: <>Dois dias, <em className="not-italic text-cafe-300">uma casa</em></>,
-            subtitle: dates.join(' e ') + (event.location ? `, ${event.location}` : ''),
+            title: <>Dois dias <em className="not-italic text-cafe-300">de Retiro</em></>,
+            subtitle: scheduleSubtitle,
             content: (
                 <div className="divide-y divide-cafe-100/10">
                     {schedule.map(day => (
@@ -320,7 +326,10 @@ export const EventPage = ({ event: initial }: { event?: EventItem }) => {
                 {/* PROGRAMAÇÃO */}
                 {sections.includes('programacao') && (
                     <section id="informacoes" className="scroll-mt-32">
-                        <SectionHead n={num('programacao')} total={sections.length} title="Programação" kicker={<>Dois dias, <em className="text-cafe-500">uma casa</em></>} />
+                        <SectionHead n={num('programacao')} total={sections.length} title="Programação" kicker={<>Dois dias <em className="text-cafe-500">de Retiro</em></>} />
+                        <p className="font-news italic text-lg md:text-xl text-cafe-700 -mt-5 mb-8">
+                            {scheduleSubtitle}
+                        </p>
                         <div className="divide-y divide-cafe-700/15">
                             {schedule.map((day, i) => (
                                 <motion.div
