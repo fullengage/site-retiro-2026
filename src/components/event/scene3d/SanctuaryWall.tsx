@@ -163,7 +163,7 @@ export function SanctuaryWall({
                 </mesh>
                 {logoTex && (
                     <mesh position={[0, 0, 0.04]}>
-                        <planeGeometry args={[0.94, 0.94]} />
+                        <planeGeometry args={[1.06, 1.06]} />
                         <meshStandardMaterial
                             map={logoTex}
                             transparent

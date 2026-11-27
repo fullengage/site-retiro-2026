@@ -510,7 +510,7 @@ export const EventHeroScene = (p: Props) => {
                                 <img
                                     src="/images/logo-comunidade-emblema.png"
                                     alt=""
-                                    className="w-4 h-4 rounded-full object-cover"
+                                    className="w-5 h-5 rounded-full object-contain bg-cafe-900 p-0.5"
                                 />
                                 Comunidade Voz de Deus
                             </span>
@@ -586,16 +586,7 @@ export const EventHeroScene = (p: Props) => {
                                 )}
                             </div>
 
-                            <motion.div
-                                style={{ opacity: fadeOut }}
-                                className="hidden md:block order-3 md:pb-8 md:text-right"
-                            >
-                                {p.description && (
-                                    <p className="text-cafe-900 text-base leading-relaxed max-w-xs md:ml-auto bg-cafe-100/75 backdrop-blur-sm rounded-2xl p-4 border border-cafe-700/10">
-                                        {p.description}
-                                    </p>
-                                )}
-                            </motion.div>
+                            <div className="hidden md:block order-3" aria-hidden="true" />
                         </motion.div>
                     </>
                 )}

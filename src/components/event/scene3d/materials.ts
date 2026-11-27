@@ -528,9 +528,16 @@ export function useCommunityLogoTexture(
         img.onload = () => {
             if (cancelled) return
             const size = 512
+            const pad = 24
             const [canvas, g] = makeCanvas(size, size)
             g.clearRect(0, 0, size, size)
-            g.drawImage(img, 0, 0, size, size)
+            const avail = size - pad * 2
+            const scale = Math.min(avail / img.naturalWidth, avail / img.naturalHeight)
+            const dw = Math.round(img.naturalWidth * scale)
+            const dh = Math.round(img.naturalHeight * scale)
+            const dx = Math.round((size - dw) / 2)
+            const dy = Math.round((size - dh) / 2)
+            g.drawImage(img, dx, dy, dw, dh)
 
             const imgData = g.getImageData(0, 0, size, size)
             const data = imgData.data
