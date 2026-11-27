@@ -312,11 +312,11 @@ export const EventPage = ({ event: initial }: { event?: EventItem }) => {
                 photos={photos}
                 info={info}
                 hasPlaylist={playlists.length > 0}
+                playlistEmbeds={playlists}
                 delay={showIntro ? 2.2 : 0}
             />
 
             <div className="max-w-5xl mx-auto px-5 md:px-8 mt-16 space-y-28">
-                {c.description && <p className="md:hidden text-xl text-cafe-700 leading-relaxed">{c.description}</p>}
                 {/* PROGRAMAÇÃO */}
                 {sections.includes('programacao') && (
                     <section id="informacoes" className="scroll-mt-32">
